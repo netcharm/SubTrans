@@ -126,29 +126,29 @@ namespace SubTitles
 
             for (int i = 0; i < lvItems.SelectedIndices.Count; i++)
             {
+                if (i >= lines.Length) continue;
+
                 var evt = ass.Events[lvItems.SelectedIndices[i]];
-                var line = lines[i];//.Replace("\\n", "\\");
-                var match_s = Regex.Matches(evt.Text, @"\{.*?\}", RegexOptions.IgnoreCase);
-                var match_t = Regex.Matches(line, @"\{.*?\}", RegexOptions.IgnoreCase);
-                for (int m = 0; m < match_s.Count; m++)
-                {
-                    var match = match_s[m].Value;
-                    line = line.Replace(match_t[m].Value, match);
-                }
-                evt.Translated = line.Replace("\\n", "\\N").Replace(" {", "{").Replace("} ", "}").Replace(" \\", "\\");
+                evt.Translated = lines[i];
             }
-            lvItems.Update();
+            ///lvItems.Update();
+            lvItems.Invalidate();
         }
 
         private void btnMerge_Click(object sender, EventArgs e)
         {
             SaveFileDialog dlgSave = new SaveFileDialog();
             dlgSave.DefaultExt = ".ass";
-            dlgSave.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|Text File|*.txt|All File|*.*";
+            dlgSave.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|WebVTT File|*.vtt";
             dlgSave.FilterIndex = 0;
             if (dlgSave.ShowDialog() == DialogResult.OK)
             {
-                ass.SaveTo(dlgSave.FileName, ASS.SaveOptions.Merge);
+                var flags = ASS.SaveFlags.Merge;
+                if (dlgSave.FilterIndex == 3)
+                    flags = flags | ASS.SaveFlags.SRT;
+                else if (dlgSave.FilterIndex == 4)
+                    flags = flags | ASS.SaveFlags.VTT;
+                ass.Save(dlgSave.FileName, flags);
             }
         }
 
@@ -156,11 +156,16 @@ namespace SubTitles
         {
             SaveFileDialog dlgSave = new SaveFileDialog();
             dlgSave.DefaultExt = ".ass";
-            dlgSave.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|Text File|*.txt|All File|*.*";
+            dlgSave.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|WebVTT File|*.vtt";
             dlgSave.FilterIndex = 0;
             if (dlgSave.ShowDialog() == DialogResult.OK)
             {
-                ass.SaveTo(dlgSave.FileName, ASS.SaveOptions.Replace);
+                var flags = ASS.SaveFlags.Replace;
+                if (dlgSave.FilterIndex == 3)
+                    flags = flags | ASS.SaveFlags.SRT;
+                else if (dlgSave.FilterIndex == 4)
+                    flags = flags | ASS.SaveFlags.VTT;
+                ass.Save(dlgSave.FileName, flags);
             }
         }
     }

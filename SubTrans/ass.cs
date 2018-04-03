@@ -10,8 +10,10 @@ namespace SubTitles
 {
     public class ASS
     {
-        private enum SectionOptions { ScriptInfo = 0, Styles = 1, Events = 2, Fonts = 3, Graphics = 4, Unknown = -1 };
-        public enum SaveOptions { Replace = 0, Merge = 1 };
+        private enum Sections { ScriptInfo = 0, Styles = 1, Events = 2, Fonts = 3, Graphics = 4, Unknown = -1 };
+
+        [Flags]
+        public enum SaveFlags { Replace = 0, Merge = 1, SRT = 2, VTT = 4 };
 
         public class SCRIPTINFO
         {
@@ -618,13 +620,29 @@ namespace SubTitles
                 get { return Field("Actor"); }
                 set { Field("Actor", value); }
             }
-            public string Translated;
+            private string translated = string.Empty;
+            public string Translated
+            {
+                get { return translated; }
+                set {
+                    var line = value;
+                    var match_s = Regex.Matches(Text, @"\{ *\\.*?\}", RegexOptions.IgnoreCase);
+                    var match_t = Regex.Matches(line, @"\{ *\\.*?\}", RegexOptions.IgnoreCase);
+                    for (int m = 0; m < match_s.Count; m++)
+                    {
+                        var match = match_s[m].Value;
+                        line = line.Replace(match_t[m].Value, match);
+                    }
+                    translated = line.Replace("\\ ", "\\").Replace(" \\", "\\").Replace("\\n", "\\N").Replace(" {", "{").Replace("} ", "}");
+                }
+            }
         }
 
         public SCRIPTINFO ScriptInfo = new SCRIPTINFO();
-        internal List<string> EventsRaw = new List<string>();
-        internal List<string> StylesRaw = new List<string>();
-
+        private List<string> StylesRaw = new List<string>();
+        private List<string> FontsRaw = new List<string>();
+        private List<string> GraphicsRaw = new List<string>();
+        private List<string> EventsRaw = new List<string>();
 
         private string style_format;
         private string[] style_fields;
@@ -653,7 +671,7 @@ namespace SubTitles
             set { styles = value; }
         }
 
-        internal void SetStyle(ref STYLE e, string field, string value)
+        private void SetStyle(ref STYLE e, string field, string value)
         {
             if (string.Equals(field, "Name", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -749,7 +767,7 @@ namespace SubTitles
             }
         }
 
-        internal void SetEvent(ref EVENT e, string field, string value)
+        private void SetEvent(ref EVENT e, string field, string value)
         {
             if (string.Equals(field, "Marked", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -974,12 +992,12 @@ namespace SubTitles
 
         private void ParseFont(string v)
         {
-            throw new NotImplementedException();
+            FontsRaw.Add(v);
         }
 
         private void ParseGraphic(string v)
         {
-            throw new NotImplementedException();
+            GraphicsRaw.Add(v);
         }
 
         public ASS()
@@ -1011,7 +1029,7 @@ namespace SubTitles
             if (!valid) return;
             ScriptInfo.Raw.Add(lines[0]);
 
-            SectionOptions opt = SectionOptions.ScriptInfo;
+            Sections section = Sections.ScriptInfo;
 
             for (int i = 1; i < lines.Length; i++)
             {
@@ -1021,7 +1039,7 @@ namespace SubTitles
                 valid = Regex.IsMatch(line, @"^\[v4\+* Styles\+*\]", RegexOptions.IgnoreCase);
                 if (valid)
                 {
-                    opt = SectionOptions.Styles;
+                    section = Sections.Styles;
                     StylesRaw.Add(line);
                     continue;
                 }
@@ -1029,7 +1047,7 @@ namespace SubTitles
                 valid = Regex.IsMatch(line, @"^\[Events\]", RegexOptions.IgnoreCase);
                 if (valid)
                 {
-                    opt = SectionOptions.Events;
+                    section = Sections.Events;
                     EventsRaw.Add(line);
                     continue;
                 }
@@ -1037,57 +1055,83 @@ namespace SubTitles
                 valid = Regex.IsMatch(line, @"^\[Fonts\]", RegexOptions.IgnoreCase);
                 if (valid)
                 {
-                    opt = SectionOptions.Fonts;
+                    section = Sections.Fonts;
                     continue;
                 }
 
                 valid = Regex.IsMatch(line, @"^\[Graphics\]", RegexOptions.IgnoreCase);
                 if (valid)
                 {
-                    opt = SectionOptions.Graphics;
+                    section = Sections.Graphics;
                     continue;
                 }
                 #endregion
 
-                switch (opt)
+                switch (section)
                 {
-                    case SectionOptions.ScriptInfo:
+                    case Sections.ScriptInfo:
                         ScriptInfo.Raw.Add(line);
                         ParseScriptInfo(line);
                         break;
-                    case SectionOptions.Styles:
+                    case Sections.Styles:
                         StylesRaw.Add(line);
                         ParseStyle(line);
                         break;
-                    case SectionOptions.Events:
+                    case Sections.Events:
                         EventsRaw.Add(line);
                         ParseEvent(line);
                         break;
-                    case SectionOptions.Fonts:
+                    case Sections.Fonts:
                         ParseFont(line);
                         break;
-                    case SectionOptions.Graphics:
+                    case Sections.Graphics:
                         ParseGraphic(line);
                         break;
                 }
             }
         }
 
-        public void SaveTo(string ass_file, SaveOptions option = SaveOptions.Merge)
+        public void Save(string ass_file, SaveFlags flags = SaveFlags.Merge)
         {
+            if (flags.HasFlag(SaveFlags.SRT) || flags.HasFlag(SaveFlags.VTT))
+            {
+                SaveAsSrtVtt(ass_file, flags);
+                return;
+            }
+
             StringBuilder sb = new StringBuilder();
+
+            #region Save Script Info Section
             for (int i = 0; i < ScriptInfo.Raw.Count; i++)
             {
                 sb.AppendLine(ScriptInfo.Raw[i]);
             }
-            sb.AppendLine();
+            //sb.AppendLine();
+            #endregion
 
+            #region Save Styles Section
             for (int i = 0; i < StylesRaw.Count; i++)
             {
                 sb.AppendLine(StylesRaw[i]);
             }
-            sb.AppendLine();
+            //sb.AppendLine();
+            #endregion
+            
+            #region Save Fonts Section
+            for (int i = 0; i < FontsRaw.Count; i++)
+            {
+                sb.AppendLine(FontsRaw[i]);
+            }
+            #endregion
 
+            #region Save Graphics Section
+            for (int i = 0; i < GraphicsRaw.Count; i++)
+            {
+                sb.AppendLine(GraphicsRaw[i]);
+            }
+            #endregion
+
+            #region Save Events Section
             sb.AppendLine(EventsRaw[0]);
             sb.AppendLine(EventsRaw[1]);
             for (int i = 2; i < events.Count+2; i++)
@@ -1100,15 +1144,15 @@ namespace SubTitles
                     evo.Add(evt.Field(k));
                 }
                 string line = string.Empty;
-                switch (option)
+                switch (flags)
                 {
-                    case SaveOptions.Merge:
+                    case SaveFlags.Merge:
                         if (string.IsNullOrEmpty(events[i - 2].Translated))
                             line = $"{string.Join(",", evo)},{events[i - 2].Text}";
                         else
                             line = $"{string.Join(",", evo)},{events[i - 2].Text}\\N{events[i-2].Translated}";
                         break;
-                    case SaveOptions.Replace:
+                    case SaveFlags.Replace:
                         if (string.IsNullOrEmpty(events[i - 2].Translated))
                             line = $"{string.Join(",", evo)}, {events[i - 2].Text}";
                         else
@@ -1123,8 +1167,69 @@ namespace SubTitles
                 sb.AppendLine(line);
             }
             sb.AppendLine();
+            #endregion
 
             File.WriteAllText(ass_file, sb.ToString());
         }
+
+        public void SaveAsSrtVtt(string ass_file, SaveFlags flags = SaveFlags.Merge)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            string ext = ".srt";
+
+            if (flags.HasFlag(SaveFlags.VTT))
+            {
+                ext = ".vtt";
+
+                sb.AppendLine($"WEBVTT");
+                sb.AppendLine();
+                sb.AppendLine($"video::cue {{");
+                sb.AppendLine($"  background-color: transparent;");
+                sb.AppendLine($"  color: yellow;");
+                sb.AppendLine($"}}");
+                sb.AppendLine();
+                sb.AppendLine();
+            }
+
+            for (int i = 0; i < events.Count; i++)
+            {
+                sb.AppendLine($"{i + 1}");
+                if(flags.HasFlag(SaveFlags.VTT))
+                {
+                    sb.AppendLine($"{events[i].Start.Replace(",", ".")} --> {events[i].End.Replace(",", ".")}");
+                }
+                else
+                {
+                    sb.AppendLine($"{events[i].Start.Replace(".", ",")} --> {events[i].End.Replace(".", ",")}");
+                }
+
+                string line = string.Empty;
+                if (flags.HasFlag(SaveFlags.Replace))
+                {
+                    if (string.IsNullOrEmpty(events[i].Translated))
+                        line = events[i].Text;
+                    else
+                        line = events[i].Translated;
+                }
+                else if(flags.HasFlag(SaveFlags.Replace))
+                {
+                    if (string.IsNullOrEmpty(events[i].Translated))
+                        line = events[i].Text;
+                    else
+                        line = $"{events[i].Text}\\N{events[i].Translated}";
+                }
+                var lines = line.Split(new string[] { "\\N", "\r\n", "\n\r", "\n", "\r" }, StringSplitOptions.None);
+                foreach (var l in lines)
+                {
+                    sb.AppendLine($"{Regex.Replace(l, @"\{ *\\.*?\}", "", RegexOptions.IgnoreCase)}");
+                }
+                sb.AppendLine();
+            }
+            
+            File.WriteAllText(Path.ChangeExtension(ass_file, ext), sb.ToString());
+        }
+
     }
 }
+
