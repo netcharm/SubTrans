@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SubTrans.Properties
+namespace SubTitles.Properties
 {
 
 
