@@ -28,12 +28,24 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.lvItems = new System.Windows.Forms.ListView();
             this.btnLoad = new System.Windows.Forms.Button();
             this.btnPaste = new System.Windows.Forms.Button();
             this.btnCopy = new System.Windows.Forms.Button();
             this.btnReplace = new System.Windows.Forms.Button();
             this.btnMerge = new System.Windows.Forms.Button();
+            this.cmsContext = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.tsmiCopy = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiPaste = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep0 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiMerge = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiReplace = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep1 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiLoadASS = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmsContext.SuspendLayout();
             this.SuspendLayout();
             // 
             // lvItems
@@ -54,6 +66,7 @@
             this.lvItems.DrawItem += new System.Windows.Forms.DrawListViewItemEventHandler(this.lvItems_DrawItem);
             this.lvItems.DrawSubItem += new System.Windows.Forms.DrawListViewSubItemEventHandler(this.lvItems_DrawSubItem);
             this.lvItems.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.lvItems_RetrieveVirtualItem);
+            this.lvItems.KeyUp += new System.Windows.Forms.KeyEventHandler(this.lvItems_KeyUp);
             // 
             // btnLoad
             // 
@@ -110,11 +123,85 @@
             this.btnMerge.UseVisualStyleBackColor = true;
             this.btnMerge.Click += new System.EventHandler(this.btnMerge_Click);
             // 
+            // cmsContext
+            // 
+            this.cmsContext.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsmiCopy,
+            this.tsmiPaste,
+            this.tsmiSep0,
+            this.tsmiMerge,
+            this.tsmiReplace,
+            this.tsmiSep1,
+            this.tsmiLoadASS,
+            this.tsmiSep2,
+            this.tsmiExit});
+            this.cmsContext.Name = "cmsContext";
+            this.cmsContext.Size = new System.Drawing.Size(269, 176);
+            // 
+            // tsmiCopy
+            // 
+            this.tsmiCopy.Name = "tsmiCopy";
+            this.tsmiCopy.Size = new System.Drawing.Size(268, 22);
+            this.tsmiCopy.Text = "Copy Selected Text To Clipboard";
+            this.tsmiCopy.Click += new System.EventHandler(this.btnCopy_Click);
+            // 
+            // tsmiPaste
+            // 
+            this.tsmiPaste.Name = "tsmiPaste";
+            this.tsmiPaste.Size = new System.Drawing.Size(266, 22);
+            this.tsmiPaste.Text = "Paste Translated from Clipboard";
+            this.tsmiPaste.Click += new System.EventHandler(this.btnPaste_Click);
+            // 
+            // tsmiSep0
+            // 
+            this.tsmiSep0.Name = "tsmiSep0";
+            this.tsmiSep0.Size = new System.Drawing.Size(149, 6);
+            // 
+            // tsmiMerge
+            // 
+            this.tsmiMerge.Name = "tsmiMerge";
+            this.tsmiMerge.Size = new System.Drawing.Size(266, 22);
+            this.tsmiMerge.Text = "Merge Translated To...";
+            this.tsmiMerge.Click += new System.EventHandler(this.btnMerge_Click);
+            // 
+            // tsmiReplace
+            // 
+            this.tsmiReplace.Name = "tsmiReplace";
+            this.tsmiReplace.Size = new System.Drawing.Size(266, 22);
+            this.tsmiReplace.Text = "Replace Translated To...";
+            this.tsmiReplace.Click += new System.EventHandler(this.btnReplace_Click);
+            // 
+            // tsmiSep1
+            // 
+            this.tsmiSep1.Name = "tsmiSep1";
+            this.tsmiSep1.Size = new System.Drawing.Size(149, 6);
+            // 
+            // tsmiLoadASS
+            // 
+            this.tsmiLoadASS.Name = "tsmiLoadASS";
+            this.tsmiLoadASS.Size = new System.Drawing.Size(266, 22);
+            this.tsmiLoadASS.Text = "Load ASS";
+            this.tsmiLoadASS.Click += new System.EventHandler(this.btnLoad_Click);
+            // 
+            // tsmiSep2
+            // 
+            this.tsmiSep2.Name = "tsmiSep2";
+            this.tsmiSep2.Size = new System.Drawing.Size(149, 6);
+            // 
+            // tsmiExit
+            // 
+            this.tsmiExit.Name = "tsmiExit";
+            this.tsmiExit.Size = new System.Drawing.Size(266, 22);
+            this.tsmiExit.Text = "Exit";
+            this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
+            // 
             // MainForm
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(750, 472);
+            this.ContextMenuStrip = this.cmsContext;
             this.Controls.Add(this.btnMerge);
             this.Controls.Add(this.btnReplace);
             this.Controls.Add(this.btnCopy);
@@ -125,6 +212,9 @@
             this.Name = "MainForm";
             this.Text = "Subtitle Translator";
             this.Load += new System.EventHandler(this.MainForm_Load);
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
+            this.DragOver += new System.Windows.Forms.DragEventHandler(this.MainForm_DragOver);
+            this.cmsContext.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -137,6 +227,16 @@
         private System.Windows.Forms.Button btnCopy;
         private System.Windows.Forms.Button btnReplace;
         private System.Windows.Forms.Button btnMerge;
+        private System.Windows.Forms.ContextMenuStrip cmsContext;
+        private System.Windows.Forms.ToolStripMenuItem tsmiCopy;
+        private System.Windows.Forms.ToolStripMenuItem tsmiPaste;
+        private System.Windows.Forms.ToolStripSeparator tsmiSep0;
+        private System.Windows.Forms.ToolStripMenuItem tsmiMerge;
+        private System.Windows.Forms.ToolStripMenuItem tsmiReplace;
+        private System.Windows.Forms.ToolStripSeparator tsmiSep1;
+        private System.Windows.Forms.ToolStripMenuItem tsmiLoadASS;
+        private System.Windows.Forms.ToolStripSeparator tsmiSep2;
+        private System.Windows.Forms.ToolStripMenuItem tsmiExit;
     }
 }
 

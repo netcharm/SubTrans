@@ -1006,6 +1006,22 @@ namespace SubTitles
             if (events == null) events = new List<EVENT>();
         }
 
+        public ASS(string ass)
+        {
+            if (styles == null) styles = new List<STYLE>();
+            if (events == null) events = new List<EVENT>();
+
+            Load(ass);
+        }
+
+        public ASS(string[] lines)
+        {
+            if (styles == null) styles = new List<STYLE>();
+            if (events == null) events = new List<EVENT>();
+
+            Load(lines);
+        }
+
         public void Load(string ass)
         {
             ScriptInfo.Clear();

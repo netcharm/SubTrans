@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -61,6 +62,53 @@ namespace SubTitles
             InitListView(lvItems, null);
         }
 
+        private void MainForm_DragOver(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] dragFiles = (string[])e.Data.GetData(DataFormats.FileDrop, true);
+                if (dragFiles.Length > 0)
+                {
+                    e.Effect = DragDropEffects.Copy;
+                }
+            }
+            return;
+        }
+
+        private void MainForm_DragDrop(object sender, DragEventArgs e)
+        {
+            // Determine whether string data exists in the drop data. If not, then 
+            // the drop effect reflects that the drop cannot occur. 
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                //e.Effect = DragDropEffects.Copy;
+                try
+                {
+                    string[] dragFiles = (string[])e.Data.GetData(DataFormats.FileDrop, true);
+                    if (dragFiles.Length > 0)
+                    {
+                        string dragFileName = dragFiles[0].ToString();
+                        string ext = Path.GetExtension(dragFileName).ToLower();
+
+                        string[] exts = { ".ass", ".ssa" };
+
+                        if (exts.Contains(ext))
+                        {
+                            ass.Load(dragFileName);
+                            InitListView(lvItems, ass.EventFields);
+                            lvItems.VirtualListSize = ass.Events.Count();
+                        }
+                    }
+                }
+                catch
+                {
+
+                }
+            }
+            return;
+        }
+
+
         private void lvItems_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
         {
             var evt = ass.Events[e.ItemIndex];
@@ -90,7 +138,8 @@ namespace SubTitles
         {
             OpenFileDialog dlgOpen = new OpenFileDialog();
             dlgOpen.DefaultExt = ".ass";
-            dlgOpen.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|Text File|*.txt|All File|*.*";
+            //dlgOpen.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|Text File|*.txt|All File|*.*";
+            dlgOpen.Filter = "ASS File|*.ass|SSA File|*.ssa";
             dlgOpen.FilterIndex = 0;
             if (dlgOpen.ShowDialog() == DialogResult.OK)
             {
@@ -167,6 +216,24 @@ namespace SubTitles
                     flags = flags | ASS.SaveFlags.VTT;
                 ass.Save(dlgSave.FileName, flags);
             }
+        }
+
+        private void lvItems_KeyUp(object sender, KeyEventArgs e)
+        {
+            if(e.Control && e.KeyCode == Keys.C)
+            {
+                btnCopy.PerformClick();
+            }
+            else if(e.Control && e.KeyCode == Keys.V)
+            {
+                btnPaste.PerformClick();
+            }
+
+        }
+
+        private void tsmiExit_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }
