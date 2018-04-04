@@ -206,7 +206,6 @@
             this.Controls.Add(this.btnPaste);
             this.Controls.Add(this.btnLoad);
             this.Controls.Add(this.lvItems);
-            this.DoubleBuffered = true;
             this.Name = "MainForm";
             this.Text = "Subtitle Translator";
             this.Load += new System.EventHandler(this.MainForm_Load);

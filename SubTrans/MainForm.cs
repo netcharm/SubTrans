@@ -18,6 +18,7 @@ namespace SubTitles
     {
         ASS ass = new ASS();
         Dictionary<int, ListViewItem> lvItemCache = new Dictionary<int, ListViewItem>();
+        string LastFilename = string.Empty;
 
         #region ListView Helper routines
         private const int LVM_FIRST = 4096;
@@ -110,6 +111,14 @@ namespace SubTitles
             }
         }
 
+        private void LoadSubTitle(string subtitle)
+        {
+            ass.Load(subtitle);
+            InitListView(lvItems, ass.EventFields);
+            lvItems.VirtualListSize = ass.Events.Count();
+            LastFilename = subtitle;
+        }
+
         public MainForm()
         {
             InitializeComponent();
@@ -156,9 +165,7 @@ namespace SubTitles
 
                         if (exts.Contains(ext))
                         {
-                            ass.Load(dragFileName);
-                            InitListView(lvItems, ass.EventFields);
-                            lvItems.VirtualListSize = ass.Events.Count();
+                            LoadSubTitle(dragFileName);
                         }
                     }
                 }
@@ -219,10 +226,7 @@ namespace SubTitles
             dlgOpen.FilterIndex = 0;
             if (dlgOpen.ShowDialog() == DialogResult.OK)
             {
-                ass.Load(dlgOpen.FileName);
-                lvItemCache.Clear();
-                InitListView(lvItems, ass.EventFields);
-                lvItems.VirtualListSize = ass.Events.Count();
+                LoadSubTitle(dlgOpen.FileName);
             }
         }
 
@@ -267,6 +271,8 @@ namespace SubTitles
         private void btnMerge_Click(object sender, EventArgs e)
         {
             SaveFileDialog dlgSave = new SaveFileDialog();
+            if(!string.IsNullOrEmpty(LastFilename))
+                dlgSave.InitialDirectory = Path.GetDirectoryName(LastFilename);
             dlgSave.DefaultExt = ".ass";
             dlgSave.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|WebVTT File|*.vtt";
             dlgSave.FilterIndex = 0;
@@ -284,6 +290,8 @@ namespace SubTitles
         private void btnReplace_Click(object sender, EventArgs e)
         {
             SaveFileDialog dlgSave = new SaveFileDialog();
+            if (!string.IsNullOrEmpty(LastFilename))
+                dlgSave.InitialDirectory = Path.GetDirectoryName(LastFilename);
             dlgSave.DefaultExt = ".ass";
             dlgSave.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|WebVTT File|*.vtt";
             dlgSave.FilterIndex = 0;
