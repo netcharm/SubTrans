@@ -5,6 +5,8 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -15,6 +17,60 @@ namespace SubTitles
     public partial class MainForm : Form
     {
         ASS ass = new ASS();
+        Dictionary<int, ListViewItem> lvItemCache = new Dictionary<int, ListViewItem>();
+
+        #region ListView Helper routines
+        private const int LVM_FIRST = 4096;
+
+        private const int LVM_SETITEMSTATE = LVM_FIRST + 43;
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        public struct LVITEM
+        {
+            public int mask;
+            public int iItem;
+            public int iSubItem;
+            public int state;
+            public int stateMask;
+            [MarshalAs(UnmanagedType.LPTStr)]
+            public string pszText;
+            public int cchTextMax;
+            public int iImage;
+            public IntPtr lParam;
+            public int iIndent;
+            public int iGroupId;
+            public int cColumns;
+            public IntPtr puColumns;
+        };
+
+        [DllImport("user32.dll", EntryPoint = "SendMessage", CharSet = CharSet.Auto)]
+        public static extern IntPtr SendMessageLVItem(HandleRef hWnd, int msg, int wParam, ref LVITEM lvi);
+
+        /// <summary>
+        /// Select all rows on the given listview
+        /// </summary>
+        /// <param name="listView">The listview whose items are to be selected</param>
+        public static void SelectAllItems(ListView listView)
+        {
+            //NativeMethods.SetItemState(listView, -1, 2, 2);
+            SetItemState(listView, -1, 2, 2);
+        }
+
+        /// <summary>
+        /// Set the item state on the given item
+        /// </summary>
+        /// <param name="list">The listview whose item's state is to be changed</param>
+        /// <param name="itemIndex">The index of the item to be changed</param>
+        /// <param name="mask">Which bits of the value are to be set?</param>
+        /// <param name="value">The value to be set</param>
+        public static void SetItemState(ListView listView, int itemIndex, int mask, int value)
+        {
+            LVITEM lvItem = new LVITEM();
+            lvItem.stateMask = mask;
+            lvItem.state = value;
+            SendMessageLVItem(new HandleRef(listView, listView.Handle), LVM_SETITEMSTATE, itemIndex, ref lvItem);
+        }
+        #endregion
 
         private void InitListView(ListView lv, string[] headers)
         {
@@ -36,9 +92,11 @@ namespace SubTitles
                     col.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
                     lv.Columns.Add(col);
                 }
+                lv.Columns[lv.Columns.Count - 1].Width = 640;
 
                 col = new ColumnHeader();
                 col.Text = "Translated";
+                col.Width = 640;
                 col.TextAlign = HorizontalAlignment.Left;
                 col.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
                 lv.Columns.Add(col);
@@ -60,8 +118,12 @@ namespace SubTitles
         private void MainForm_Load(object sender, EventArgs e)
         {
             InitListView(lvItems, null);
+            Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            lvItems.DoubleBuffered(true);
+            //lvItems.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
         }
 
+        #region Drag/Drop Routines
         private void MainForm_DragOver(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -107,30 +169,44 @@ namespace SubTitles
             }
             return;
         }
-
+        #endregion
 
         private void lvItems_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
         {
-            var evt = ass.Events[e.ItemIndex];
-            ListViewItem lvi = new ListViewItem();
-            //lvi.SubItems.Add(evt.Text);
-            lvi.Text = $"{e.ItemIndex + 1}";
-            for (int i=0; i< ass.EventFields.Length;i++)
+            if (lvItemCache.ContainsKey(e.ItemIndex))
             {
-                lvi.SubItems.Add(evt.Field(ass.EventFields[i]));
+                e.Item = lvItemCache[e.ItemIndex];
             }
-            lvi.SubItems.Add(evt.Translated);
+            else
+            {
+                var evt = ass.Events[e.ItemIndex];
+                ListViewItem lvi = new ListViewItem();
+                lvi.Text = $"{e.ItemIndex + 1}";
+                for (int i = 0; i < ass.EventFields.Length; i++)
+                {
+                    lvi.SubItems.Add(evt.Field(ass.EventFields[i]));
+                }
+                lvi.SubItems.Add(evt.Translated);
 
-            e.Item = lvi;
+                lvItemCache[e.ItemIndex] = lvi;
+                e.Item = lvi;
+            }
         }
 
-        private void lvItems_DrawItem(object sender, DrawListViewItemEventArgs e)
+        private void lvItems_KeyUp(object sender, KeyEventArgs e)
         {
-
-        }
-
-        private void lvItems_DrawSubItem(object sender, DrawListViewSubItemEventArgs e)
-        {
+            if (e.Control && e.KeyCode == Keys.A)
+            {
+                SelectAllItems(lvItems);
+            }
+            else if (e.Control && e.KeyCode == Keys.C)
+            {
+                btnCopy.PerformClick();
+            }
+            else if (e.Control && e.KeyCode == Keys.V)
+            {
+                btnPaste.PerformClick();
+            }
 
         }
 
@@ -144,6 +220,7 @@ namespace SubTitles
             if (dlgOpen.ShowDialog() == DialogResult.OK)
             {
                 ass.Load(dlgOpen.FileName);
+                lvItemCache.Clear();
                 InitListView(lvItems, ass.EventFields);
                 lvItems.VirtualListSize = ass.Events.Count();
             }
@@ -179,6 +256,9 @@ namespace SubTitles
 
                 var evt = ass.Events[lvItems.SelectedIndices[i]];
                 evt.Translated = lines[i];
+
+                var lvi = lvItemCache[lvItems.SelectedIndices[i]];
+                lvi.SubItems[lvi.SubItems.Count - 1].Text = evt.Translated;
             }
             ///lvItems.Update();
             lvItems.Invalidate();
@@ -218,22 +298,28 @@ namespace SubTitles
             }
         }
 
-        private void lvItems_KeyUp(object sender, KeyEventArgs e)
-        {
-            if(e.Control && e.KeyCode == Keys.C)
-            {
-                btnCopy.PerformClick();
-            }
-            else if(e.Control && e.KeyCode == Keys.V)
-            {
-                btnPaste.PerformClick();
-            }
-
-        }
-
         private void tsmiExit_Click(object sender, EventArgs e)
         {
             Close();
         }
     }
+
+    public static class DoubleBufferListView
+    {
+        /// <summary>  
+        /// 双缓冲，解决闪烁问题  
+        /// </summary>  
+        /// <param name="lv"></param>  
+        /// <param name="flag"></param>  
+        public static void DoubleBuffered(this ListView lv, bool flag)
+        {
+            if (System.Windows.Forms.SystemInformation.TerminalServerSession) return;
+
+            Type lvType = lv.GetType();
+            PropertyInfo pi = lvType.GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
+            pi.SetValue(lv, flag, null);
+        }
+    }
+
+
 }

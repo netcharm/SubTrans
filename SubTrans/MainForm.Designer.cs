@@ -36,13 +36,13 @@
             this.btnReplace = new System.Windows.Forms.Button();
             this.btnMerge = new System.Windows.Forms.Button();
             this.cmsContext = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.tsmiLoadASS = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSep0 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiCopy = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiPaste = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiSep0 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiSep1 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiMerge = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiReplace = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiSep1 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsmiLoadASS = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
             this.cmsContext.SuspendLayout();
@@ -59,19 +59,17 @@
             this.lvItems.HideSelection = false;
             this.lvItems.Location = new System.Drawing.Point(12, 12);
             this.lvItems.Name = "lvItems";
-            this.lvItems.Size = new System.Drawing.Size(725, 419);
+            this.lvItems.Size = new System.Drawing.Size(727, 420);
             this.lvItems.TabIndex = 0;
             this.lvItems.UseCompatibleStateImageBehavior = false;
             this.lvItems.View = System.Windows.Forms.View.Details;
-            this.lvItems.DrawItem += new System.Windows.Forms.DrawListViewItemEventHandler(this.lvItems_DrawItem);
-            this.lvItems.DrawSubItem += new System.Windows.Forms.DrawListViewSubItemEventHandler(this.lvItems_DrawSubItem);
             this.lvItems.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.lvItems_RetrieveVirtualItem);
             this.lvItems.KeyUp += new System.Windows.Forms.KeyEventHandler(this.lvItems_KeyUp);
             // 
             // btnLoad
             // 
             this.btnLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLoad.Location = new System.Drawing.Point(662, 441);
+            this.btnLoad.Location = new System.Drawing.Point(664, 442);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(75, 23);
             this.btnLoad.TabIndex = 1;
@@ -82,7 +80,7 @@
             // btnPaste
             // 
             this.btnPaste.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnPaste.Location = new System.Drawing.Point(93, 441);
+            this.btnPaste.Location = new System.Drawing.Point(93, 442);
             this.btnPaste.Name = "btnPaste";
             this.btnPaste.Size = new System.Drawing.Size(75, 23);
             this.btnPaste.TabIndex = 2;
@@ -93,7 +91,7 @@
             // btnCopy
             // 
             this.btnCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnCopy.Location = new System.Drawing.Point(12, 441);
+            this.btnCopy.Location = new System.Drawing.Point(12, 442);
             this.btnCopy.Name = "btnCopy";
             this.btnCopy.Size = new System.Drawing.Size(75, 23);
             this.btnCopy.TabIndex = 3;
@@ -104,7 +102,7 @@
             // btnReplace
             // 
             this.btnReplace.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnReplace.Location = new System.Drawing.Point(551, 441);
+            this.btnReplace.Location = new System.Drawing.Point(553, 442);
             this.btnReplace.Name = "btnReplace";
             this.btnReplace.Size = new System.Drawing.Size(105, 23);
             this.btnReplace.TabIndex = 4;
@@ -115,7 +113,7 @@
             // btnMerge
             // 
             this.btnMerge.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMerge.Location = new System.Drawing.Point(434, 441);
+            this.btnMerge.Location = new System.Drawing.Point(436, 442);
             this.btnMerge.Name = "btnMerge";
             this.btnMerge.Size = new System.Drawing.Size(111, 23);
             this.btnMerge.TabIndex = 5;
@@ -126,17 +124,29 @@
             // cmsContext
             // 
             this.cmsContext.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsmiLoadASS,
+            this.tsmiSep0,
             this.tsmiCopy,
             this.tsmiPaste,
-            this.tsmiSep0,
+            this.tsmiSep1,
             this.tsmiMerge,
             this.tsmiReplace,
-            this.tsmiSep1,
-            this.tsmiLoadASS,
             this.tsmiSep2,
             this.tsmiExit});
             this.cmsContext.Name = "cmsContext";
-            this.cmsContext.Size = new System.Drawing.Size(269, 176);
+            this.cmsContext.Size = new System.Drawing.Size(269, 154);
+            // 
+            // tsmiLoadASS
+            // 
+            this.tsmiLoadASS.Name = "tsmiLoadASS";
+            this.tsmiLoadASS.Size = new System.Drawing.Size(268, 22);
+            this.tsmiLoadASS.Text = "Load ASS";
+            this.tsmiLoadASS.Click += new System.EventHandler(this.btnLoad_Click);
+            // 
+            // tsmiSep0
+            // 
+            this.tsmiSep0.Name = "tsmiSep0";
+            this.tsmiSep0.Size = new System.Drawing.Size(265, 6);
             // 
             // tsmiCopy
             // 
@@ -148,50 +158,38 @@
             // tsmiPaste
             // 
             this.tsmiPaste.Name = "tsmiPaste";
-            this.tsmiPaste.Size = new System.Drawing.Size(266, 22);
+            this.tsmiPaste.Size = new System.Drawing.Size(268, 22);
             this.tsmiPaste.Text = "Paste Translated from Clipboard";
             this.tsmiPaste.Click += new System.EventHandler(this.btnPaste_Click);
             // 
-            // tsmiSep0
+            // tsmiSep1
             // 
-            this.tsmiSep0.Name = "tsmiSep0";
-            this.tsmiSep0.Size = new System.Drawing.Size(149, 6);
+            this.tsmiSep1.Name = "tsmiSep1";
+            this.tsmiSep1.Size = new System.Drawing.Size(265, 6);
             // 
             // tsmiMerge
             // 
             this.tsmiMerge.Name = "tsmiMerge";
-            this.tsmiMerge.Size = new System.Drawing.Size(266, 22);
+            this.tsmiMerge.Size = new System.Drawing.Size(268, 22);
             this.tsmiMerge.Text = "Merge Translated To...";
             this.tsmiMerge.Click += new System.EventHandler(this.btnMerge_Click);
             // 
             // tsmiReplace
             // 
             this.tsmiReplace.Name = "tsmiReplace";
-            this.tsmiReplace.Size = new System.Drawing.Size(266, 22);
+            this.tsmiReplace.Size = new System.Drawing.Size(268, 22);
             this.tsmiReplace.Text = "Replace Translated To...";
             this.tsmiReplace.Click += new System.EventHandler(this.btnReplace_Click);
-            // 
-            // tsmiSep1
-            // 
-            this.tsmiSep1.Name = "tsmiSep1";
-            this.tsmiSep1.Size = new System.Drawing.Size(149, 6);
-            // 
-            // tsmiLoadASS
-            // 
-            this.tsmiLoadASS.Name = "tsmiLoadASS";
-            this.tsmiLoadASS.Size = new System.Drawing.Size(266, 22);
-            this.tsmiLoadASS.Text = "Load ASS";
-            this.tsmiLoadASS.Click += new System.EventHandler(this.btnLoad_Click);
             // 
             // tsmiSep2
             // 
             this.tsmiSep2.Name = "tsmiSep2";
-            this.tsmiSep2.Size = new System.Drawing.Size(149, 6);
+            this.tsmiSep2.Size = new System.Drawing.Size(265, 6);
             // 
             // tsmiExit
             // 
             this.tsmiExit.Name = "tsmiExit";
-            this.tsmiExit.Size = new System.Drawing.Size(266, 22);
+            this.tsmiExit.Size = new System.Drawing.Size(268, 22);
             this.tsmiExit.Text = "Exit";
             this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
             // 
@@ -200,7 +198,7 @@
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(750, 472);
+            this.ClientSize = new System.Drawing.Size(752, 473);
             this.ContextMenuStrip = this.cmsContext;
             this.Controls.Add(this.btnMerge);
             this.Controls.Add(this.btnReplace);
