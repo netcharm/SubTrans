@@ -13,7 +13,7 @@ namespace SubTitles
         private enum Sections { ScriptInfo = 0, Styles = 1, Events = 2, Fonts = 3, Graphics = 4, Unknown = -1 };
 
         [Flags]
-        public enum SaveFlags { Replace = 0, Merge = 1, SRT = 2, VTT = 4 };
+        public enum SaveFlags { None = 0, Replace = 1, Merge = 2, SRT = 4, VTT = 8, BOM = 256 };
 
         public class SCRIPTINFO
         {
@@ -44,6 +44,7 @@ namespace SubTitles
 
             public void Clear()
             {
+                Raw.Clear();
                 Comments.Clear();
 
                 Title = string.Empty;
@@ -73,6 +74,18 @@ namespace SubTitles
 
         public class STYLE
         {
+            // Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, 
+            //         Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, 
+            //         Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+            private string[] FIELD_ALLOWED = new string[] {
+                "Name", "Fontname", "Fontsize",
+                "PrimaryColour", "SecondaryColour", "TertiaryColour", "OutlineColour", "BackColour",
+                "Bold", "Italic", "Underline", "StrikeOut",
+                "ScaleX", "ScaleY", "Spacing", "Angle", "BorderStyle", "Outline", "Shadow", "Alignment",
+                "MarginL", "MarginR", "MarginV",
+                "Encoding"
+            };
+
             private SortedDictionary<string, string> fields = new SortedDictionary<string, string>();
             public SortedDictionary<string, string> Fields
             {
@@ -81,103 +94,13 @@ namespace SubTitles
 
             public string Field(string field)
             {
+                if (string.IsNullOrEmpty(field)) return (string.Empty);
+
                 if (!fields.ContainsKey(field)) return (string.Empty);
 
-                else if (string.Equals(field, "Name", StringComparison.CurrentCultureIgnoreCase))
+                if (FIELD_ALLOWED.Contains(field, StringComparer.CurrentCultureIgnoreCase))
                 {
-                    return (fields["Name"]);
-                }
-                else if (string.Equals(field, "Fontname", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Fontname"]);
-                }
-                else if (string.Equals(field, "Fontsize", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Fontsize"]);
-                }
-                else if (string.Equals(field, "PrimaryColour", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["PrimaryColour"]);
-                }
-                else if (string.Equals(field, "SecondaryColour", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["SecondaryColour"]);
-                }
-                else if (string.Equals(field, "TertiaryColour", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["TertiaryColour"]);
-                }
-                else if (string.Equals(field, "OutlineColour", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["OutlineColour"]);
-                }
-                else if (string.Equals(field, "BackColour", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["BackColour"]);
-                }
-                else if (string.Equals(field, "Bold", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Bold"]);
-                }
-                else if (string.Equals(field, "Italic", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Italic"]);
-                }
-                else if (string.Equals(field, "Underline", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Underline"]);
-                }
-                else if (string.Equals(field, "StrikeOut", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["StrikeOut"]);
-                }
-                else if (string.Equals(field, "ScaleX", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["ScaleX"]);
-                }
-                else if (string.Equals(field, "ScaleY", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["ScaleY"]);
-                }
-                else if (string.Equals(field, "Spacing", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Spacing"]);
-                }
-                else if (string.Equals(field, "Angle", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Angle"]);
-                }
-                else if (string.Equals(field, "BorderStyle", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["BorderStyle"]);
-                }
-                else if (string.Equals(field, "Outline", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Outline"]);
-                }
-                else if (string.Equals(field, "Shadow", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Shadow"]);
-                }
-                else if (string.Equals(field, "Alignment", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Alignment"]);
-                }
-                else if (string.Equals(field, "MarginL", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["MarginL"]);
-                }
-                else if (string.Equals(field, "MarginR", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["MarginR"]);
-                }
-                else if (string.Equals(field, "MarginV", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["MarginV"]);
-                }
-                else if (string.Equals(field, "Encoding", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Encoding"]);
+                    return (fields[field]);
                 }
                 else
                 {
@@ -187,107 +110,15 @@ namespace SubTitles
 
             public void Field(string field, string value)
             {
-                if (string.Equals(field, "Name", StringComparison.CurrentCultureIgnoreCase))
+                if (string.IsNullOrEmpty(field)) return;
+
+                if (FIELD_ALLOWED.Contains(field, StringComparer.CurrentCultureIgnoreCase))
                 {
-                    fields["Name"] = value;
-                }
-                else if (string.Equals(field, "Fontname", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["Fontname"] = value;
-                }
-                else if (string.Equals(field, "Fontsize", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["Fontsize"] = value;
-                }
-                else if (string.Equals(field, "PrimaryColour", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["PrimaryColour"] = value;
-                }
-                else if (string.Equals(field, "SecondaryColour", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["SecondaryColour"] = value;
-                }
-                else if (string.Equals(field, "TertiaryColour", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["TertiaryColour"] = value;
-                }
-                else if (string.Equals(field, "OutlineColour", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["OutlineColour"] = value;
-                }
-                else if (string.Equals(field, "BackColour", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["BackColour"] = value;
-                }
-                else if (string.Equals(field, "Bold", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["Bold"] = value;
-                }
-                else if (string.Equals(field, "Italic", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["Italic"] = value;
-                }
-                else if (string.Equals(field, "Underline", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["Underline"] = value;
-                }
-                else if (string.Equals(field, "StrikeOut", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["StrikeOut"] = value;
-                }
-                else if (string.Equals(field, "ScaleX", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["ScaleX"] = value;
-                }
-                else if (string.Equals(field, "ScaleY", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["ScaleY"] = value;
-                }
-                else if (string.Equals(field, "Spacing", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["Spacing"] = value;
-                }
-                else if (string.Equals(field, "Angle", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["Angle"] = value;
-                }
-                else if (string.Equals(field, "BorderStyle", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["BorderStyle"] = value;
-                }
-                else if (string.Equals(field, "Outline", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["Outline"] = value;
-                }
-                else if (string.Equals(field, "Shadow", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["Shadow"] = value;
-                }
-                else if (string.Equals(field, "Alignment", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["Alignment"] = value;
-                }
-                else if (string.Equals(field, "MarginL", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["MarginL"] = value;
-                }
-                else if (string.Equals(field, "MarginR", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["MarginR"] = value;
-                }
-                else if (string.Equals(field, "MarginV", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["MarginV"] = value;
-                }
-                else if (string.Equals(field, "Encoding", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["Encoding"] = value;
+                    fields[field] = value;
                 }
             }
 
-            // Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, 
-            //         Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, 
-            //         Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+            #region Style Properties
             public string Raw;
             public string Name
             {
@@ -414,10 +245,20 @@ namespace SubTitles
                 get { return Field("Encoding"); }
                 set { Field("Encoding", value); }
             }
+            #endregion
         }
 
         public class EVENT
         {
+            // Format: Marked, Layer, Start, End, Style, Name,
+            //         MarginL, MarginR, MarginV, Effect, Text,
+            //         Actor, Type
+            private string[] FIELD_ALLOWED = new string[] {
+                "Marked", "Layer", "Start", "End", "Style", "Name",
+                "MarginL", "MarginR", "MarginV", "Effect", "Text",
+                "Actor", "Type"
+            };
+
             private SortedDictionary<string, string> fields = new SortedDictionary<string, string>();
             public SortedDictionary<string, string> Fields
             {
@@ -426,59 +267,13 @@ namespace SubTitles
 
             public string Field(string field)
             {
+                if(string.IsNullOrEmpty(field)) return(string.Empty);
+
                 if (!fields.ContainsKey(field)) return (string.Empty);
 
-                else if (string.Equals(field, "Marked", StringComparison.CurrentCultureIgnoreCase))
+                if (FIELD_ALLOWED.Contains(field, StringComparer.CurrentCultureIgnoreCase))
                 {
-                    return (fields["Marked"]);
-                }
-                else if (string.Equals(field, "Layer", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Layer"]);
-                }
-                else if (string.Equals(field, "Start", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Start"]);
-                }
-                else if (string.Equals(field, "End", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["End"]);
-                }
-                else if (string.Equals(field, "Style", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Style"]);
-                }
-                else if (string.Equals(field, "Name", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Name"]);
-                }
-                else if (string.Equals(field, "MarginL", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["MarginL"]);
-                }
-                else if (string.Equals(field, "MarginR", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["MarginR"]);
-                }
-                else if (string.Equals(field, "MarginV", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["MarginV"]);
-                }
-                else if (string.Equals(field, "Effect", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Effect"]);
-                }
-                else if (string.Equals(field, "Text", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Text"]);
-                }
-                else if (string.Equals(field, "Actor", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Actor"]);
-                }
-                else if (string.Equals(field, "Type", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return (fields["Type"]);
+                    return (fields[field]);
                 }
                 else
                 {
@@ -488,72 +283,15 @@ namespace SubTitles
 
             public void Field(string field, string value)
             {
-                if (string.Equals(field, "Marked", StringComparison.CurrentCultureIgnoreCase))
+                if (string.IsNullOrEmpty(field)) return;
+
+                if (FIELD_ALLOWED.Contains(field, StringComparer.CurrentCultureIgnoreCase))
                 {
-                    //this.Marked = value;
-                    fields["Marked"] = value;
-                }
-                else if (string.Equals(field, "Layer", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    //this.Layer = value;
-                    fields["Layer"] = value;
-                }
-                else if (string.Equals(field, "Start", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    //this.Start = value;
-                    fields["Start"] = value;
-                }
-                else if (string.Equals(field, "End", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    //this.End = value;
-                    fields["End"] = value;
-                }
-                else if (string.Equals(field, "Style", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    //this.Style = value;
-                    fields["Style"] = value;
-                }
-                else if (string.Equals(field, "Name", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    //this.Name = value;
-                    fields["Name"] = value;
-                }
-                else if (string.Equals(field, "MarginL", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    //this.MarginL = value;
-                    fields["MarginL"] = value;
-                }
-                else if (string.Equals(field, "MarginR", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    //this.MarginR = value;
-                    fields["MarginR"] = value;
-                }
-                else if (string.Equals(field, "MarginV", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    //this.MarginV = value;
-                    fields["MarginV"] = value;
-                }
-                else if (string.Equals(field, "Effect", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    //this.Effect = value;
-                    fields["Effect"] = value;
-                }
-                else if (string.Equals(field, "Text", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    //this.Text = value;
-                    fields["Text"] = value;
-                }
-                else if (string.Equals(field, "Actor", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    //this.Actor = value;
-                    fields["Actor"] = value;
-                }
-                else if (string.Equals(field, "Type", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    fields["Type"] = value;
+                    fields[field] = value;
                 }
             }
 
+            #region Event Properties
             public string Raw;
             public string Type
             {
@@ -636,6 +374,7 @@ namespace SubTitles
                     translated = line.Replace("\\ ", "\\").Replace(" \\", "\\").Replace("\\n", "\\N").Replace(" {", "{").Replace("} ", "}");
                 }
             }
+            #endregion
         }
 
         public SCRIPTINFO ScriptInfo = new SCRIPTINFO();
@@ -950,9 +689,6 @@ namespace SubTitles
                 {
                     event_fields[i] = event_fields[i].Trim();
                 }
-                //var el = event_fields.ToList();
-                //el.Insert(0, "Type");
-                //event_fields = el.ToArray();
             }
             else if (v.StartsWith("Dialogue:", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -1162,6 +898,9 @@ namespace SubTitles
                 string line = string.Empty;
                 switch (flags)
                 {
+                    case SaveFlags.None:
+                        line = $"{string.Join(",", evo)},{events[i - 2].Text}";
+                        break;
                     case SaveFlags.Merge:
                         if (string.IsNullOrEmpty(events[i - 2].Translated))
                             line = $"{string.Join(",", evo)},{events[i - 2].Text}";
@@ -1170,9 +909,9 @@ namespace SubTitles
                         break;
                     case SaveFlags.Replace:
                         if (string.IsNullOrEmpty(events[i - 2].Translated))
-                            line = $"{string.Join(",", evo)}, {events[i - 2].Text}";
+                            line = $"{string.Join(",", evo)},{events[i - 2].Text}";
                         else
-                            line = $"{string.Join(",", evo)}, {events[i - 2].Translated}";
+                            line = $"{string.Join(",", evo)},{events[i - 2].Translated}";
                         break;
                     default:
                         break;
@@ -1185,7 +924,7 @@ namespace SubTitles
             sb.AppendLine();
             #endregion
 
-            File.WriteAllText(ass_file, sb.ToString());
+            File.WriteAllText(ass_file, sb.ToString(), new UTF8Encoding(true));
         }
 
         public void SaveAsSrtVtt(string ass_file, SaveFlags flags = SaveFlags.Merge)
@@ -1221,14 +960,19 @@ namespace SubTitles
                 }
 
                 string line = string.Empty;
-                if (flags.HasFlag(SaveFlags.Replace))
+
+                if (flags.HasFlag(SaveFlags.None))
+                {
+                    line = events[i].Text;
+                }
+                else if (flags.HasFlag(SaveFlags.Replace))
                 {
                     if (string.IsNullOrEmpty(events[i].Translated))
                         line = events[i].Text;
                     else
                         line = events[i].Translated;
                 }
-                else if(flags.HasFlag(SaveFlags.Replace))
+                else if(flags.HasFlag(SaveFlags.Merge))
                 {
                     if (string.IsNullOrEmpty(events[i].Translated))
                         line = events[i].Text;
@@ -1243,7 +987,7 @@ namespace SubTitles
                 sb.AppendLine();
             }
             
-            File.WriteAllText(Path.ChangeExtension(ass_file, ext), sb.ToString());
+            File.WriteAllText(Path.ChangeExtension(ass_file, ext), sb.ToString(), new UTF8Encoding(true));
         }
 
     }

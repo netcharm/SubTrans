@@ -289,6 +289,7 @@ namespace SubTitles
 
         private void btnReplace_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(LastFilename) || ass == null) return;
             SaveFileDialog dlgSave = new SaveFileDialog();
             if (!string.IsNullOrEmpty(LastFilename))
                 dlgSave.InitialDirectory = Path.GetDirectoryName(LastFilename);
@@ -309,6 +310,26 @@ namespace SubTitles
         private void tsmiExit_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void tsmiSaveAs_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(LastFilename) || ass == null) return;
+            SaveFileDialog dlgSave = new SaveFileDialog();
+            if (!string.IsNullOrEmpty(LastFilename))
+                dlgSave.InitialDirectory = Path.GetDirectoryName(LastFilename);
+            dlgSave.DefaultExt = ".ass";
+            dlgSave.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|WebVTT File|*.vtt";
+            dlgSave.FilterIndex = 0;
+            if (dlgSave.ShowDialog() == DialogResult.OK)
+            {
+                var flags = ASS.SaveFlags.None;
+                if (dlgSave.FilterIndex == 3)
+                    flags = flags | ASS.SaveFlags.SRT;
+                else if (dlgSave.FilterIndex == 4)
+                    flags = flags | ASS.SaveFlags.VTT;
+                ass.Save(dlgSave.FileName, flags);
+            }
         }
     }
 

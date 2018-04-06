@@ -45,6 +45,7 @@
             this.tsmiReplace = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiSaveAs = new System.Windows.Forms.ToolStripMenuItem();
             this.cmsContext.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -129,12 +130,13 @@
             this.tsmiCopy,
             this.tsmiPaste,
             this.tsmiSep1,
+            this.tsmiSaveAs,
             this.tsmiMerge,
             this.tsmiReplace,
             this.tsmiSep2,
             this.tsmiExit});
             this.cmsContext.Name = "cmsContext";
-            this.cmsContext.Size = new System.Drawing.Size(269, 154);
+            this.cmsContext.Size = new System.Drawing.Size(269, 198);
             // 
             // tsmiLoadASS
             // 
@@ -171,14 +173,14 @@
             // 
             this.tsmiMerge.Name = "tsmiMerge";
             this.tsmiMerge.Size = new System.Drawing.Size(268, 22);
-            this.tsmiMerge.Text = "Merge Translated To...";
+            this.tsmiMerge.Text = "Merge Translated As...";
             this.tsmiMerge.Click += new System.EventHandler(this.btnMerge_Click);
             // 
             // tsmiReplace
             // 
             this.tsmiReplace.Name = "tsmiReplace";
             this.tsmiReplace.Size = new System.Drawing.Size(268, 22);
-            this.tsmiReplace.Text = "Replace Translated To...";
+            this.tsmiReplace.Text = "Replace Translated As...";
             this.tsmiReplace.Click += new System.EventHandler(this.btnReplace_Click);
             // 
             // tsmiSep2
@@ -192,6 +194,13 @@
             this.tsmiExit.Size = new System.Drawing.Size(268, 22);
             this.tsmiExit.Text = "Exit";
             this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
+            // 
+            // tsmiSaveAs
+            // 
+            this.tsmiSaveAs.Name = "tsmiSaveAs";
+            this.tsmiSaveAs.Size = new System.Drawing.Size(268, 22);
+            this.tsmiSaveAs.Text = "Save As...";
+            this.tsmiSaveAs.Click += new System.EventHandler(this.tsmiSaveAs_Click);
             // 
             // MainForm
             // 
@@ -234,6 +243,7 @@
         private System.Windows.Forms.ToolStripMenuItem tsmiLoadASS;
         private System.Windows.Forms.ToolStripSeparator tsmiSep2;
         private System.Windows.Forms.ToolStripMenuItem tsmiExit;
+        private System.Windows.Forms.ToolStripMenuItem tsmiSaveAs;
     }
 }
 
