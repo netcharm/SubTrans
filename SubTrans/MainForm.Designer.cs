@@ -41,11 +41,11 @@
             this.tsmiCopy = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiPaste = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep1 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsmiSaveAs = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiMerge = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiReplace = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiSaveAs = new System.Windows.Forms.ToolStripMenuItem();
             this.cmsContext.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -136,7 +136,7 @@
             this.tsmiSep2,
             this.tsmiExit});
             this.cmsContext.Name = "cmsContext";
-            this.cmsContext.Size = new System.Drawing.Size(269, 198);
+            this.cmsContext.Size = new System.Drawing.Size(269, 176);
             // 
             // tsmiLoadASS
             // 
@@ -169,6 +169,13 @@
             this.tsmiSep1.Name = "tsmiSep1";
             this.tsmiSep1.Size = new System.Drawing.Size(265, 6);
             // 
+            // tsmiSaveAs
+            // 
+            this.tsmiSaveAs.Name = "tsmiSaveAs";
+            this.tsmiSaveAs.Size = new System.Drawing.Size(268, 22);
+            this.tsmiSaveAs.Text = "Save As...";
+            this.tsmiSaveAs.Click += new System.EventHandler(this.tsmiSaveAs_Click);
+            // 
             // tsmiMerge
             // 
             this.tsmiMerge.Name = "tsmiMerge";
@@ -195,13 +202,6 @@
             this.tsmiExit.Text = "Exit";
             this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
             // 
-            // tsmiSaveAs
-            // 
-            this.tsmiSaveAs.Name = "tsmiSaveAs";
-            this.tsmiSaveAs.Size = new System.Drawing.Size(268, 22);
-            this.tsmiSaveAs.Text = "Save As...";
-            this.tsmiSaveAs.Click += new System.EventHandler(this.tsmiSaveAs_Click);
-            // 
             // MainForm
             // 
             this.AllowDrop = true;
@@ -215,6 +215,7 @@
             this.Controls.Add(this.btnPaste);
             this.Controls.Add(this.btnLoad);
             this.Controls.Add(this.lvItems);
+            this.MinimumSize = new System.Drawing.Size(640, 320);
             this.Name = "MainForm";
             this.Text = "Subtitle Translator";
             this.Load += new System.EventHandler(this.MainForm_Load);

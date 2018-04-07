@@ -366,7 +366,7 @@ namespace SubTitles
                     var line = value;
                     var match_s = Regex.Matches(Text, @"\{ *\\.*?\}", RegexOptions.IgnoreCase);
                     var match_t = Regex.Matches(line, @"\{ *\\.*?\}", RegexOptions.IgnoreCase);
-                    for (int m = 0; m < match_s.Count; m++)
+                    for (int m = 0; m < Math.Min(match_s.Count, match_t.Count); m++)
                     {
                         var match = match_s[m].Value;
                         line = line.Replace(match_t[m].Value, match);
@@ -890,7 +890,7 @@ namespace SubTitles
             {
                 var evt = events[i - 2];
                 var evo = new List<string>();
-                foreach (var k in EventFields)
+                foreach (var k in event_fields)
                 {
                     if (string.Equals(k, "Text", StringComparison.CurrentCultureIgnoreCase)) continue;
                     evo.Add(evt.Field(k));

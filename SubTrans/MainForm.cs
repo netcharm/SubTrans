@@ -180,6 +180,8 @@ namespace SubTitles
 
         private void lvItems_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
         {
+            if (ass == null || e.ItemIndex < 0 || e.ItemIndex >= ass.Events.Count) return;
+
             if (lvItemCache.ContainsKey(e.ItemIndex))
             {
                 e.Item = lvItemCache[e.ItemIndex];
