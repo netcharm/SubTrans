@@ -267,7 +267,7 @@ namespace SubTitles
 
             public string Field(string field)
             {
-                if (string.IsNullOrEmpty(field)) return (string.Empty);
+                if(string.IsNullOrEmpty(field)) return(string.Empty);
 
                 if (!fields.ContainsKey(field)) return (string.Empty);
 
@@ -373,8 +373,7 @@ namespace SubTitles
             public string Translated
             {
                 get { return translated; }
-                set
-                {
+                set {
                     var line = value;
                     var match_s = Regex.Matches(Text, @"\{ *\\.*?\}", RegexOptions.IgnoreCase);
                     var match_t = Regex.Matches(line, @"\{ *\\.*?\}", RegexOptions.IgnoreCase);
@@ -738,7 +737,7 @@ namespace SubTitles
             }
             //sb.AppendLine();
             #endregion
-
+            
             #region Save Fonts Section
             for (int i = 0; i < FontsRaw.Count; i++)
             {
@@ -756,7 +755,7 @@ namespace SubTitles
             #region Save Events Section
             sb.AppendLine(EventsRaw[0]);
             sb.AppendLine(EventsRaw[1]);
-            for (int i = 2; i < events.Count + 2; i++)
+            for (int i = 2; i < events.Count+2; i++)
             {
                 var evt = events[i - 2];
                 var evo = new List<string>();
@@ -776,7 +775,7 @@ namespace SubTitles
                         if (string.IsNullOrEmpty(events[i - 2].Translated))
                             line = $"{string.Join(",", evo)},{events[i - 2].Text}";
                         else
-                            line = $"{string.Join(",", evo)},{events[i - 2].Text}\\N{events[i - 2].Translated}";
+                            line = $"{string.Join(",", evo)},{events[i - 2].Text}\\N{events[i-2].Translated}";
                         break;
                     case SaveFlags.Replace:
                         if (string.IsNullOrEmpty(events[i - 2].Translated))
@@ -789,7 +788,7 @@ namespace SubTitles
                 }
                 int idx = line.IndexOf(",");
                 if (idx > 0)
-                    line = $"{line.Substring(0, idx)}: {line.Substring(idx + 1)}";
+                    line = $"{line.Substring(0, idx)}: {line.Substring(idx+1)}";
                 sb.AppendLine(line);
             }
             sb.AppendLine();
@@ -821,7 +820,7 @@ namespace SubTitles
             for (int i = 0; i < events.Count; i++)
             {
                 sb.AppendLine($"{i + 1}");
-                if (flags.HasFlag(SaveFlags.VTT))
+                if(flags.HasFlag(SaveFlags.VTT))
                 {
                     sb.AppendLine($"{events[i].Start.Replace(",", ".")} --> {events[i].End.Replace(",", ".")}");
                 }
@@ -843,7 +842,7 @@ namespace SubTitles
                     else
                         line = events[i].Translated;
                 }
-                else if (flags.HasFlag(SaveFlags.Merge))
+                else if(flags.HasFlag(SaveFlags.Merge))
                 {
                     if (string.IsNullOrEmpty(events[i].Translated))
                         line = events[i].Text;
@@ -857,7 +856,7 @@ namespace SubTitles
                 }
                 sb.AppendLine();
             }
-
+            
             File.WriteAllText(Path.ChangeExtension(ass_file, ext), sb.ToString(), new UTF8Encoding(true));
         }
 

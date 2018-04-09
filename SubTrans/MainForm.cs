@@ -143,7 +143,6 @@ namespace SubTitles
                     e.Effect = DragDropEffects.Copy;
                 }
             }
-            return;
         }
 
         private void MainForm_DragDrop(object sender, DragEventArgs e)
@@ -190,7 +189,7 @@ namespace SubTitles
             {
                 var evt = ass.Events[e.ItemIndex];
                 ListViewItem lvi = new ListViewItem();
-                lvi.Text = $"{e.ItemIndex + 1}";
+                lvi.Text = evt.ID;
                 for (int i = 0; i < ass.EventFields.Length; i++)
                 {
                     lvi.SubItems.Add(evt.Field(ass.EventFields[i]));
@@ -216,7 +215,6 @@ namespace SubTitles
             {
                 btnPaste.PerformClick();
             }
-
         }
 
         private void btnLoad_Click(object sender, EventArgs e)

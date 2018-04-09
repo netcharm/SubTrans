@@ -1,0 +1,38 @@
+﻿<Window x:Name="MainForm" x:Class="SubTitles.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SubTitles.Wpf"
+        mc:Ignorable="d"
+        Title="Suntitle Translator" Height="350" Width="525" Icon="subtitle.ico" KeyUp="MainForm_KeyUp">
+    <Grid x:Name="MainGrid" DragOver="Grid_DragOver" Drop="Grid_Drop">
+        <Grid.ContextMenu>
+            <ContextMenu HasDropShadow="True">
+                <MenuItem x:Name="cmiLoadASS" Header="Load ASS" Click="btnLoad_Click" />
+                <Separator/>
+                <MenuItem x:Name="cmiCopy" Header="Copy Selected Text To Clipboard" Click="btnCopy_Click" />
+                <MenuItem x:Name="cmiPaste" Header="Paste Translated from Clipboard" Click="btnPaste_Click" />
+                <Separator/>
+                <MenuItem x:Name="cmiSaveAs" Header="Save As..." Click="cmiSaveAs_Click" />
+                <MenuItem x:Name="cmiMerge"  Header="Merge Translated As..." Click="btnMerge_Click" />
+                <MenuItem x:Name="cmiReplace" Header="Replace Translated As..." Click="btnReplace_Click" />
+                <Separator/>
+                <MenuItem x:Name="cmiExit" Header="Exit" Click="cmiExit_Click" />
+            </ContextMenu>
+        </Grid.ContextMenu>
+        <ListView x:Name="lvItems" Margin="10,10,10,48" UseLayoutRounding="True" IsTextSearchCaseSensitive="True" AlternationCount="1" SnapsToDevicePixels="True">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Button x:Name="btnCopy" Content="Copy" HorizontalAlignment="Left" Margin="11,274,0,10" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnCopy_Click"/>
+        <Button x:Name="btnPaste" Content="Paste" HorizontalAlignment="Left" Margin="91,274,0,10" VerticalAlignment="Bottom" Width="75" RenderTransformOrigin="2.133,0.568" Height="24" Click="btnPaste_Click"/>
+        <Button x:Name="btnLoad" Content="Load ASS" HorizontalAlignment="Right" Margin="0,274,10,10" VerticalAlignment="Bottom" Width="81" Height="24" Click="btnLoad_Click"/>
+        <Button x:Name="btnReplace" Content="Replace ..." HorizontalAlignment="Right" Margin="0,274,95,10" VerticalAlignment="Bottom" Width="80" Height="24" Click="btnReplace_Click"/>
+        <Button x:Name="btnMerge" Content="Merge ..." Margin="0,274,179,10" VerticalAlignment="Bottom" Width="80" HorizontalAlignment="Right" Height="24" Click="btnMerge_Click"/>
+
+    </Grid>
+</Window>

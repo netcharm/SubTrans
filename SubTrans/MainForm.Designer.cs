@@ -35,7 +35,7 @@
             this.btnCopy = new System.Windows.Forms.Button();
             this.btnReplace = new System.Windows.Forms.Button();
             this.btnMerge = new System.Windows.Forms.Button();
-            this.cmsContext = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.cmActions = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tsmiLoadASS = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep0 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiCopy = new System.Windows.Forms.ToolStripMenuItem();
@@ -46,7 +46,7 @@
             this.tsmiReplace = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
             this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmsContext.SuspendLayout();
+            this.cmActions.SuspendLayout();
             this.SuspendLayout();
             // 
             // lvItems
@@ -122,9 +122,9 @@
             this.btnMerge.UseVisualStyleBackColor = true;
             this.btnMerge.Click += new System.EventHandler(this.btnMerge_Click);
             // 
-            // cmsContext
+            // cmActions
             // 
-            this.cmsContext.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cmActions.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsmiLoadASS,
             this.tsmiSep0,
             this.tsmiCopy,
@@ -135,8 +135,8 @@
             this.tsmiReplace,
             this.tsmiSep2,
             this.tsmiExit});
-            this.cmsContext.Name = "cmsContext";
-            this.cmsContext.Size = new System.Drawing.Size(269, 176);
+            this.cmActions.Name = "cmsContext";
+            this.cmActions.Size = new System.Drawing.Size(269, 198);
             // 
             // tsmiLoadASS
             // 
@@ -208,7 +208,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(752, 473);
-            this.ContextMenuStrip = this.cmsContext;
+            this.ContextMenuStrip = this.cmActions;
             this.Controls.Add(this.btnMerge);
             this.Controls.Add(this.btnReplace);
             this.Controls.Add(this.btnCopy);
@@ -221,7 +221,7 @@
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
             this.DragOver += new System.Windows.Forms.DragEventHandler(this.MainForm_DragOver);
-            this.cmsContext.ResumeLayout(false);
+            this.cmActions.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -234,7 +234,7 @@
         private System.Windows.Forms.Button btnCopy;
         private System.Windows.Forms.Button btnReplace;
         private System.Windows.Forms.Button btnMerge;
-        private System.Windows.Forms.ContextMenuStrip cmsContext;
+        private System.Windows.Forms.ContextMenuStrip cmActions;
         private System.Windows.Forms.ToolStripMenuItem tsmiCopy;
         private System.Windows.Forms.ToolStripMenuItem tsmiPaste;
         private System.Windows.Forms.ToolStripSeparator tsmiSep0;
