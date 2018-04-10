@@ -307,12 +307,7 @@ namespace SubTitles
             }
         }
 
-        private void tsmiExit_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
-
-        private void tsmiSaveAs_Click(object sender, EventArgs e)
+        private void cmiSaveAs_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(LastFilename) || ass == null) return;
             SaveFileDialog dlgSave = new SaveFileDialog();
@@ -330,6 +325,11 @@ namespace SubTitles
                     flags = flags | ASS.SaveFlags.VTT;
                 ass.Save(dlgSave.FileName, flags);
             }
+        }
+
+        private void cmiExit_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 

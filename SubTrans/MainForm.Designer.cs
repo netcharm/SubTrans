@@ -36,16 +36,16 @@
             this.btnReplace = new System.Windows.Forms.Button();
             this.btnMerge = new System.Windows.Forms.Button();
             this.cmActions = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.tsmiLoadASS = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiLoadASS = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep0 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsmiCopy = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiPaste = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiCopy = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiPaste = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep1 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsmiSaveAs = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiMerge = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiReplace = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiSaveAs = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiMerge = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiReplace = new System.Windows.Forms.ToolStripMenuItem();
             this.tsmiSep2 = new System.Windows.Forms.ToolStripSeparator();
-            this.tsmiExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmiExit = new System.Windows.Forms.ToolStripMenuItem();
             this.cmActions.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -125,82 +125,82 @@
             // cmActions
             // 
             this.cmActions.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tsmiLoadASS,
+            this.cmiLoadASS,
             this.tsmiSep0,
-            this.tsmiCopy,
-            this.tsmiPaste,
+            this.cmiCopy,
+            this.cmiPaste,
             this.tsmiSep1,
-            this.tsmiSaveAs,
-            this.tsmiMerge,
-            this.tsmiReplace,
+            this.cmiSaveAs,
+            this.cmiMerge,
+            this.cmiReplace,
             this.tsmiSep2,
-            this.tsmiExit});
+            this.cmiExit});
             this.cmActions.Name = "cmsContext";
             this.cmActions.Size = new System.Drawing.Size(269, 198);
             // 
-            // tsmiLoadASS
+            // cmiLoadASS
             // 
-            this.tsmiLoadASS.Name = "tsmiLoadASS";
-            this.tsmiLoadASS.Size = new System.Drawing.Size(268, 22);
-            this.tsmiLoadASS.Text = "Load ASS";
-            this.tsmiLoadASS.Click += new System.EventHandler(this.btnLoad_Click);
+            this.cmiLoadASS.Name = "cmiLoadASS";
+            this.cmiLoadASS.Size = new System.Drawing.Size(268, 22);
+            this.cmiLoadASS.Text = "Load ASS";
+            this.cmiLoadASS.Click += new System.EventHandler(this.btnLoad_Click);
             // 
             // tsmiSep0
             // 
             this.tsmiSep0.Name = "tsmiSep0";
             this.tsmiSep0.Size = new System.Drawing.Size(265, 6);
             // 
-            // tsmiCopy
+            // cmiCopy
             // 
-            this.tsmiCopy.Name = "tsmiCopy";
-            this.tsmiCopy.Size = new System.Drawing.Size(268, 22);
-            this.tsmiCopy.Text = "Copy Selected Text To Clipboard";
-            this.tsmiCopy.Click += new System.EventHandler(this.btnCopy_Click);
+            this.cmiCopy.Name = "cmiCopy";
+            this.cmiCopy.Size = new System.Drawing.Size(268, 22);
+            this.cmiCopy.Text = "Copy Selected Text To Clipboard";
+            this.cmiCopy.Click += new System.EventHandler(this.btnCopy_Click);
             // 
-            // tsmiPaste
+            // cmiPaste
             // 
-            this.tsmiPaste.Name = "tsmiPaste";
-            this.tsmiPaste.Size = new System.Drawing.Size(268, 22);
-            this.tsmiPaste.Text = "Paste Translated from Clipboard";
-            this.tsmiPaste.Click += new System.EventHandler(this.btnPaste_Click);
+            this.cmiPaste.Name = "cmiPaste";
+            this.cmiPaste.Size = new System.Drawing.Size(268, 22);
+            this.cmiPaste.Text = "Paste Translated from Clipboard";
+            this.cmiPaste.Click += new System.EventHandler(this.btnPaste_Click);
             // 
             // tsmiSep1
             // 
             this.tsmiSep1.Name = "tsmiSep1";
             this.tsmiSep1.Size = new System.Drawing.Size(265, 6);
             // 
-            // tsmiSaveAs
+            // cmiSaveAs
             // 
-            this.tsmiSaveAs.Name = "tsmiSaveAs";
-            this.tsmiSaveAs.Size = new System.Drawing.Size(268, 22);
-            this.tsmiSaveAs.Text = "Save As...";
-            this.tsmiSaveAs.Click += new System.EventHandler(this.tsmiSaveAs_Click);
+            this.cmiSaveAs.Name = "cmiSaveAs";
+            this.cmiSaveAs.Size = new System.Drawing.Size(268, 22);
+            this.cmiSaveAs.Text = "Save As...";
+            this.cmiSaveAs.Click += new System.EventHandler(this.cmiSaveAs_Click);
             // 
-            // tsmiMerge
+            // cmiMerge
             // 
-            this.tsmiMerge.Name = "tsmiMerge";
-            this.tsmiMerge.Size = new System.Drawing.Size(268, 22);
-            this.tsmiMerge.Text = "Merge Translated As...";
-            this.tsmiMerge.Click += new System.EventHandler(this.btnMerge_Click);
+            this.cmiMerge.Name = "cmiMerge";
+            this.cmiMerge.Size = new System.Drawing.Size(268, 22);
+            this.cmiMerge.Text = "Merge Translated As...";
+            this.cmiMerge.Click += new System.EventHandler(this.btnMerge_Click);
             // 
-            // tsmiReplace
+            // cmiReplace
             // 
-            this.tsmiReplace.Name = "tsmiReplace";
-            this.tsmiReplace.Size = new System.Drawing.Size(268, 22);
-            this.tsmiReplace.Text = "Replace Translated As...";
-            this.tsmiReplace.Click += new System.EventHandler(this.btnReplace_Click);
+            this.cmiReplace.Name = "cmiReplace";
+            this.cmiReplace.Size = new System.Drawing.Size(268, 22);
+            this.cmiReplace.Text = "Replace Translated As...";
+            this.cmiReplace.Click += new System.EventHandler(this.btnReplace_Click);
             // 
             // tsmiSep2
             // 
             this.tsmiSep2.Name = "tsmiSep2";
             this.tsmiSep2.Size = new System.Drawing.Size(265, 6);
             // 
-            // tsmiExit
+            // cmiExit
             // 
-            this.tsmiExit.Name = "tsmiExit";
-            this.tsmiExit.Size = new System.Drawing.Size(268, 22);
-            this.tsmiExit.Text = "Exit";
-            this.tsmiExit.Click += new System.EventHandler(this.tsmiExit_Click);
+            this.cmiExit.Name = "cmiExit";
+            this.cmiExit.Size = new System.Drawing.Size(268, 22);
+            this.cmiExit.Text = "Exit";
+            this.cmiExit.Click += new System.EventHandler(this.cmiExit_Click);
             // 
             // MainForm
             // 
@@ -235,16 +235,16 @@
         private System.Windows.Forms.Button btnReplace;
         private System.Windows.Forms.Button btnMerge;
         private System.Windows.Forms.ContextMenuStrip cmActions;
-        private System.Windows.Forms.ToolStripMenuItem tsmiCopy;
-        private System.Windows.Forms.ToolStripMenuItem tsmiPaste;
+        private System.Windows.Forms.ToolStripMenuItem cmiCopy;
+        private System.Windows.Forms.ToolStripMenuItem cmiPaste;
         private System.Windows.Forms.ToolStripSeparator tsmiSep0;
-        private System.Windows.Forms.ToolStripMenuItem tsmiMerge;
-        private System.Windows.Forms.ToolStripMenuItem tsmiReplace;
+        private System.Windows.Forms.ToolStripMenuItem cmiMerge;
+        private System.Windows.Forms.ToolStripMenuItem cmiReplace;
         private System.Windows.Forms.ToolStripSeparator tsmiSep1;
-        private System.Windows.Forms.ToolStripMenuItem tsmiLoadASS;
+        private System.Windows.Forms.ToolStripMenuItem cmiLoadASS;
         private System.Windows.Forms.ToolStripSeparator tsmiSep2;
-        private System.Windows.Forms.ToolStripMenuItem tsmiExit;
-        private System.Windows.Forms.ToolStripMenuItem tsmiSaveAs;
+        private System.Windows.Forms.ToolStripMenuItem cmiExit;
+        private System.Windows.Forms.ToolStripMenuItem cmiSaveAs;
     }
 }
 

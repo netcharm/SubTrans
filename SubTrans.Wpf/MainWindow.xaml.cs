@@ -30,12 +30,11 @@ namespace SubTitles
 
         private void InitListView(ListView lv, string[] headers)
         {
+            lv.Items.Clear();
+            GridView gv = (GridView)lv.View;
+            gv.Columns.Clear();
             if (headers != null)
             {
-                lv.Items.Clear();
-
-                GridView gv = new GridView();
-
                 var col = new GridViewColumn();
                 col.Header = "ID";
                 col.DisplayMemberBinding = new Binding(col.Header.ToString());
@@ -55,12 +54,6 @@ namespace SubTitles
                 col.DisplayMemberBinding = new Binding(col.Header.ToString());
                 col.Width = 640;
                 gv.Columns.Add(col);
-
-                lv.View = gv;
-            }
-            else
-            {
-                lv.View = null;
             }
         }
 
@@ -69,7 +62,7 @@ namespace SubTitles
             ass.Load(subtitle);
             InitListView(lvItems, ass.EventFields);
             LastFilename = subtitle;
-            for(int i = 0; i < ass.Events.Count; i++)
+            for (int i = 0; i < ass.Events.Count; i++)
             {
                 lvItems.Items.Add(ass.Events[i]);
             }
@@ -82,6 +75,7 @@ namespace SubTitles
             MainGrid.AllowDrop = true;
         }
 
+        #region Drag/Drop Routines
         private void Grid_DragOver(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -122,6 +116,41 @@ namespace SubTitles
                 {
 
                 }
+            }
+        }
+        #endregion
+
+        private void MainForm_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftCtrl))//|| Keyboard.IsKeyDown(Key.RightCtrl))
+            {
+                if (e.Key == Key.C)
+                {
+                    //typeof(System.Windows.Controls.Primitives.ButtonBase).GetMethod("OnClick", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(btnCopy, new object[0]);
+                    ButtonAutomationPeer peer = new ButtonAutomationPeer(btnCopy);
+                    IInvokeProvider invokeProv = peer.GetPattern(PatternInterface.Invoke) as IInvokeProvider;
+                    invokeProv.Invoke();
+                }
+                else if (e.Key == Key.V)
+                {
+                    //typeof(System.Windows.Controls.Primitives.ButtonBase).GetMethod("OnClick", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(btnPaste, new object[0]);
+                    ButtonAutomationPeer peer = new ButtonAutomationPeer(btnPaste);
+                    IInvokeProvider invokeProv = peer.GetPattern(PatternInterface.Invoke) as IInvokeProvider;
+                    invokeProv.Invoke();
+                }
+            }
+        }
+
+        private void btnLoad_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dlgOpen = new OpenFileDialog();
+            dlgOpen.DefaultExt = ".ass";
+            //dlgOpen.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|Text File|*.txt|All File|*.*";
+            dlgOpen.Filter = "ASS File|*.ass|SSA File|*.ssa";
+            dlgOpen.FilterIndex = 0;
+            if (dlgOpen.ShowDialog() == true)
+            {
+                LoadSubTitle(dlgOpen.FileName);
             }
         }
 
@@ -204,19 +233,6 @@ namespace SubTitles
             }
         }
 
-        private void btnLoad_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog dlgOpen = new OpenFileDialog();
-            dlgOpen.DefaultExt = ".ass";
-            //dlgOpen.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|Text File|*.txt|All File|*.*";
-            dlgOpen.Filter = "ASS File|*.ass|SSA File|*.ssa";
-            dlgOpen.FilterIndex = 0;
-            if (dlgOpen.ShowDialog() == true)
-            {
-                LoadSubTitle(dlgOpen.FileName);
-            }
-        }
-
         private void cmiSaveAs_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(LastFilename) || ass == null) return;
@@ -242,23 +258,5 @@ namespace SubTitles
             Close();
         }
 
-        private void MainForm_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) )//|| Keyboard.IsKeyDown(Key.RightCtrl))
-            {
-                if (e.Key == Key.C)
-                {
-                    ButtonAutomationPeer peer = new ButtonAutomationPeer(btnCopy);
-                    IInvokeProvider invokeProv = peer.GetPattern(PatternInterface.Invoke) as IInvokeProvider;
-                    invokeProv.Invoke();
-                }
-                else if (e.Key == Key.V)
-                {
-                    ButtonAutomationPeer peer = new ButtonAutomationPeer(btnPaste);
-                    IInvokeProvider invokeProv = peer.GetPattern(PatternInterface.Invoke) as IInvokeProvider;
-                    invokeProv.Invoke();
-                }
-            }
-        }
     }
 }
