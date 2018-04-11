@@ -5,8 +5,35 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SubTitles.Wpf"
         mc:Ignorable="d"
-        Title="Suntitle Translator" Height="350" Width="525" Icon="subtitle.ico" KeyUp="MainForm_KeyUp">
+        Title="Suntitle Translator" Height="512" Width="768" KeyUp="MainForm_KeyUp" MinWidth="640" MinHeight="400">
     <Grid x:Name="MainGrid" DragOver="Grid_DragOver" Drop="Grid_Drop">
+        <Grid.Resources>
+            <Style TargetType="ContentControl">
+                <Setter Property="BorderThickness" Value="0,0,1,0"></Setter>
+                <Setter Property="BorderBrush">
+                    <Setter.Value>
+                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrush}}"/>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Margin" Value="0,0,-7,0"></Setter>
+            </Style>
+            <Style TargetType="ListViewItem">
+                <Style.Triggers>
+                    <Trigger Property="ItemsControl.AlternationIndex"  Value="0">
+                        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
+                    </Trigger>
+                    <Trigger Property="ItemsControl.AlternationIndex"  Value="1">
+                        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
+                    </Trigger>
+                    <Trigger Property="IsSelected"  Value="True">
+                        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.GradientActiveCaptionBrushKey}}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <DataTemplate DataType="system:String" x:Key="GridLine">
+                <!-- put your data template here -->
+            </DataTemplate>
+        </Grid.Resources>
         <Grid.ContextMenu>
             <ContextMenu HasDropShadow="True">
                 <MenuItem x:Name="cmiLoadASS" Header="Load ASS" Click="btnLoad_Click" />
@@ -21,7 +48,7 @@
                 <MenuItem x:Name="cmiExit" Header="Exit" Click="cmiExit_Click" />
             </ContextMenu>
         </Grid.ContextMenu>
-        <ListView x:Name="lvItems" Margin="10,10,10,48" UseLayoutRounding="True" IsTextSearchCaseSensitive="True" AlternationCount="1" SnapsToDevicePixels="True">
+        <ListView x:Name="lvItems" Margin="10,10,10,48" UseLayoutRounding="True" IsTextSearchCaseSensitive="True" SnapsToDevicePixels="True" AlternationCount="0" FontSize="14">
             <ListView.View>
                 <GridView>
                     <GridViewColumn/>

@@ -136,7 +136,7 @@
             this.tsmiSep2,
             this.cmiExit});
             this.cmActions.Name = "cmsContext";
-            this.cmActions.Size = new System.Drawing.Size(269, 198);
+            this.cmActions.Size = new System.Drawing.Size(269, 176);
             // 
             // cmiLoadASS
             // 
@@ -215,7 +215,7 @@
             this.Controls.Add(this.btnPaste);
             this.Controls.Add(this.btnLoad);
             this.Controls.Add(this.lvItems);
-            this.MinimumSize = new System.Drawing.Size(640, 320);
+            this.MinimumSize = new System.Drawing.Size(640, 400);
             this.Name = "MainForm";
             this.Text = "Subtitle Translator";
             this.Load += new System.EventHandler(this.MainForm_Load);

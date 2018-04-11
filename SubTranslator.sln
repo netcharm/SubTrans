@@ -7,6 +7,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubTrans", "SubTrans\SubTra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubTrans.wpf", "SubTrans.Wpf\SubTrans.wpf.csproj", "{2929DEFD-F39E-4009-A5E8-12ED05CB1CC6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4A1F138D-94B4-4A2E-8EB2-C65517BD36EA}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\MIT License = ..\..\..\MIT License
+		readme.md = readme.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
