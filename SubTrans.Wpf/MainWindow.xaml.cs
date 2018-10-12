@@ -184,6 +184,30 @@ namespace SubTitles
             }
         }
 
+        private void SaveASS(ASS.SaveFlags flags)
+        {
+            if (ass == null) return;
+            else if (string.IsNullOrEmpty(LastFilename) && !string.IsNullOrEmpty(ass.ScriptInfo.Title))
+                LastFilename = ass.ScriptInfo.Title;
+            else if (!string.IsNullOrEmpty(LastFilename) && string.IsNullOrEmpty(ass.ScriptInfo.Title))
+                ass.ScriptInfo.Title = LastFilename;
+
+            SaveFileDialog dlgSave = new SaveFileDialog();
+            if (!string.IsNullOrEmpty(LastFilename))
+                dlgSave.InitialDirectory = Path.GetDirectoryName(LastFilename);
+            dlgSave.DefaultExt = ".ass";
+            dlgSave.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|WebVTT File|*.vtt";
+            dlgSave.FilterIndex = 0;
+            if (dlgSave.ShowDialog() == true)
+            {
+                if (dlgSave.FilterIndex == 3)
+                    flags = flags | ASS.SaveFlags.SRT;
+                else if (dlgSave.FilterIndex == 4)
+                    flags = flags | ASS.SaveFlags.VTT;
+                ass.Save(dlgSave.FileName, flags);
+            }
+        }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -337,68 +361,17 @@ namespace SubTitles
 
         private void btnMerge_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog dlgSave = new SaveFileDialog();
-            if (!string.IsNullOrEmpty(LastFilename))
-                dlgSave.InitialDirectory = System.IO.Path.GetDirectoryName(LastFilename);
-            dlgSave.DefaultExt = ".ass";
-            dlgSave.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|WebVTT File|*.vtt";
-            dlgSave.FilterIndex = 0;
-            if (dlgSave.ShowDialog() == true)
-            {
-                var flags = ASS.SaveFlags.Merge;
-                if (dlgSave.FilterIndex == 3)
-                    flags = flags | ASS.SaveFlags.SRT;
-                else if (dlgSave.FilterIndex == 4)
-                    flags = flags | ASS.SaveFlags.VTT;
-                ass.Save(dlgSave.FileName, flags);
-            }
+            SaveASS(ASS.SaveFlags.Merge);
         }
 
         private void btnReplace_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(LastFilename) || ass == null) return;
-            SaveFileDialog dlgSave = new SaveFileDialog();
-            if (!string.IsNullOrEmpty(LastFilename))
-                dlgSave.InitialDirectory = System.IO.Path.GetDirectoryName(LastFilename);
-            dlgSave.DefaultExt = ".ass";
-            dlgSave.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|WebVTT File|*.vtt";
-            dlgSave.FilterIndex = 0;
-            if (dlgSave.ShowDialog() == true)
-            {
-                var flags = ASS.SaveFlags.Replace;
-                if (dlgSave.FilterIndex == 3)
-                    flags = flags | ASS.SaveFlags.SRT;
-                else if (dlgSave.FilterIndex == 4)
-                    flags = flags | ASS.SaveFlags.VTT;
-                ass.Save(dlgSave.FileName, flags);
-            }
+            SaveASS(ASS.SaveFlags.Replace);
         }
 
         private void cmiSaveAs_Click(object sender, RoutedEventArgs e)
         {
-            if(ass == null) return;
-
-            if (string.IsNullOrEmpty(LastFilename) && !string.IsNullOrEmpty(ass.ScriptInfo.Title))
-                LastFilename = ass.ScriptInfo.Title;
-
-            SaveFileDialog dlgSave = new SaveFileDialog();
-            if (!string.IsNullOrEmpty(LastFilename))
-            {
-                dlgSave.InitialDirectory = Path.GetDirectoryName(LastFilename);
-                dlgSave.FileName = LastFilename;
-            }
-            dlgSave.DefaultExt = ".ass";
-            dlgSave.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|WebVTT File|*.vtt";
-            dlgSave.FilterIndex = 0;
-            if (dlgSave.ShowDialog() == true)
-            {
-                var flags = ASS.SaveFlags.None;
-                if (dlgSave.FilterIndex == 3)
-                    flags = flags | ASS.SaveFlags.SRT;
-                else if (dlgSave.FilterIndex == 4)
-                    flags = flags | ASS.SaveFlags.VTT;
-                ass.Save(dlgSave.FileName, flags);
-            }
+            SaveASS(ASS.SaveFlags.None);
         }
 
         private void cmiExit_Click(object sender, RoutedEventArgs e)
