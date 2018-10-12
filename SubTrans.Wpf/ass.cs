@@ -659,6 +659,13 @@ namespace SubTitles
         public void Load(string[] lines)
         {
             ScriptInfo = new SCRIPTINFO();
+            StylesRaw.Clear();
+            FontsRaw.Clear();
+            GraphicsRaw.Clear();
+            EventsRaw.Clear();
+
+            Events.Clear();
+            Styles.Clear();
 
             if (lines.Length <= 0) return;
 

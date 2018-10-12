@@ -39,10 +39,10 @@
         <Grid.ContextMenu>
             <ContextMenu HasDropShadow="True">
                 <MenuItem x:Name="cmiLoadASS" Header="Load ASS" Click="btnLoad_Click" />
+                <MenuItem x:Name="cmiPasteYoutube" Header="Paste Youtube Subtitles" Click="btnPasteYoutube_Click" />
                 <Separator/>
                 <MenuItem x:Name="cmiCopy" Header="Copy Selected Text To Clipboard" Click="btnCopy_Click" />
                 <MenuItem x:Name="cmiPaste" Header="Paste Translated From Clipboard" Click="btnPaste_Click" />
-                <MenuItem x:Name="cmiPasteYoutube" Header="Paste YouTube Subtitles" Click="btnPasteYoutube_Click" />
                 <Separator/>
                 <MenuItem x:Name="cmiSaveAs" Header="Save As..." Click="cmiSaveAs_Click" />
                 <MenuItem x:Name="cmiMerge"  Header="Merge Translated As..." Click="btnMerge_Click" />
@@ -54,7 +54,6 @@
         <ListView x:Name="lvItems" Margin="10,10,10,48" UseLayoutRounding="True" 
                   IsTextSearchCaseSensitive="True" 
                   ItemsSource="{Binding Events, BindsDirectlyToSource=True, IsAsync=True, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local1:MainWindow}}, ValidatesOnNotifyDataErrors=False}"
-                  SourceUpdated="lvItems_SourceUpdated" TargetUpdated="lvItems_TargetUpdated"
                   SnapsToDevicePixels="True" AlternationCount="0" FontSize="14">
             <ListView.View>
                 <GridView>

@@ -141,7 +141,6 @@ namespace SubTitles
         private void InitListView(ListView lv, string[] headers)
         {
             lv.AlternationCount = 2;           
-            //lv.Items.Clear();
             events.Clear();
             lv.Items.Refresh();
 
@@ -181,7 +180,6 @@ namespace SubTitles
             LastFilename = subtitle;
             for (int i = 0; i < ass.Events.Count; i++)
             {
-                //lvItems.Items.Add(ass.Events[i]);
                 events.Add(ass.Events[i]);
             }
         }
@@ -259,13 +257,6 @@ namespace SubTitles
                     invokeProv.Invoke();
                 }
             }
-            //else if (e.Key == Key.Escape)
-            //{
-            //    if (InputBox.Visibility == Visibility.Visible)
-            //    {
-            //        InputBox.Visibility = Visibility.Collapsed;
-            //    }
-            //}
         }
 
         private void btnLoad_Click(object sender, RoutedEventArgs e)
@@ -385,10 +376,17 @@ namespace SubTitles
 
         private void cmiSaveAs_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(LastFilename) || ass == null) return;
+            if(ass == null) return;
+
+            if (string.IsNullOrEmpty(LastFilename) && !string.IsNullOrEmpty(ass.ScriptInfo.Title))
+                LastFilename = ass.ScriptInfo.Title;
+
             SaveFileDialog dlgSave = new SaveFileDialog();
             if (!string.IsNullOrEmpty(LastFilename))
-                dlgSave.InitialDirectory = System.IO.Path.GetDirectoryName(LastFilename);
+            {
+                dlgSave.InitialDirectory = Path.GetDirectoryName(LastFilename);
+                dlgSave.FileName = LastFilename;
+            }
             dlgSave.DefaultExt = ".ass";
             dlgSave.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|WebVTT File|*.vtt";
             dlgSave.FilterIndex = 0;
@@ -407,17 +405,5 @@ namespace SubTitles
         {
             Close();
         }
-
-        private void lvItems_TargetUpdated(object sender, DataTransferEventArgs e)
-        {
-            //
-        }
-
-        private void lvItems_SourceUpdated(object sender, DataTransferEventArgs e)
-        {
-
-        }
-
-
     }
 }
