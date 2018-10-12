@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -26,7 +27,12 @@ namespace SubTitles
     public partial class MainWindow : Window
     {
         ASS ass = new ASS();
-        Dictionary<int, ListViewItem> lvItemCache = new Dictionary<int, ListViewItem>();
+        private ObservableCollection<ASS.EVENT> events = new ObservableCollection<ASS.EVENT>();
+        public ObservableCollection<ASS.EVENT> Events
+        {
+            get { return (events); }
+        }
+
         string LastFilename = string.Empty;
 
         #region Extract Icon from application
@@ -123,7 +129,7 @@ namespace SubTitles
             string xaml = @"<DataTemplate xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation"" 
                                           xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""> 
                <Border BorderBrush=""LightGray"" BorderThickness=""1,0,0,0"" Margin=""-6,-2,-8,-2"">
-                   <TextBlock Text=""{{Binding {0}}}""/>
+                   <TextBlock Text=""{{Binding {0}, IsAsync=True, Mode=OneWay, NotifyOnSourceUpdated=True, NotifyOnTargetUpdated=True}}""/>
                </Border>
             </DataTemplate>";
 
@@ -134,8 +140,11 @@ namespace SubTitles
 
         private void InitListView(ListView lv, string[] headers)
         {
-            lv.AlternationCount = 2;
-            lv.Items.Clear();
+            lv.AlternationCount = 2;           
+            //lv.Items.Clear();
+            events.Clear();
+            lv.Items.Refresh();
+
             GridView gv = (GridView)lv.View;
             gv.Columns.Clear();
             if (headers != null)
@@ -172,7 +181,8 @@ namespace SubTitles
             LastFilename = subtitle;
             for (int i = 0; i < ass.Events.Count; i++)
             {
-                lvItems.Items.Add(ass.Events[i]);                   
+                //lvItems.Items.Add(ass.Events[i]);
+                events.Add(ass.Events[i]);
             }
         }
 
@@ -182,6 +192,7 @@ namespace SubTitles
             var apppath = Assembly.GetExecutingAssembly().Location;
             Icon = GetIcon(apppath.ToString());
             MainGrid.AllowDrop = true;
+            lvItems.ItemsSource = events;
         }
 
         #region Drag/Drop Routines
@@ -286,21 +297,22 @@ namespace SubTitles
 
             StringBuilder sb = new StringBuilder();
             var texts = Clipboard.GetText();
-            //var lines = texts.Split(new string[] { "\r", "\n", "\n\r", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
             var lines = texts.Split(new string[] { "\n\r", "\r\n", "\r", "\n", }, StringSplitOptions.None);
 
-            for (int i = 0; i < lvItems.SelectedItems.Count; i++)
+            foreach(var item in lvItems.SelectedItems)
             {
-                if (i >= lines.Length) continue;
+                if (item is ASS.EVENT)
+                {
+                    var selected = item as ASS.EVENT;
+                    var idx = Convert.ToInt32(selected.ID) - 1;
+                    if (idx >= lines.Length) continue;
 
-                var idx = lvItems.Items.IndexOf(lvItems.SelectedItems[i]);
-                var evt = ass.Events[idx];
-                evt.Translated = lines[i];
-
-                lvItems.SelectedItems[i] = evt;
+                    var evt = ass.Events[idx];
+                    evt.Translated = lines[idx];
+                    events[idx].Translated = evt.Translated;
+                }
             }
-            ICollectionView view = CollectionViewSource.GetDefaultView(lvItems.Items);
-            view.Refresh();
+            lvItems.Items.Refresh();
         }
 
         private void btnMerge_Click(object sender, RoutedEventArgs e)
@@ -367,5 +379,14 @@ namespace SubTitles
             Close();
         }
 
+        private void lvItems_TargetUpdated(object sender, DataTransferEventArgs e)
+        {
+            //
+        }
+
+        private void lvItems_SourceUpdated(object sender, DataTransferEventArgs e)
+        {
+
+        }
     }
 }
