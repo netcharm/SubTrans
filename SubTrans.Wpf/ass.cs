@@ -8,8 +8,24 @@ using System.Threading.Tasks;
 
 namespace SubTitles
 {
+    public class YouTubeSubtitleItem
+    {
+        public DateTime last_time;
+        public string last_text;
+        public DateTime curr_time;
+        public string curr_text;
+    }
+
     public class ASS
     {
+        public static string Style_Default_ENG = @"Style: Default,Tahoma,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string Style_Note_ENG = @"Style: Note,Times New Roman,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string Style_Title_ENG = @"Style: Title,Arial,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+
+        public static string Style_Default_CHS = @"Style: Default,微软雅黑,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string Style_Note_CHS = @"Style: Note,宋体,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string Style_Title_CHS = @"Style: Title,全真細隸書,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+
         private enum Sections { ScriptInfo = 0, Styles = 1, Events = 2, Fonts = 3, Graphics = 4, Unknown = -1 };
 
         [Flags]
@@ -709,6 +725,72 @@ namespace SubTitles
                         ParseGraphic(line);
                         break;
                 }
+            }
+        }
+
+        public void LoadFromYouTube(string[] contents, string title="Untitled")
+        {
+            var last_time = new DateTime(0);
+            var last_text = string.Empty;
+            var curr_time = new DateTime(0);
+            var curr_text = string.Empty;
+
+            var re_src = new Regex(@"^\d+:\d+$", RegexOptions.IgnoreCase);
+
+            if (contents is string[])
+            {
+                List<string> lines = new List<string>();
+                lines.Add($"[Script Info]\n");
+                lines.Add($"Title: {title}\n");
+                lines.Add($"\n");
+                lines.Add($"[V4+ Styles]\n");
+                lines.Add($"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n");
+                lines.Add($"{Style_Default_CHS}\n");
+                lines.Add($"{Style_Note_CHS}\n");
+                lines.Add($"{Style_Title_CHS}\n");
+                lines.Add($"\n");
+                lines.Add($"[Events]\n");
+                lines.Add($"Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text\n");
+
+                var c = contents.Length;
+                int th = 0, tm = 0, ts = 0;
+
+                for (int i = 0; i < c; i++)
+                {
+                    var l = contents[i];
+                    if (re_src.IsMatch(l))
+                    {
+                        last_time = curr_time;
+                        last_text = curr_text;
+
+                        var tt = l.Replace("\n", "").Split(':');
+                        var tc = tt.Length;
+                        if (tc == 2)
+                        {
+                            th = Convert.ToInt32(tt[0]) / 60;
+                            tm = Convert.ToInt32(tt[0]) - th * 60;
+                            ts = Convert.ToInt32(tt[1]);
+                        }
+                        else if (tc == 3)
+                        {
+                            th = Convert.ToInt32(tt[0]);
+                            tm = Convert.ToInt32(tt[1]);
+                            ts = Convert.ToInt32(tt[2]);
+                        }
+
+                        curr_time = new DateTime(1, 1, 1, th, tm, ts);
+                        curr_text = contents[i + 1].Replace("\n", "");
+
+                        lines.Add($"Dialogue: 0,{last_time.ToString("HH:mm:ss.ff")},{curr_time.ToString("HH:mm:ss.ff")},Default,NTP,0000,0000,0000,,{last_text}");
+                        //lines.Add(new YouTubeSubtitleItem() { last_time = last_time, curr_time = curr_time, last_text = last_text });
+                    }
+                }
+                var end_time = curr_time;
+                end_time = end_time + TimeSpan.FromSeconds(10);
+                lines.Add($"Dialogue: 0,{curr_time.ToString("HH:mm:ss.ff")},{end_time.ToString("HH:mm:ss.ff")},Default,NTP,0000,0000,0000,,{curr_text}");
+                //lines.Add(new YouTubeSubtitleItem() { last_time = curr_time, curr_time = end_time, last_text = curr_text });
+
+                Load(lines.ToArray());
             }
         }
 

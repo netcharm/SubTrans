@@ -41,7 +41,8 @@
                 <MenuItem x:Name="cmiLoadASS" Header="Load ASS" Click="btnLoad_Click" />
                 <Separator/>
                 <MenuItem x:Name="cmiCopy" Header="Copy Selected Text To Clipboard" Click="btnCopy_Click" />
-                <MenuItem x:Name="cmiPaste" Header="Paste Translated from Clipboard" Click="btnPaste_Click" />
+                <MenuItem x:Name="cmiPaste" Header="Paste Translated From Clipboard" Click="btnPaste_Click" />
+                <MenuItem x:Name="cmiPasteYoutube" Header="Paste YouTube Subtitles" Click="btnPasteYoutube_Click" />
                 <Separator/>
                 <MenuItem x:Name="cmiSaveAs" Header="Save As..." Click="cmiSaveAs_Click" />
                 <MenuItem x:Name="cmiMerge"  Header="Merge Translated As..." Click="btnMerge_Click" />

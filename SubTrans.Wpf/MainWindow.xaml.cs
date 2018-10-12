@@ -259,6 +259,13 @@ namespace SubTitles
                     invokeProv.Invoke();
                 }
             }
+            //else if (e.Key == Key.Escape)
+            //{
+            //    if (InputBox.Visibility == Visibility.Visible)
+            //    {
+            //        InputBox.Visibility = Visibility.Collapsed;
+            //    }
+            //}
         }
 
         private void btnLoad_Click(object sender, RoutedEventArgs e)
@@ -313,6 +320,28 @@ namespace SubTitles
                 }
             }
             lvItems.Items.Refresh();
+        }
+
+        private void btnPasteYoutube_Click(object sender, RoutedEventArgs e)
+        {
+            events.Clear();
+            var texts = Clipboard.GetText();
+            var lines = texts.Split(new string[] { "\n\r", "\r\n", "\r", "\n", }, StringSplitOptions.None);
+            //string title = Microsoft.VisualBasic.Interaction.InputBox("Input Title", "Input Title", "Default", -1, -1);
+
+            string title = string.Empty;
+            var dlgInput = new InputDialog("Input", title);
+            if (dlgInput.ShowDialog() == true)
+            {
+                title = dlgInput.Text;
+            }
+            ass.LoadFromYouTube(lines, title);
+            InitListView(lvItems, ass.EventFields);
+            for (int i = 0; i < ass.Events.Count; i++)
+            {
+                //lvItems.Items.Add(ass.Events[i]);
+                events.Add(ass.Events[i]);
+            }
         }
 
         private void btnMerge_Click(object sender, RoutedEventArgs e)
@@ -388,5 +417,7 @@ namespace SubTitles
         {
 
         }
+
+
     }
 }
