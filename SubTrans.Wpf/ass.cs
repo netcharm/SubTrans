@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -264,7 +266,7 @@ namespace SubTitles
             #endregion
         }
 
-        public class EVENT
+        public class EVENT : INotifyPropertyChanged
         {
             // Format: Marked, Layer, Start, End, Style, Name,
             //         MarginL, MarginR, MarginV, Effect, Text,
@@ -274,6 +276,12 @@ namespace SubTitles
                 "MarginL", "MarginR", "MarginV", "Effect", "Text",
                 "Actor", "Type"
             };
+
+            public event PropertyChangedEventHandler PropertyChanged;
+            private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
 
             private SortedDictionary<string, string> fields = new SortedDictionary<string, string>();
             public SortedDictionary<string, string> Fields
@@ -378,7 +386,7 @@ namespace SubTitles
             public string Text
             {
                 get { return Field("Text"); }
-                set { Field("Text", value); }
+                set { Field("Text", value); NotifyPropertyChanged("Text"); }
             }
             public string Actor
             {
@@ -399,6 +407,7 @@ namespace SubTitles
                         line = line.Replace(match_t[m].Value, match);
                     }
                     translated = line.Replace("\\ ", "\\").Replace(" \\", "\\").Replace("\\n", "\\N").Replace(" {", "{").Replace("} ", "}");
+                    NotifyPropertyChanged("Translated");
                 }
             }
             #endregion
@@ -632,7 +641,9 @@ namespace SubTitles
             if (styles == null) styles = new List<STYLE>();
             if (events == null) events = new List<EVENT>();
 
-            Load(ass);
+            new Action(async () => {
+                await Load(ass);
+            }).Invoke(); 
         }
 
         public ASS(string[] lines)
@@ -643,7 +654,7 @@ namespace SubTitles
             Load(lines);
         }
 
-        public void Load(string ass)
+        public async Task Load(string ass)
         {
             ScriptInfo.Clear();
             styles.Clear();
@@ -651,8 +662,17 @@ namespace SubTitles
 
             if (File.Exists(ass))
             {
+                var ext = Path.GetExtension(ass).ToLower();
+                var fn = Path.GetFileNameWithoutExtension(ass);
                 var lines = File.ReadAllLines(ass);
-                Load(lines);
+                if (ext.Equals(".srt"))
+                {
+                    await LoadFromSrt(lines, fn);
+                }
+                else if (ext.Equals(".ass") || ext.Equals(".ssa"))
+                {
+                    Load(lines);
+                }
             }
         }
 
@@ -733,6 +753,14 @@ namespace SubTitles
                         break;
                 }
             }
+        }
+
+        public async Task LoadFromSrt(string[] contents, string title="Untitled")
+        {
+            var srt = new SRTContent();
+            await srt.Load(contents);
+            var lines = srt.ToAss(title);
+            Load(lines.ToArray());
         }
 
         public void LoadFromYouTube(string[] contents, string title="Untitled")

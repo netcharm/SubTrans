@@ -53,7 +53,8 @@
         </Grid.ContextMenu>
         <ListView x:Name="lvItems" Margin="10,10,10,48" UseLayoutRounding="True" 
                   IsTextSearchCaseSensitive="True" 
-                  ItemsSource="{Binding Events, BindsDirectlyToSource=True, IsAsync=True, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local1:MainWindow}}, ValidatesOnNotifyDataErrors=False}"
+                  ItemsSource="{Binding Events, Mode=OneWay, BindsDirectlyToSource=True, IsAsync=True, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local1:MainWindow}}, ValidatesOnNotifyDataErrors=False}"
+                  TargetUpdated="lvItems_TargetUpdated"
                   SnapsToDevicePixels="True" AlternationCount="0" FontSize="14">
             <ListView.View>
                 <GridView>

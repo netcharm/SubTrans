@@ -173,9 +173,9 @@ namespace SubTitles
             }
         }
 
-        private void LoadSubTitle(string subtitle)
+        private async void LoadSubTitle(string subtitle)
         {
-            ass.Load(subtitle);
+            await ass.Load(subtitle);
             InitListView(lvItems, ass.EventFields);
             LastFilename = subtitle;
             for (int i = 0; i < ass.Events.Count; i++)
@@ -244,9 +244,9 @@ namespace SubTitles
                     if (dragFiles.Length > 0)
                     {
                         string dragFileName = dragFiles[0].ToString();
-                        string ext = System.IO.Path.GetExtension(dragFileName).ToLower();
+                        string ext = Path.GetExtension(dragFileName).ToLower();
 
-                        string[] exts = { ".ass", ".ssa" };
+                        string[] exts = { ".ass", ".ssa", ".srt" };
 
                         if (exts.Contains(ext))
                         {
@@ -288,7 +288,7 @@ namespace SubTitles
             OpenFileDialog dlgOpen = new OpenFileDialog();
             dlgOpen.DefaultExt = ".ass";
             //dlgOpen.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|Text File|*.txt|All File|*.*";
-            dlgOpen.Filter = "ASS File|*.ass|SSA File|*.ssa";
+            dlgOpen.Filter = "All Supported File|*.ass;*.ssa;*.srt|ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt";
             dlgOpen.FilterIndex = 0;
             if (dlgOpen.ShowDialog() == true)
             {
@@ -321,20 +321,22 @@ namespace SubTitles
             var texts = Clipboard.GetText();
             var lines = texts.Split(new string[] { "\n\r", "\r\n", "\r", "\n", }, StringSplitOptions.None);
 
-            foreach(var item in lvItems.SelectedItems)
+            var idx_t = -1;
+            foreach (var item in lvItems.SelectedItems)
             {
+                idx_t++;
                 if (item is ASS.EVENT)
                 {
                     var selected = item as ASS.EVENT;
                     var idx = Convert.ToInt32(selected.ID) - 1;
-                    if (idx >= lines.Length) continue;
+                    if (idx_t >= lines.Length) continue;
 
                     var evt = ass.Events[idx];
-                    evt.Translated = lines[idx];
+                    evt.Translated = lines[idx_t];
                     events[idx].Translated = evt.Translated;
                 }
             }
-            lvItems.Items.Refresh();
+            //lvItems.Items.Refresh();
         }
 
         private void btnPasteYoutube_Click(object sender, RoutedEventArgs e)
@@ -377,6 +379,11 @@ namespace SubTitles
         private void cmiExit_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private void lvItems_TargetUpdated(object sender, DataTransferEventArgs e)
+        {
+
         }
     }
 }
