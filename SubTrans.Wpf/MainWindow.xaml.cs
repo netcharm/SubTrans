@@ -142,7 +142,6 @@ namespace SubTitles
         {
             lv.AlternationCount = 2;           
             events.Clear();
-            lv.Items.Refresh();
 
             GridView gv = (GridView)lv.View;
             gv.Columns.Clear();
@@ -298,18 +297,22 @@ namespace SubTitles
 
         private void btnCopy_Click(object sender, RoutedEventArgs e)
         {
-            if (lvItems.Items.Count <= 0) return;
-            if (lvItems.SelectedItems.Count <= 0) return;
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < lvItems.SelectedItems.Count; i++)
+            try
             {
-                var idx = lvItems.Items.IndexOf(lvItems.SelectedItems[i]);
-                var evt = ass.Events[idx];
-                sb.AppendLine(evt.Text);
-            }
-            Clipboard.SetText(sb.ToString());
+                if (lvItems.Items.Count <= 0) return;
+                if (lvItems.SelectedItems.Count <= 0) return;
 
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < lvItems.SelectedItems.Count; i++)
+                {
+                    var idx = lvItems.Items.IndexOf(lvItems.SelectedItems[i]);
+                    var evt = ass.Events[idx];
+                    sb.AppendLine(evt.Text);
+                }
+                var text = sb.ToString();
+                Clipboard.SetDataObject(text);
+            }
+            catch (Exception) { }
         }
 
         private void btnPaste_Click(object sender, RoutedEventArgs e)
@@ -336,7 +339,6 @@ namespace SubTitles
                     events[idx].Translated = evt.Translated;
                 }
             }
-            //lvItems.Items.Refresh();
         }
 
         private void btnPasteYoutube_Click(object sender, RoutedEventArgs e)
@@ -344,7 +346,6 @@ namespace SubTitles
             events.Clear();
             var texts = Clipboard.GetText();
             var lines = texts.Split(new string[] { "\n\r", "\r\n", "\r", "\n", }, StringSplitOptions.None);
-            //string title = Microsoft.VisualBasic.Interaction.InputBox("Input Title", "Input Title", "Default", -1, -1);
 
             string title = string.Empty;
             var dlgInput = new InputDialog("Input", title);
@@ -356,7 +357,6 @@ namespace SubTitles
             InitListView(lvItems, ass.EventFields);
             for (int i = 0; i < ass.Events.Count; i++)
             {
-                //lvItems.Items.Add(ass.Events[i]);
                 events.Add(ass.Events[i]);
             }
         }
@@ -379,11 +379,6 @@ namespace SubTitles
         private void cmiExit_Click(object sender, RoutedEventArgs e)
         {
             Close();
-        }
-
-        private void lvItems_TargetUpdated(object sender, DataTransferEventArgs e)
-        {
-
         }
     }
 }
