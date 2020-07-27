@@ -11,19 +11,13 @@ using System.Threading.Tasks;
 
 namespace SubTitles
 {
-    public static class DefaultStyle
+    public static class DefaultVttHeader
     {
-        public static string ENG_Default = "Style: Default,Tahoma,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string ENG_Note = "Style: Note,Times New Roman,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string ENG_Title = "Style: Title,Arial,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string Style { get; } = @"video::cue {
+  background-color: transparent;
+  color: yellow;
+}";
 
-        public static string CHS_Default = "Style: Default,更纱黑体 SC,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string CHS_Note = "Style: Note,宋体,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string CHS_Title = "Style: Title,更纱黑体 SC,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-
-        public static string CHT_Default = "Style: Default,Sarasa Gothic TC,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string CHT_Note = "Style: Note,宋体,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string CHT_Title = "Style: Title,Sarasa Gothic TC,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
     }
 
     public class SimpleTitle
@@ -32,7 +26,7 @@ namespace SubTitles
         public double Confidence { get; set; } = 100.0;
     }
 
-    public class SRT : INotifyPropertyChanged
+    public class SrtBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -40,11 +34,9 @@ namespace SubTitles
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public byte[] Audio { get; set; }
         public TimeSpan Start { get; set; } = TimeSpan.FromSeconds(0);
         public TimeSpan End { get; set; } = TimeSpan.FromSeconds(0);
 
-        public byte[] NewAudio { get; set; }
         public TimeSpan NewStart { get; set; } = TimeSpan.FromSeconds(0);
         public TimeSpan NewEnd { get; set; } = TimeSpan.FromSeconds(0);
 
@@ -132,10 +124,12 @@ namespace SubTitles
         }
     }
 
-    public class SRTContent
+    public class SrtCollection
     {
         public CultureInfo Culture { get; set; } = CultureInfo.CurrentCulture;
-        public List<SRT> Contents { get; } = new List<SRT>();
+        public List<SrtBase> Contents { get; } = new List<SrtBase>();
+
+        private string vtt_header = string.Empty;
 
         public async void Load(string file)
         {
@@ -162,7 +156,6 @@ namespace SubTitles
                 {
                     try
                     {
-
                         if (Regex.IsMatch(contents[i], @"^\d+$"))
                         {
                             line = contents[i];
@@ -173,17 +166,20 @@ namespace SubTitles
                             var time = Regex.Replace(line, @"-->", "-", RegexOptions.IgnoreCase).Split('-');
                             start = TimeSpan.Parse(time[0].Trim().Replace(",", "."));
                             end = TimeSpan.Parse(time[1].Trim().Replace(",", "."));
+
+                            if (index == 0)
+                            {
+                                vtt_header = string.Join(Environment.NewLine, contents.Take(i - 1)).Trim();
+                            }
                         }
                         else if (index >= 0 && string.IsNullOrEmpty(contents[i].Trim()))
                         {
-                            var title = new SRT()
+                            var title = new SrtBase()
                             {
                                 Index = index,
                                 Language = Culture.IetfLanguageTag,
-                                Audio = null,
                                 Start = start,
                                 End = end,
-                                NewAudio = null,
                                 NewStart = start,
                                 NewEnd = end,
                                 Text = text.Trim()
@@ -215,9 +211,9 @@ namespace SubTitles
             sb.AppendLine($"[V4+ Styles]");
             sb.AppendLine($"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding");
             //sb.AppendLine($"Style: Default,Tahoma,24,&H00FFFFFF,&HF0000000,&H00000000,&HF0000000,1,0,0,0,100,100,0,0.00,1,1,0,2,30,30,10,1");
-            sb.AppendLine($"{DefaultStyle.CHS_Default}");
-            sb.AppendLine($"{DefaultStyle.CHS_Note}");
-            sb.AppendLine($"{DefaultStyle.CHS_Title}");
+            sb.AppendLine($"{AssStyle.CHS_Default}");
+            sb.AppendLine($"{AssStyle.CHS_Note}");
+            sb.AppendLine($"{AssStyle.CHS_Title}");
             sb.AppendLine();
             sb.AppendLine($"[Events]");
             sb.AppendLine($"Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text");
@@ -240,19 +236,46 @@ namespace SubTitles
             sb.Add($"[V4+ Styles]");
             sb.Add($"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding");
             //sb.AppendLine($"Style: Default,Tahoma,24,&H00FFFFFF,&HF0000000,&H00000000,&HF0000000,1,0,0,0,100,100,0,0.00,1,1,0,2,30,30,10,1");
-            sb.Add($"{DefaultStyle.CHS_Default}");
-            sb.Add($"{DefaultStyle.CHS_Note}");
-            sb.Add($"{DefaultStyle.CHS_Title}");
+            sb.Add($"{AssStyle.CHS_Default}");
+            sb.Add($"{AssStyle.CHS_Note}");
+            sb.Add($"{AssStyle.CHS_Title}");
             sb.Add("");
             sb.Add($"[Events]");
             sb.Add($"Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text");
 
             foreach (var t in Contents)
             {
-                sb.Add($"Dialogue: 0,{t.NewStart.ToString(@"hh\:mm\:ss\.ff")},{t.NewEnd.ToString(@"hh\:mm\:ss\.ff")},Default,NTP,0000,0000,0000,,{t.MultiLingoText}");
+                var text = t.MultiLingoText.Replace("\r\n", "\\N").Replace("\n\r", "\\N").Replace("\r", "\\N").Replace("\n", "\\N");
+                sb.Add($"Dialogue: 0,{t.NewStart.ToString(@"hh\:mm\:ss\.ff")},{t.NewEnd.ToString(@"hh\:mm\:ss\.ff")},Default,NTP,0000,0000,0000,,{text}");
             }
 
             return (sb);
+        }
+
+        public string ToSRT()
+        {
+            string result = string.Empty;
+            if (Contents is IEnumerable<SrtBase>)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (SrtBase s in Contents)
+                {
+                    sb.AppendLine($"{s.DisplayIndex}");
+                    sb.AppendLine($"{s.NewStart.ToString(@"hh\:mm\:ss\,fff")} --> {s.NewEnd.ToString(@"hh\:mm\:ss\,fff")}");
+                    sb.AppendLine($"{s.MultiLingoText}");
+                    sb.AppendLine();
+                }
+                result = sb.ToString();
+            }
+            return (result);
+        }
+
+        public string ToVtt()
+        {
+            if (string.IsNullOrEmpty(vtt_header) || vtt_header.StartsWith("WEBVTT", StringComparison.CurrentCultureIgnoreCase))
+                return ($"WEBVTT{Environment.NewLine}{DefaultVttHeader.Style}{Environment.NewLine}{ToSRT()}");
+            else
+                return ($"{vtt_header}{Environment.NewLine}{ToSRT()}");
         }
     }
 }

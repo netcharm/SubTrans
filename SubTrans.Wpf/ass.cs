@@ -18,16 +18,29 @@ namespace SubTitles
         public string curr_text;
     }
 
+    public static class AssStyle
+    {
+        public static string ENG_Default { get; } = @"Style: Default,Lucida Calligraphy,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string ENG_Note { get; } = @"Style: Note,Times New Roman,18,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string ENG_Title { get; } = @"Style: Title,Segoe,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string ENG_Color { get; } = @"{\1c&HFFFFFF&\2c&HEDEDEE&\3c&HF3DC95&}";
+        public static string ENG_Font { get; } = @"{\fnLucida Calligraphy}";
+
+        public static string CHS_Default { get; } = @"Style: Default,更纱黑体 SC,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHS_Note { get; } = @"Style: Note,宋体,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHS_Title { get; } = @"Style: Title,更纱黑体 SC,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHS_Color { get; } = @"{\1c&HFFFFFF&\2c&HEDEDEE&\3c&H95C6F3&}";
+        public static string CHS_Font { get; } = @"{\fn更纱黑体 SC}";
+
+        public static string CHT_Default { get; } = @"Style: Default,Sarasa Gothic TC,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHT_Note { get; } = @"Style: Note,宋体,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHT_Title { get; } = @"Style: Title,Sarasa Gothic TC,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHT_Color { get; } = @"{\1c&HFFFFFF&\2c&HEDEDEE&\3c&H95C6F3&}";
+        public static string CHT_Font { get; } = @"{\fnSarasa Gothic TC}";
+    }
+
     public class ASS
     {
-        public static string Style_Default_ENG = @"Style: Default,Tahoma,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string Style_Note_ENG = @"Style: Note,Times New Roman,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string Style_Title_ENG = @"Style: Title,Arial,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-
-        public static string Style_Default_CHS = @"Style: Default,微软雅黑,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string Style_Note_CHS = @"Style: Note,宋体,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string Style_Title_CHS = @"Style: Title,全真細隸書,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-
         private enum Sections { ScriptInfo = 0, Styles = 1, Events = 2, Fonts = 3, Graphics = 4, Unknown = -1 };
 
         [Flags]
@@ -291,7 +304,7 @@ namespace SubTitles
 
             public string Field(string field)
             {
-                if(string.IsNullOrEmpty(field)) return(string.Empty);
+                if (string.IsNullOrEmpty(field)) return (string.Empty);
 
                 if (!fields.ContainsKey(field)) return (string.Empty);
 
@@ -397,7 +410,8 @@ namespace SubTitles
             public string Translated
             {
                 get { return translated; }
-                set {
+                set
+                {
                     var line = value;
                     var match_s = Regex.Matches(Text, @"\{ *\\.*?\}", RegexOptions.IgnoreCase);
                     var match_t = Regex.Matches(line, @"\{ *\\.*?\}", RegexOptions.IgnoreCase);
@@ -412,6 +426,8 @@ namespace SubTitles
             }
             #endregion
         }
+
+        public string YoutubeLanguage { get; set; } = "ENG";
 
         public SCRIPTINFO ScriptInfo = new SCRIPTINFO();
         private List<string> StylesRaw = new List<string>();
@@ -643,7 +659,7 @@ namespace SubTitles
 
             new Action(async () => {
                 await Load(ass);
-            }).Invoke(); 
+            }).Invoke();
         }
 
         public ASS(string[] lines)
@@ -665,7 +681,7 @@ namespace SubTitles
                 var ext = Path.GetExtension(ass).ToLower();
                 var fn = Path.GetFileNameWithoutExtension(ass);
                 var lines = File.ReadAllLines(ass);
-                if (ext.Equals(".srt"))
+                if (ext.Equals(".srt") || ext.Equals(".vtt"))
                 {
                     await LoadFromSrt(lines, fn);
                 }
@@ -755,15 +771,15 @@ namespace SubTitles
             }
         }
 
-        public async Task LoadFromSrt(string[] contents, string title="Untitled")
+        public async Task LoadFromSrt(string[] contents, string title = "Untitled")
         {
-            var srt = new SRTContent();
+            var srt = new SrtCollection();
             await srt.Load(contents);
             var lines = srt.ToAss(title);
             Load(lines.ToArray());
         }
 
-        public void LoadFromYouTube(string[] contents, string title="Untitled")
+        public void LoadFromYouTube(string[] contents, string title = "Untitled")
         {
             var last_time = new DateTime(0);
             var last_text = string.Empty;
@@ -780,9 +796,24 @@ namespace SubTitles
                 lines.Add($"\n");
                 lines.Add($"[V4+ Styles]\n");
                 lines.Add($"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n");
-                lines.Add($"{Style_Default_CHS}\n");
-                lines.Add($"{Style_Note_CHS}\n");
-                lines.Add($"{Style_Title_CHS}\n");
+                if (YoutubeLanguage.Equals("CHS", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    lines.Add($"{AssStyle.CHS_Default}\n");
+                    lines.Add($"{AssStyle.CHS_Note}\n");
+                    lines.Add($"{AssStyle.CHS_Title}\n");
+                }
+                else if (YoutubeLanguage.Equals("CHT", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    lines.Add($"{AssStyle.CHS_Default}\n");
+                    lines.Add($"{AssStyle.CHS_Note}\n");
+                    lines.Add($"{AssStyle.CHS_Title}\n");
+                }
+                else
+                {
+                    lines.Add($"{AssStyle.ENG_Default}\n");
+                    lines.Add($"{AssStyle.ENG_Note}\n");
+                    lines.Add($"{AssStyle.ENG_Title}\n");
+                }
                 lines.Add($"\n");
                 lines.Add($"[Events]\n");
                 lines.Add($"Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text\n");
@@ -854,7 +885,7 @@ namespace SubTitles
             }
             //sb.AppendLine();
             #endregion
-            
+
             #region Save Fonts Section
             for (int i = 0; i < FontsRaw.Count; i++)
             {
@@ -872,9 +903,10 @@ namespace SubTitles
             #region Save Events Section
             sb.AppendLine(EventsRaw[0]);
             sb.AppendLine(EventsRaw[1]);
-            for (int i = 2; i < events.Count+2; i++)
+            for (int i = 2; i < events.Count + 2; i++)
             {
-                var evt = events[i - 2];
+                var current = i-2;
+                var evt = events[current];
                 var evo = new List<string>();
                 foreach (var k in event_fields)
                 {
@@ -886,26 +918,26 @@ namespace SubTitles
                 switch (flags)
                 {
                     case SaveFlags.None:
-                        line = $"{string.Join(",", evo)},{events[i - 2].Text}";
+                        line = $"{string.Join(",", evo)},{events[current].Text}";
                         break;
                     case SaveFlags.Merge:
-                        if (string.IsNullOrEmpty(events[i - 2].Translated))
-                            line = $"{string.Join(",", evo)},{events[i - 2].Text}";
+                        if (string.IsNullOrEmpty(events[current].Translated))
+                            line = $"{string.Join(",", evo)},{AssStyle.ENG_Color}{AssStyle.ENG_Font}{events[current].Text}";
                         else
-                            line = $"{string.Join(",", evo)},{events[i - 2].Text}\\N{events[i-2].Translated}";
+                            line = $"{string.Join(",", evo)},{AssStyle.ENG_Color}{AssStyle.ENG_Font}{events[current].Text}\\N{AssStyle.CHS_Color}{AssStyle.CHS_Font}{events[current].Translated}";
                         break;
                     case SaveFlags.Replace:
-                        if (string.IsNullOrEmpty(events[i - 2].Translated))
-                            line = $"{string.Join(",", evo)},{events[i - 2].Text}";
+                        if (string.IsNullOrEmpty(events[current].Translated))
+                            line = $"{string.Join(",", evo)},{events[current].Text}";
                         else
-                            line = $"{string.Join(",", evo)},{events[i - 2].Translated}";
+                            line = $"{string.Join(",", evo)},{events[current].Translated}";
                         break;
                     default:
                         break;
                 }
                 int idx = line.IndexOf(",");
                 if (idx > 0)
-                    line = $"{line.Substring(0, idx)}: {line.Substring(idx+1)}";
+                    line = $"{line.Substring(0, idx)}: {line.Substring(idx + 1)}";
                 sb.AppendLine(line);
             }
             sb.AppendLine();
@@ -937,7 +969,7 @@ namespace SubTitles
             for (int i = 0; i < events.Count; i++)
             {
                 sb.AppendLine($"{i + 1}");
-                if(flags.HasFlag(SaveFlags.VTT))
+                if (flags.HasFlag(SaveFlags.VTT))
                 {
                     sb.AppendLine($"{events[i].Start.Replace(",", ".")} --> {events[i].End.Replace(",", ".")}");
                 }
@@ -959,7 +991,7 @@ namespace SubTitles
                     else
                         line = events[i].Translated;
                 }
-                else if(flags.HasFlag(SaveFlags.Merge))
+                else if (flags.HasFlag(SaveFlags.Merge))
                 {
                     if (string.IsNullOrEmpty(events[i].Translated))
                         line = events[i].Text;
@@ -973,7 +1005,7 @@ namespace SubTitles
                 }
                 sb.AppendLine();
             }
-            
+
             File.WriteAllText(Path.ChangeExtension(ass_file, ext), sb.ToString(), new UTF8Encoding(true));
         }
 

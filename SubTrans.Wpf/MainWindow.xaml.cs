@@ -380,5 +380,22 @@ namespace SubTitles
         {
             Close();
         }
+
+        private void cmiLang_Click(object sender, RoutedEventArgs e)
+        {
+            if (ass == null) return;
+            if (sender == cmiLangEng)
+            {
+                ass.YoutubeLanguage = "ENG";
+                cmiLangEng.IsChecked = true;
+                cmiLangChs.IsChecked = false;
+            }
+            else if(sender == cmiLangChs)
+            {
+                ass.YoutubeLanguage = "CHS";
+                cmiLangEng.IsChecked = false;
+                cmiLangChs.IsChecked = true;
+            }
+        }
     }
 }
