@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Automation.Peers;
 using System.Windows.Automation.Provider;
@@ -124,6 +125,23 @@ namespace SubTitles
 
         #endregion
 
+        private string GetValidFileName(string name)
+        {
+            string result = string.Empty;
+
+            List<char> cl = new List<char>();
+            var ci = Path.GetInvalidFileNameChars();
+            foreach (char c in name)
+            {
+                if (ci.Contains(c))
+                    cl.Add('_');
+                else
+                    cl.Add(c);
+            }
+
+            return (string.Join("", cl));
+        }
+
         private DataTemplate GetCellTemplate(string colname)
         {
             string xaml = @"<DataTemplate xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation"" 
@@ -135,12 +153,12 @@ namespace SubTitles
 
             StringReader stringReader = new StringReader(string.Format(xaml, colname));
             XmlReader xmlReader = XmlReader.Create(stringReader);
-            return(XamlReader.Load(xmlReader) as DataTemplate);
+            return (XamlReader.Load(xmlReader) as DataTemplate);
         }
 
         private void InitListView(ListView lv, string[] headers)
         {
-            lv.AlternationCount = 2;           
+            lv.AlternationCount = 2;
             events.Clear();
 
             GridView gv = (GridView)lv.View;
@@ -151,6 +169,7 @@ namespace SubTitles
                 col.Header = "ID";
                 col.DisplayMemberBinding = new Binding(col.Header.ToString());
                 col.CellTemplate = GetCellTemplate(col.Header.ToString());
+                col.Width = 48;
                 gv.Columns.Add(col);
 
                 foreach (string header in headers)
@@ -174,20 +193,28 @@ namespace SubTitles
 
         private async void LoadSubTitle(string subtitle)
         {
-            await ass.Load(subtitle);
-            InitListView(lvItems, ass.EventFields);
-            LastFilename = subtitle;
-            for (int i = 0; i < ass.Events.Count; i++)
+            try
             {
-                events.Add(ass.Events[i]);
+                LoadProgress.IsIndeterminate = true;
+                await ass.Load(subtitle);
+                InitListView(lvItems, ass.EventFields);
+                LastFilename = subtitle;
+                for (int i = 0; i < ass.Events.Count; i++)
+                {
+                    events.Add(ass.Events[i]);
+                }
+            }
+            finally
+            {
+                LoadProgress.IsIndeterminate = false;
             }
         }
 
-        private void SaveASS(ASS.SaveFlags flags)
+        private void SaveASS(ASS.SaveFlags flags = ASS.SaveFlags.BOM)
         {
             if (ass == null) return;
             else if (string.IsNullOrEmpty(LastFilename) && !string.IsNullOrEmpty(ass.ScriptInfo.Title))
-                LastFilename = ass.ScriptInfo.Title;
+                LastFilename = GetValidFileName(ass.ScriptInfo.Title);
             else if (!string.IsNullOrEmpty(LastFilename) && string.IsNullOrEmpty(ass.ScriptInfo.Title))
                 ass.ScriptInfo.Title = LastFilename;
 
@@ -195,15 +222,25 @@ namespace SubTitles
             if (!string.IsNullOrEmpty(LastFilename))
                 dlgSave.InitialDirectory = Path.GetDirectoryName(LastFilename);
             dlgSave.DefaultExt = ".ass";
-            dlgSave.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|WebVTT File|*.vtt";
+            dlgSave.FileName = Path.GetFileNameWithoutExtension(LastFilename);
+            dlgSave.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|WebVTT File|*.vtt|Lyric File|*.lrc|Text File|*.txt";
             dlgSave.FilterIndex = 0;
             if (dlgSave.ShowDialog() == true)
             {
-                if (dlgSave.FilterIndex == 3)
+                if (dlgSave.FilterIndex == 1)
+                    flags = flags | ASS.SaveFlags.ASS;
+                else if (dlgSave.FilterIndex == 2)
+                    flags = flags | ASS.SaveFlags.ASS;
+                else if (dlgSave.FilterIndex == 3)
                     flags = flags | ASS.SaveFlags.SRT;
                 else if (dlgSave.FilterIndex == 4)
                     flags = flags | ASS.SaveFlags.VTT;
+                else if (dlgSave.FilterIndex == 5)
+                    flags = flags | ASS.SaveFlags.LRC;
+                else if (dlgSave.FilterIndex == 6)
+                    flags = flags | ASS.SaveFlags.TXT;
                 ass.Save(dlgSave.FileName, flags);
+                LastFilename = dlgSave.FileName;
             }
         }
 
@@ -287,7 +324,7 @@ namespace SubTitles
             OpenFileDialog dlgOpen = new OpenFileDialog();
             dlgOpen.DefaultExt = ".ass";
             //dlgOpen.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|Text File|*.txt|All File|*.*";
-            dlgOpen.Filter = "All Supported File|*.ass;*.ssa;*.srt|ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt";
+            dlgOpen.Filter = "All Supported File|*.ass;*.ssa;*.srt;*.vtt|ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|VTT Fils|*.vtt";
             dlgOpen.FilterIndex = 0;
             if (dlgOpen.ShowDialog() == true)
             {
@@ -307,7 +344,8 @@ namespace SubTitles
                 {
                     var idx = lvItems.Items.IndexOf(lvItems.SelectedItems[i]);
                     var evt = ass.Events[idx];
-                    sb.AppendLine(evt.Text);
+                    var t = Regex.Replace(evt.Text, @"\\[n|N]", " $0 ", RegexOptions.IgnoreCase);
+                    sb.AppendLine(t);
                 }
                 var text = sb.ToString();
                 Clipboard.SetDataObject(text);
@@ -347,11 +385,21 @@ namespace SubTitles
             var texts = Clipboard.GetText();
             var lines = texts.Split(new string[] { "\n\r", "\r\n", "\r", "\n", }, StringSplitOptions.None);
 
-            string title = string.Empty;
-            var dlgInput = new InputDialog("Input", title);
-            if (dlgInput.ShowDialog() == true)
+            var title = string.Empty;
+            var no_title = Regex.IsMatch(lines[0], @"^\d{1,2}:\d{1,2}", RegexOptions.IgnoreCase);
+            if (no_title)
             {
-                title = dlgInput.Text;
+                title = "No Title";
+                var dlgInput = new InputDialog("Input", title);
+                if (dlgInput.ShowDialog() == true)
+                {
+                    title = dlgInput.Text;
+                }
+            }
+            else
+            {
+                title = lines[0];
+                lines = lines.Skip(1).ToArray();
             }
             ass.LoadFromYouTube(lines, title);
             InitListView(lvItems, ass.EventFields);
@@ -363,22 +411,23 @@ namespace SubTitles
 
         private void btnMerge_Click(object sender, RoutedEventArgs e)
         {
-            SaveASS(ASS.SaveFlags.Merge);
+            SaveASS(ASS.SaveFlags.Merge | ASS.SaveFlags.BOM);
         }
 
         private void btnReplace_Click(object sender, RoutedEventArgs e)
         {
-            SaveASS(ASS.SaveFlags.Replace);
+            SaveASS(ASS.SaveFlags.Replace | ASS.SaveFlags.BOM);
         }
 
         private void cmiSaveAs_Click(object sender, RoutedEventArgs e)
         {
-            SaveASS(ASS.SaveFlags.None);
+            SaveASS(ASS.SaveFlags.BOM);
         }
 
-        private void cmiExit_Click(object sender, RoutedEventArgs e)
+        private void cmiSaveWithBOM_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            if (ass == null) return;
+            ass.SaveWithUTF8BOM = cmiSaveWithBOM.IsChecked;
         }
 
         private void cmiLang_Click(object sender, RoutedEventArgs e)
@@ -390,12 +439,18 @@ namespace SubTitles
                 cmiLangEng.IsChecked = true;
                 cmiLangChs.IsChecked = false;
             }
-            else if(sender == cmiLangChs)
+            else if (sender == cmiLangChs)
             {
                 ass.YoutubeLanguage = "CHS";
                 cmiLangEng.IsChecked = false;
                 cmiLangChs.IsChecked = true;
             }
+            ass.ChangeStyle();
+        }
+
+        private void cmiExit_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
     }
 }

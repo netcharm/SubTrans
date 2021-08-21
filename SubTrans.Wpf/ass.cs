@@ -44,7 +44,7 @@ namespace SubTitles
         private enum Sections { ScriptInfo = 0, Styles = 1, Events = 2, Fonts = 3, Graphics = 4, Unknown = -1 };
 
         [Flags]
-        public enum SaveFlags { None = 0, Replace = 1, Merge = 2, SRT = 4, VTT = 8, BOM = 256 };
+        public enum SaveFlags { None = 0, Replace = 1, Merge = 2, SRT = 4, VTT = 8, LRC = 16, TXT = 32, ASS = 64, BOM = 256 };
 
         public class SCRIPTINFO
         {
@@ -59,6 +59,8 @@ namespace SubTitles
             public string ScriptUpdatedBy;
             public string UpdateDetails;
             public string ScriptType;
+            public string ScrollPosition;
+            public string VideoZoomPercent;
             public string Collisions;
             public string PlayResY;
             public string PlayResX;
@@ -410,8 +412,7 @@ namespace SubTitles
             public string Translated
             {
                 get { return translated; }
-                set
-                {
+                set {
                     var line = value;
                     var match_s = Regex.Matches(Text, @"\{ *\\.*?\}", RegexOptions.IgnoreCase);
                     var match_t = Regex.Matches(line, @"\{ *\\.*?\}", RegexOptions.IgnoreCase);
@@ -427,6 +428,7 @@ namespace SubTitles
             #endregion
         }
 
+        public bool SaveWithUTF8BOM { get; set; } = true;
         public string YoutubeLanguage { get; set; } = "ENG";
 
         public SCRIPTINFO ScriptInfo = new SCRIPTINFO();
@@ -775,7 +777,7 @@ namespace SubTitles
         {
             var srt = new SrtCollection();
             await srt.Load(contents);
-            var lines = srt.ToAss(title);
+            var lines = srt.ToAss(title, YoutubeLanguage);
             Load(lines.ToArray());
         }
 
@@ -791,32 +793,32 @@ namespace SubTitles
             if (contents is string[])
             {
                 List<string> lines = new List<string>();
-                lines.Add($"[Script Info]\n");
-                lines.Add($"Title: {title}\n");
-                lines.Add($"\n");
-                lines.Add($"[V4+ Styles]\n");
-                lines.Add($"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n");
+                lines.Add($"[Script Info]");
+                lines.Add($"Title: {title}");
+                lines.Add($"");
+                lines.Add($"[V4+ Styles]");
+                lines.Add($"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding");
                 if (YoutubeLanguage.Equals("CHS", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    lines.Add($"{AssStyle.CHS_Default}\n");
-                    lines.Add($"{AssStyle.CHS_Note}\n");
-                    lines.Add($"{AssStyle.CHS_Title}\n");
+                    lines.Add($"{AssStyle.CHS_Default}");
+                    lines.Add($"{AssStyle.CHS_Note}");
+                    lines.Add($"{AssStyle.CHS_Title}");
                 }
                 else if (YoutubeLanguage.Equals("CHT", StringComparison.CurrentCultureIgnoreCase))
                 {
-                    lines.Add($"{AssStyle.CHS_Default}\n");
-                    lines.Add($"{AssStyle.CHS_Note}\n");
-                    lines.Add($"{AssStyle.CHS_Title}\n");
+                    lines.Add($"{AssStyle.CHT_Default}");
+                    lines.Add($"{AssStyle.CHT_Note}");
+                    lines.Add($"{AssStyle.CHT_Title}");
                 }
                 else
                 {
-                    lines.Add($"{AssStyle.ENG_Default}\n");
-                    lines.Add($"{AssStyle.ENG_Note}\n");
-                    lines.Add($"{AssStyle.ENG_Title}\n");
+                    lines.Add($"{AssStyle.ENG_Default}");
+                    lines.Add($"{AssStyle.ENG_Note}");
+                    lines.Add($"{AssStyle.ENG_Title}");
                 }
-                lines.Add($"\n");
-                lines.Add($"[Events]\n");
-                lines.Add($"Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text\n");
+                lines.Add($"");
+                lines.Add($"[Events]");
+                lines.Add($"Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text");
 
                 var c = contents.Length;
                 int th = 0, tm = 0, ts = 0;
@@ -847,6 +849,7 @@ namespace SubTitles
                         curr_time = new DateTime(1, 1, 1, th, tm, ts);
                         curr_text = contents[i + 1].Replace("\n", "");
 
+                        if (last_time.Equals(curr_time) && string.IsNullOrEmpty(last_text)) continue;
                         lines.Add($"Dialogue: 0,{last_time.ToString("HH:mm:ss.ff")},{curr_time.ToString("HH:mm:ss.ff")},Default,NTP,0000,0000,0000,,{last_text}");
                         //lines.Add(new YouTubeSubtitleItem() { last_time = last_time, curr_time = curr_time, last_text = last_text });
                     }
@@ -860,93 +863,99 @@ namespace SubTitles
             }
         }
 
-        public void Save(string ass_file, SaveFlags flags = SaveFlags.Merge)
+        public void Save(string ass_file, SaveFlags flags = SaveFlags.Merge | SaveFlags.BOM)
         {
             if (flags.HasFlag(SaveFlags.SRT) || flags.HasFlag(SaveFlags.VTT))
-            {
                 SaveAsSrtVtt(ass_file, flags);
-                return;
-            }
-
-            StringBuilder sb = new StringBuilder();
-
-            #region Save Script Info Section
-            for (int i = 0; i < ScriptInfo.Raw.Count; i++)
+            else if (flags.HasFlag(SaveFlags.LRC))
+                SaveAsLRC(ass_file, flags);
+            else if (flags.HasFlag(SaveFlags.TXT))
+                SaveAsTxt(ass_file, flags);
+            else
             {
-                sb.AppendLine(ScriptInfo.Raw[i]);
-            }
-            //sb.AppendLine();
-            #endregion
+                StringBuilder sb = new StringBuilder();
 
-            #region Save Styles Section
-            for (int i = 0; i < StylesRaw.Count; i++)
-            {
-                sb.AppendLine(StylesRaw[i]);
-            }
-            //sb.AppendLine();
-            #endregion
+                #region Save Script Info Section
+                if (string.IsNullOrEmpty(ScriptInfo.ScriptType)) { ScriptInfo.ScriptType = "v4.00+"; ScriptInfo.Raw.Insert(1, "ScriptType: v4.00+"); }
+                if (string.IsNullOrEmpty(ScriptInfo.ScrollPosition)) { ScriptInfo.ScrollPosition = "0"; ScriptInfo.Raw.Insert(2, "Scroll Position: 0"); }
+                if (string.IsNullOrEmpty(ScriptInfo.VideoZoomPercent)) { ScriptInfo.VideoZoomPercent = "1"; ScriptInfo.Raw.Insert(3, "Video Zoom Percent: 1"); }
 
-            #region Save Fonts Section
-            for (int i = 0; i < FontsRaw.Count; i++)
-            {
-                sb.AppendLine(FontsRaw[i]);
-            }
-            #endregion
-
-            #region Save Graphics Section
-            for (int i = 0; i < GraphicsRaw.Count; i++)
-            {
-                sb.AppendLine(GraphicsRaw[i]);
-            }
-            #endregion
-
-            #region Save Events Section
-            sb.AppendLine(EventsRaw[0]);
-            sb.AppendLine(EventsRaw[1]);
-            for (int i = 2; i < events.Count + 2; i++)
-            {
-                var current = i-2;
-                var evt = events[current];
-                var evo = new List<string>();
-                foreach (var k in event_fields)
+                for (int i = 0; i < ScriptInfo.Raw.Count; i++)
                 {
-                    if (string.Equals(k, "ID", StringComparison.CurrentCultureIgnoreCase)) continue;
-                    if (string.Equals(k, "Text", StringComparison.CurrentCultureIgnoreCase)) continue;
-                    evo.Add(evt.Field(k));
+                    sb.AppendLine(ScriptInfo.Raw[i]);
                 }
-                string line = string.Empty;
-                switch (flags)
+                //sb.AppendLine();
+                #endregion
+
+                #region Save Styles Section
+                for (int i = 0; i < StylesRaw.Count; i++)
                 {
-                    case SaveFlags.None:
-                        line = $"{string.Join(",", evo)},{events[current].Text}";
-                        break;
-                    case SaveFlags.Merge:
+                    sb.AppendLine(StylesRaw[i]);
+                }
+                //sb.AppendLine();
+                #endregion
+
+                #region Save Fonts Section
+                for (int i = 0; i < FontsRaw.Count; i++)
+                {
+                    sb.AppendLine(FontsRaw[i]);
+                }
+                #endregion
+
+                #region Save Graphics Section
+                for (int i = 0; i < GraphicsRaw.Count; i++)
+                {
+                    sb.AppendLine(GraphicsRaw[i]);
+                }
+                #endregion
+
+                #region Save Events Section
+                sb.AppendLine(EventsRaw[0]);
+                sb.AppendLine(EventsRaw[1]);
+                for (int i = 2; i < events.Count + 2; i++)
+                {
+                    var current = i-2;
+                    var evt = events[current];
+                    var evo = new List<string>();
+                    foreach (var k in event_fields)
+                    {
+                        if (string.Equals(k, "ID", StringComparison.CurrentCultureIgnoreCase)) continue;
+                        if (string.Equals(k, "Text", StringComparison.CurrentCultureIgnoreCase)) continue;
+                        evo.Add(evt.Field(k));
+                    }
+                    string line = string.Empty;
+                    if (flags.HasFlag(SaveFlags.Merge))
+                    {
                         if (string.IsNullOrEmpty(events[current].Translated))
                             line = $"{string.Join(",", evo)},{AssStyle.ENG_Color}{AssStyle.ENG_Font}{events[current].Text}";
                         else
                             line = $"{string.Join(",", evo)},{AssStyle.ENG_Color}{AssStyle.ENG_Font}{events[current].Text}\\N{AssStyle.CHS_Color}{AssStyle.CHS_Font}{events[current].Translated}";
-                        break;
-                    case SaveFlags.Replace:
+                    }
+                    else if (flags.HasFlag(SaveFlags.Replace))
+                    {
                         if (string.IsNullOrEmpty(events[current].Translated))
                             line = $"{string.Join(",", evo)},{events[current].Text}";
                         else
                             line = $"{string.Join(",", evo)},{events[current].Translated}";
-                        break;
-                    default:
-                        break;
+                    }
+                    else
+                    {
+                        line = $"{string.Join(",", evo)},{events[current].Text}";
+                    }
+                    int idx = line.IndexOf(",");
+                    if (idx > 0)
+                        line = $"{line.Substring(0, idx)}: {line.Substring(idx + 1)}";
+                    if (!string.IsNullOrEmpty(line))
+                        sb.AppendLine(line);
                 }
-                int idx = line.IndexOf(",");
-                if (idx > 0)
-                    line = $"{line.Substring(0, idx)}: {line.Substring(idx + 1)}";
-                sb.AppendLine(line);
-            }
-            sb.AppendLine();
-            #endregion
+                sb.AppendLine();
+                #endregion
 
-            File.WriteAllText(ass_file, sb.ToString(), new UTF8Encoding(true));
+                File.WriteAllText(ass_file, sb.ToString(), new UTF8Encoding(flags.HasFlag(SaveFlags.BOM)));
+            }
         }
 
-        public void SaveAsSrtVtt(string ass_file, SaveFlags flags = SaveFlags.Merge)
+        public void SaveAsSrtVtt(string ass_file, SaveFlags flags = SaveFlags.Merge | SaveFlags.BOM)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -980,11 +989,7 @@ namespace SubTitles
 
                 string line = string.Empty;
 
-                if (flags.HasFlag(SaveFlags.None))
-                {
-                    line = events[i].Text;
-                }
-                else if (flags.HasFlag(SaveFlags.Replace))
+                if (flags.HasFlag(SaveFlags.Replace))
                 {
                     if (string.IsNullOrEmpty(events[i].Translated))
                         line = events[i].Text;
@@ -998,17 +1003,121 @@ namespace SubTitles
                     else
                         line = $"{events[i].Text}\\N{events[i].Translated}";
                 }
-                var lines = line.Split(new string[] { "\\N", "\r\n", "\n\r", "\n", "\r" }, StringSplitOptions.None);
-                foreach (var l in lines)
+                else
                 {
-                    sb.AppendLine($"{Regex.Replace(l, @"\{ *\\.*?\}", "", RegexOptions.IgnoreCase)}");
+                    line = events[i].Text;
+                }
+                if (!string.IsNullOrEmpty(line))
+                {
+                    var lines = line.Split(new string[] { "\\N", "\r\n", "\n\r", "\n", "\r" }, StringSplitOptions.None);
+                    foreach (var l in lines)
+                    {
+                        sb.AppendLine($"{Regex.Replace(l, @"\{ *\\.*?\}", "", RegexOptions.IgnoreCase)}");
+                    }
                 }
                 sb.AppendLine();
             }
 
-            File.WriteAllText(Path.ChangeExtension(ass_file, ext), sb.ToString(), new UTF8Encoding(true));
+            File.WriteAllText(Path.ChangeExtension(ass_file, ext), sb.ToString(), new UTF8Encoding(flags.HasFlag(SaveFlags.BOM)));
         }
 
+        public void SaveAsLRC(string ass_file, SaveFlags flags = SaveFlags.BOM)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine($"[Title]{ScriptInfo.Title}");
+            sb.AppendLine();
+
+            foreach (var e in events)
+            {
+                sb.Append($"[{e.Start}]");
+                if (flags.HasFlag(SaveFlags.Merge))
+                {
+                    if (string.IsNullOrEmpty(e.Translated))
+                        sb.AppendLine($"{e.Text}");
+                    else
+                        sb.AppendLine($"{e.Text}{Environment.NewLine}{e.Translated}");
+                }
+                else if (flags.HasFlag(SaveFlags.Replace))
+                {
+                    if (string.IsNullOrEmpty(e.Translated))
+                        sb.AppendLine($"{e.Text}");
+                    else
+                        sb.AppendLine($"{e.Translated}");
+                }
+                else
+                {
+                    sb.AppendLine(e.Text);
+                }
+            }
+
+            File.WriteAllText(ass_file, sb.ToString(), new UTF8Encoding(flags.HasFlag(SaveFlags.BOM)));
+        }
+
+        public void SaveAsTxt(string ass_file, SaveFlags flags = SaveFlags.BOM)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var e in events)
+            {
+                sb.AppendLine(e.Start);
+                if (flags.HasFlag(SaveFlags.Merge))
+                {
+                    if (string.IsNullOrEmpty(e.Translated))
+                        sb.AppendLine($"{e.Text}");
+                    else
+                        sb.AppendLine($"{e.Text}{Environment.NewLine}{e.Translated}");
+                }
+                else if (flags.HasFlag(SaveFlags.Replace))
+                {
+                    if (string.IsNullOrEmpty(e.Translated))
+                        sb.AppendLine($"{e.Text}");
+                    else
+                        sb.AppendLine($"{e.Translated}");
+                }
+                else
+                {
+                    sb.AppendLine(e.Text);
+                }
+                sb.AppendLine();
+            }
+
+            File.WriteAllText(ass_file, sb.ToString(), new UTF8Encoding(flags.HasFlag(SaveFlags.BOM)));
+        }
+
+        public void ChangeStyle()
+        {
+            if (StylesRaw.Count <= 2) return;
+            try
+            {
+                for (int i = StylesRaw.Count - 1; i > 1; i--)
+                {
+                    StylesRaw.RemoveAt(i);
+                }
+
+                if (YoutubeLanguage.Equals("CHS", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    StylesRaw.Add($"{AssStyle.CHS_Default}");
+                    StylesRaw.Add($"{AssStyle.CHS_Note}");
+                    StylesRaw.Add($"{AssStyle.CHS_Title}");
+                }
+                else if (YoutubeLanguage.Equals("CHT", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    StylesRaw.Add($"{AssStyle.CHT_Default}");
+                    StylesRaw.Add($"{AssStyle.CHT_Note}");
+                    StylesRaw.Add($"{AssStyle.CHT_Title}");
+                }
+                else
+                {
+                    StylesRaw.Add($"{AssStyle.ENG_Default}");
+                    StylesRaw.Add($"{AssStyle.ENG_Note}");
+                    StylesRaw.Add($"{AssStyle.ENG_Title}");
+                }
+
+                StylesRaw.Add("");
+            }
+            catch (Exception) { }
+        }
     }
 }
 
