@@ -1025,7 +1025,10 @@ namespace SubTitles
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine($"[Title]{ScriptInfo.Title}");
+            sb.AppendLine($"[ti:{ScriptInfo.Title}]");
+            sb.AppendLine($"[ar:]");
+            sb.AppendLine($"[al:]");
+            sb.AppendLine($"[by:]");
             sb.AppendLine();
 
             foreach (var e in events)
