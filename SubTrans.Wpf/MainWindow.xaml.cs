@@ -34,6 +34,7 @@ namespace SubTitles
             get { return (events); }
         }
 
+        string OriginalTitle = string.Empty;
         string LastFilename = string.Empty;
 
         #region Extract Icon from application
@@ -125,6 +126,45 @@ namespace SubTitles
 
         #endregion
 
+        private string FixBracketingError(string text)
+        {
+            var result = text;
+            try
+            {
+                if (!string.IsNullOrEmpty(result))
+                {
+                    result = Regex.Replace(text, $@"｛(\\.*?)｝", m =>
+                    {
+                        var t = $"{{{m.Groups[1].Value}}}";
+                        t = Regex.Replace(t, $@"（(.*?)）", ms =>
+                        {
+                            return ($"({ms.Groups[1].Value})");
+                        }, RegexOptions.IgnoreCase);
+                        return (t);
+                    }, RegexOptions.IgnoreCase);
+                    result = Regex.Replace(result, @"\\fn(次?新)?罗马(时代)?", @"\fnTimes New Roman", RegexOptions.IgnoreCase);
+                    result = result.Replace("｛fruf2｝", "{\blur2}").Replace("｛fru｝", "{\blur2}");
+                }
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            return (result);
+        }
+
+        private IEnumerable<string> FixBracketingError(IEnumerable<string> lines)
+        {
+            var result = lines.ToList();
+            try
+            {
+                for (var i = 0; i < lines.Count(); i++)
+                {
+                    if (string.IsNullOrEmpty(result[i])) continue;
+                    result[i] = FixBracketingError(result[i]);
+                }
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            return (result);
+        }
+
         private string GetValidFileName(string name)
         {
             string result = string.Empty;
@@ -207,6 +247,13 @@ namespace SubTitles
             finally
             {
                 LoadProgress.IsIndeterminate = false;
+                if (!string.IsNullOrEmpty(LastFilename))
+                {
+                    await Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        Title = $"{OriginalTitle} - {LastFilename}";
+                    }));
+                }
             }
         }
 
@@ -251,6 +298,7 @@ namespace SubTitles
             Icon = GetIcon(apppath.ToString());
             MainGrid.AllowDrop = true;
             lvItems.ItemsSource = events;
+            OriginalTitle = Title;
         }
 
         #region Drag/Drop Routines
@@ -373,7 +421,7 @@ namespace SubTitles
                     if (idx_t >= lines.Length) continue;
 
                     var evt = ass.Events[idx];
-                    evt.Translated = lines[idx_t];
+                    evt.Translated = FixBracketingError(lines[idx_t]);
                     events[idx].Translated = evt.Translated;
                 }
             }
@@ -417,6 +465,26 @@ namespace SubTitles
         private void btnReplace_Click(object sender, RoutedEventArgs e)
         {
             SaveASS(ASS.SaveFlags.Replace | ASS.SaveFlags.BOM);
+        }
+
+        private void cmiFixBracket_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (lvItems.Items.Count <= 0) return;
+                //if (lvItems.SelectedItems.Count <= 0) return;
+                var items = lvItems.SelectedItems.Count <= 0 ? lvItems.Items : lvItems.SelectedItems;
+                for (int i = 0; i < items.Count; i++)
+                {
+                    var idx = lvItems.Items.IndexOf(items[i]);
+                    var evt = ass.Events[idx];
+                    if (!string.IsNullOrEmpty(evt.Translated))
+                        evt.Translated = FixBracketingError(evt.Translated);
+                    else if (!string.IsNullOrEmpty(evt.Text))
+                        evt.Text = FixBracketingError(evt.Text);
+                }
+            }
+            catch (Exception) { }
         }
 
         private void cmiSaveAs_Click(object sender, RoutedEventArgs e)
