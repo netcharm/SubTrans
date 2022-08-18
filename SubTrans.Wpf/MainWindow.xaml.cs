@@ -19,14 +19,58 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml;
+using System.Xml.Serialization;
 
 namespace SubTitles
 {
+    [XmlRoot(ElementName = "Vocabulary", IsNullable = false)]
+    public partial class Terms
+    {
+        [XmlElement(ElementName = "Phrases")]
+        public List<Term> Items { get; set; } = new List<Term>();
+    }
+
+    [XmlRoot(ElementName = "Phrase", IsNullable = true)]
+    public partial class Term
+    {
+        //[XmlElement(ElementName = "Original", IsNullable = false)]
+        [XmlAttribute(AttributeName = "Original")]
+        public string Original { get; set; }
+        //[XmlElement(ElementName = "Translated", IsNullable = true)]
+        [XmlAttribute(AttributeName = "Translated")]
+        public string Translated { get; set; }
+        //[XmlElement(ElementName = "Language", IsNullable = true)]
+        [XmlAttribute(AttributeName = "Language")]
+        public string Language { get; set; }
+        //[XmlElement(ElementName = "Comment", IsNullable = true)]
+        [XmlAttribute(AttributeName = "Comment")]
+        public string Comment { get; set; }
+
+        public bool Equals(Term term)
+        {
+            if (!(term is Term)) return (false);
+            return (term.Original.Equals(Original) && term.Translated.Equals(Translated) && term.Language.Equals(Language, StringComparison.CurrentCultureIgnoreCase));
+        }
+
+        public bool Exists(Term term)
+        {
+            if (!(term is Term)) return (false);
+            return (term.Original.Equals(Original) && term.Language.Equals(Language, StringComparison.CurrentCultureIgnoreCase));
+        }
+    }
+
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static string AppExec = Assembly.GetEntryAssembly().Location;
+        private static string AppPath = Path.GetDirectoryName(AppExec);
+        private static string AppName = Path.GetFileNameWithoutExtension(AppExec);
+
+        private Terms Phrase = new Terms();
+        private string PhraseFile = Path.Combine(AppPath, $"{AppName}.phrase.xml");
+
         ASS ass = new ASS();
         private ObservableCollection<ASS.EVENT> events = new ObservableCollection<ASS.EVENT>();
         public ObservableCollection<ASS.EVENT> Events
@@ -126,6 +170,27 @@ namespace SubTitles
 
         #endregion
 
+        private string PhraseReplace(string text)
+        {
+            var result = text;
+            try
+            {
+                foreach (var phrase in Phrase.Items)
+                {
+                    if (string.IsNullOrEmpty(phrase.Original)) continue;
+                    if (string.IsNullOrEmpty(phrase.Translated)) continue;
+                    if (Regex.IsMatch(phrase.Original, @"/.+?/i", RegexOptions.IgnoreCase))
+                        result = Regex.Replace(result, phrase.Original.Trim('/'), phrase.Translated, RegexOptions.IgnoreCase);
+                    else if (Regex.IsMatch(phrase.Original, @"/.+?/"))
+                        result = Regex.Replace(result, phrase.Original.Trim('/'), phrase.Translated, RegexOptions.None);
+                    else
+                        result = result.Replace(phrase.Original, phrase.Translated);
+                }
+            }
+            catch(Exception ex) { MessageBox.Show(this, ex.Message); }
+            return (result);
+        }
+
         private string FixBracketingError(string text)
         {
             var result = text;
@@ -142,8 +207,26 @@ namespace SubTitles
                         }, RegexOptions.IgnoreCase);
                         return (t);
                     }, RegexOptions.IgnoreCase);
+
+                    result = result.Replace("｛fruf2｝", "{\blur2}").Replace("｛fru｝", "{\blur2}").TrimEnd(new char[] { '\\', '\r', '\n' });
+
                     result = Regex.Replace(result, @"\\fn(次?新)?罗马(时代)?", @"\fnTimes New Roman", RegexOptions.IgnoreCase);
-                    result = result.Replace("｛fruf2｝", "{\blur2}").Replace("｛fru｝", "{\blur2}");
+
+                    result = Regex.Replace(result, @"(\{\\.*?\})", m => { return (m.Value.Replace("\\", "\x1F")); }, RegexOptions.IgnoreCase);
+                    result = Regex.Replace(result, @"\\(h|n|N)", m => { return ($"{"\x1F"}{m.Groups[1].Value}"); }, RegexOptions.IgnoreCase);
+                    result = result.Replace("\\", "\\N").Replace("\u001F", "\\").Replace("\x1F", "\\");
+                    if (Regex.IsMatch(result, @"\{.*?\}"))
+                    {
+                        var prefix = result.StartsWith("{") ? "" : "}";
+                        var suffix = result.EndsWith("}") ? "" : "{";
+                        var regex = @"\}(.+?)\{";
+                        result = Regex.Replace($"{prefix}{result}{suffix}", regex, m =>
+                        {
+                            return (m.Value.Replace(m.Groups[1].Value, PhraseReplace(m.Groups[1].Value)));
+                        }, RegexOptions.IgnoreCase);
+                        result = result.Remove(result.Length - 1, suffix.Length).Remove(0, prefix.Length);
+                    }
+                    else result = PhraseReplace(result);
                 }
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -291,6 +374,50 @@ namespace SubTitles
             }
         }
 
+        private Terms LoadPhrase(string file = "")
+        {
+            var result = new Terms();
+            if (string.IsNullOrEmpty(file)) file = PhraseFile;
+            if (File.Exists(file))
+            {
+                try
+                {
+                    var xs = new XmlSerializer(typeof(Terms));
+                    using (StringReader tr = new StringReader(File.ReadAllText(file, Encoding.UTF8)))
+                    {
+                        result = (Terms)xs.Deserialize(tr);
+                    }
+                }
+                catch (Exception ex) { MessageBox.Show(this, ex.Message); }
+            }
+            return (result);
+        }
+
+        private void SavePhrase(string file = "", Terms terms = null)
+        {
+            if (string.IsNullOrEmpty(file)) file = PhraseFile;
+            if (terms == null) terms = Phrase;
+            if (terms is Terms)
+            {
+                try
+                {
+                    var xs = new XmlSerializer(typeof(Terms));
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        using (StreamWriter sw = new StreamWriter(ms, Encoding.UTF8))
+                        {
+                            using (XmlWriter xw = XmlWriter.Create(sw, new XmlWriterSettings() { Encoding = Encoding.UTF8, Indent = true, IndentChars = "  " }))
+                            {
+                                xs.Serialize(xw, terms);
+                            }
+                        }
+                        File.WriteAllBytes(file, ms.ToArray());
+                    }
+                }
+                catch (Exception ex) { MessageBox.Show(this, ex.Message); }
+            }
+        }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -299,6 +426,18 @@ namespace SubTitles
             MainGrid.AllowDrop = true;
             lvItems.ItemsSource = events;
             OriginalTitle = Title;
+
+#if DEBUG
+            Phrase.Items.Add(new Term() { Original = "一楼", Translated = "一层" });
+            Phrase.Items.Add(new Term() { Original = "二楼", Translated = "二层" });
+            Phrase.Items.Add(new Term() { Original = "三楼", Translated = "三层" });
+            Phrase.Items.Add(new Term() { Original = "四楼", Translated = "四层" });
+#endif
+
+            if (!File.Exists(PhraseFile))
+                SavePhrase(PhraseFile, Phrase);
+            else
+                Phrase = LoadPhrase(PhraseFile);
         }
 
         #region Drag/Drop Routines
