@@ -1,8 +1,7 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -21,7 +20,9 @@ using System.Windows.Media.Imaging;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace SubTitles
+using Microsoft.Win32;
+
+namespace SubTrans
 {
     public enum PhraseType { Auto, Manual, None };
     public enum PhraseCategory { All, Anime, Movie, Drama, None };
@@ -72,6 +73,16 @@ namespace SubTitles
         private static string AppName = Path.GetFileNameWithoutExtension(AppExec);
 
         private string[] exts = new string[] { ".ass", ".ssa", ".srt", ".vtt" };
+
+        private const string YoutubeLanguage_Key = "YoutubeLanguage";
+        private const string SaveWithBOM_Key = "SaveWithBOM";
+        private const string PasteRemoveNullLine_Key = "PasteRemoveNullLine";
+        private string YoutubeLanguage = Properties.Settings.Default.YoutubeLanguage;
+        private bool SaveWithBOM = Properties.Settings.Default.SaveWithBOM;
+        private bool PasteRemoveNullLine = Properties.Settings.Default.PasteRemoveNullLine;
+
+        private static Configuration config = ConfigurationManager.OpenExeConfiguration(AppExec);
+        private static AppSettingsSection appSection = config.AppSettings;
 
         private Terms Phrase = new Terms();
         private string PhraseFile = Path.Combine(AppPath, $"{AppName}.phrase.xml");
@@ -193,7 +204,7 @@ namespace SubTitles
                         result = result.Replace(phrase.Original, phrase.Translated);
                 }
             }
-            catch(Exception ex) { MessageBox.Show(this, ex.Message); }
+            catch (Exception ex) { MessageBox.Show(this, ex.Message); }
             return (result);
         }
 
@@ -424,6 +435,65 @@ namespace SubTitles
             }
         }
 
+        private void InvokeControl(object sender)
+        {
+            FrameworkElementAutomationPeer peer = null;
+            //typeof(System.Windows.Controls.Primitives.ButtonBase).GetMethod("OnClick", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(btnCopy, new object[0]);
+            if (sender is Button) peer = new ButtonAutomationPeer(sender as Button);
+            else if(sender is MenuItem) peer = new MenuItemAutomationPeer(sender as MenuItem);
+            if (peer is FrameworkElementAutomationPeer)
+            {
+                IInvokeProvider invokeProv = (peer as FrameworkElementAutomationPeer).GetPattern(PatternInterface.Invoke) as IInvokeProvider;
+                invokeProv.Invoke();
+            }
+        }
+
+        #region Config Helper
+        private string GetConfigValue(string key, object value = null)
+        {
+            string result = string.Empty;
+            if (appSection is AppSettingsSection)
+            {
+                if (appSection.Settings.AllKeys.Contains(key))
+                {
+                    result = appSection.Settings[key].Value;
+                }
+                else
+                {
+                    if (value != null)
+                        appSection.Settings.Add(key, value.ToString());
+                    else
+                        appSection.Settings.Add(key, string.Empty);
+
+                    config.Save();
+                }
+            }
+            return (result);
+        }
+
+        private void SetConfigValue(string key, object value = null)
+        {
+            string result = string.Empty;
+            if (appSection is AppSettingsSection)
+            {
+                if (appSection.Settings.AllKeys.Contains(key))
+                {
+                    if (value != null)
+                        appSection.Settings[key].Value = value.ToString();
+                    else
+                        appSection.Settings.Remove(key);
+
+                    config.Save();
+                }
+                else if (value != null)
+                {
+                    appSection.Settings.Add(key, value.ToString());
+                    config.Save();
+                }
+            }
+        }
+        #endregion
+
         public MainWindow()
         {
             InitializeComponent();
@@ -433,6 +503,15 @@ namespace SubTitles
             MainGrid.AllowDrop = true;
             lvItems.ItemsSource = events;
             OriginalTitle = Title;
+
+            YoutubeLanguage = GetConfigValue(YoutubeLanguage_Key, YoutubeLanguage);
+            bool.TryParse(GetConfigValue(SaveWithBOM_Key, SaveWithBOM), out SaveWithBOM);
+            bool.TryParse(GetConfigValue(PasteRemoveNullLine_Key, PasteRemoveNullLine), out PasteRemoveNullLine);
+
+            if (YoutubeLanguage == "CHS") { cmiLangChs.IsChecked = true; cmiLangEng.IsChecked = false; }
+            else if (YoutubeLanguage == "ENG") { cmiLangChs.IsChecked = false; cmiLangEng.IsChecked = true; }
+            cmiSaveWithBOM.IsChecked = SaveWithBOM;
+            cmiPasteRemoveNullLine.IsChecked = PasteRemoveNullLine;
 
 #if DEBUG
             Phrase.Items.Add(new Term() { Original = "一楼", Translated = "一层" });
@@ -503,20 +582,9 @@ namespace SubTitles
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl))//|| Keyboard.IsKeyDown(Key.RightCtrl))
             {
-                if (e.Key == Key.C)
-                {
-                    //typeof(System.Windows.Controls.Primitives.ButtonBase).GetMethod("OnClick", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(btnCopy, new object[0]);
-                    ButtonAutomationPeer peer = new ButtonAutomationPeer(btnCopy);
-                    IInvokeProvider invokeProv = peer.GetPattern(PatternInterface.Invoke) as IInvokeProvider;
-                    invokeProv.Invoke();
-                }
-                else if (e.Key == Key.V)
-                {
-                    //typeof(System.Windows.Controls.Primitives.ButtonBase).GetMethod("OnClick", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(btnPaste, new object[0]);
-                    ButtonAutomationPeer peer = new ButtonAutomationPeer(btnPaste);
-                    IInvokeProvider invokeProv = peer.GetPattern(PatternInterface.Invoke) as IInvokeProvider;
-                    invokeProv.Invoke();
-                }
+                if (e.Key == Key.S) InvokeControl(cmiSaveAs);
+                else if (e.Key == Key.C) InvokeControl(btnCopy);
+                else if (e.Key == Key.V) InvokeControl(btnPaste);                
             }
         }
 
@@ -572,6 +640,7 @@ namespace SubTitles
                 StringBuilder sb = new StringBuilder();
                 var texts = Clipboard.GetText();
                 var lines = texts.Split(new string[] { "\n\r", "\r\n", "\r", "\n", }, StringSplitOptions.None);
+                if (PasteRemoveNullLine) lines = lines.Where(l => !string.IsNullOrEmpty(l.Trim())).ToArray();
 
                 var items = new object[lvItems.SelectedItems.Count];
                 lvItems.SelectedItems.CopyTo(items, 0);
@@ -624,14 +693,44 @@ namespace SubTitles
             }
         }
 
-        private void btnMerge_Click(object sender, RoutedEventArgs e)
+        private void cmiPasteRemoveNullLine_Click(object sender, RoutedEventArgs e)
         {
-            SaveASS(ASS.SaveFlags.Merge | ASS.SaveFlags.BOM);
+            if (ass == null) return;
+            PasteRemoveNullLine = cmiPasteRemoveNullLine.IsChecked;
+            SetConfigValue(PasteRemoveNullLine_Key, PasteRemoveNullLine);
         }
 
-        private void btnReplace_Click(object sender, RoutedEventArgs e)
+        private void cmiSaveWithBOM_Click(object sender, RoutedEventArgs e)
         {
-            SaveASS(ASS.SaveFlags.Replace | ASS.SaveFlags.BOM);
+            if (ass == null) return;
+            ass.SaveWithUTF8BOM = cmiSaveWithBOM.IsChecked;
+            SaveWithBOM = ass.SaveWithUTF8BOM;
+            SetConfigValue(SaveWithBOM_Key, SaveWithBOM);
+        }
+
+        private void cmiLang_Click(object sender, RoutedEventArgs e)
+        {
+            if (ass == null) return;
+            if (sender == cmiLangEng)
+            {
+                ass.YoutubeLanguage = "ENG";
+                cmiLangEng.IsChecked = true;
+                cmiLangChs.IsChecked = false;
+            }
+            else if (sender == cmiLangChs)
+            {
+                ass.YoutubeLanguage = "CHS";
+                cmiLangEng.IsChecked = false;
+                cmiLangChs.IsChecked = true;
+            }
+            ass.ChangeStyle();
+            YoutubeLanguage = ass.YoutubeLanguage;
+            SetConfigValue(YoutubeLanguage_Key, YoutubeLanguage);
+        }
+
+        private void cmiExit_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
 
         private void cmiFixBracket_Click(object sender, RoutedEventArgs e)
@@ -654,38 +753,28 @@ namespace SubTitles
             catch (Exception) { }
         }
 
+        private void btnMerge_Click(object sender, RoutedEventArgs e)
+        {
+            if (SaveWithBOM)
+                SaveASS(ASS.SaveFlags.Merge | ASS.SaveFlags.BOM);
+            else
+                SaveASS(ASS.SaveFlags.Merge);
+        }
+
+        private void btnReplace_Click(object sender, RoutedEventArgs e)
+        {
+            if (SaveWithBOM)
+                SaveASS(ASS.SaveFlags.Replace | ASS.SaveFlags.BOM);
+            else
+                SaveASS(ASS.SaveFlags.Replace);
+        }
+
         private void cmiSaveAs_Click(object sender, RoutedEventArgs e)
         {
-            SaveASS(ASS.SaveFlags.BOM);
-        }
-
-        private void cmiSaveWithBOM_Click(object sender, RoutedEventArgs e)
-        {
-            if (ass == null) return;
-            ass.SaveWithUTF8BOM = cmiSaveWithBOM.IsChecked;
-        }
-
-        private void cmiLang_Click(object sender, RoutedEventArgs e)
-        {
-            if (ass == null) return;
-            if (sender == cmiLangEng)
-            {
-                ass.YoutubeLanguage = "ENG";
-                cmiLangEng.IsChecked = true;
-                cmiLangChs.IsChecked = false;
-            }
-            else if (sender == cmiLangChs)
-            {
-                ass.YoutubeLanguage = "CHS";
-                cmiLangEng.IsChecked = false;
-                cmiLangChs.IsChecked = true;
-            }
-            ass.ChangeStyle();
-        }
-
-        private void cmiExit_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
+            if(SaveWithBOM)
+                SaveASS(ASS.SaveFlags.BOM);
+            else
+                SaveASS(ASS.SaveFlags.None);
         }
     }
 }

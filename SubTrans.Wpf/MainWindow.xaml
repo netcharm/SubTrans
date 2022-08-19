@@ -2,8 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SubTitles.Wpf"
-        xmlns:local1="clr-namespace:SubTitles" x:Name="MainForm" x:Class="SubTitles.MainWindow"
+        xmlns:local="clr-namespace:SubTrans.Wpf"
+        xmlns:local1="clr-namespace:SubTrans" x:Name="MainForm" x:Class="SubTrans.MainWindow"
         mc:Ignorable="d"
         FontFamily="等距更纱黑体 SC, Segeo UI"
         Title="Suntitle Translator" 
@@ -41,19 +41,22 @@
         <Grid.ContextMenu>
             <ContextMenu HasDropShadow="True">
                 <MenuItem x:Name="cmiLoadASS" Header="Load ASS" Click="btnLoad_Click" />
+                <Separator/>
                 <MenuItem x:Name="cmiPasteYoutube" Header="Paste Youtube Subtitles" Click="btnPasteYoutube_Click" />
                 <Separator/>
                 <MenuItem x:Name="cmiCopy" Header="Copy Selected Text To Clipboard" Click="btnCopy_Click" />
                 <MenuItem x:Name="cmiPaste" Header="Paste Translated From Clipboard" Click="btnPaste_Click" />
                 <MenuItem x:Name="cmiFixed" Header="Fix Translated Text Bracketing" Click="cmiFixBracket_Click" />
                 <Separator/>
+                <MenuItem x:Name="cmiSaveAs" Header="Save As..." Click="cmiSaveAs_Click" />
+                <MenuItem x:Name="cmiMerge"  Header="Merge Translated As..." Click="btnMerge_Click" />
+                <MenuItem x:Name="cmiReplace" Header="Replace Translated As..." Click="btnReplace_Click" />
+                <Separator/>
                 <MenuItem x:Name="cmiLangEng" Header="Youtube English Subtitle" IsChecked="True" Click="cmiLang_Click" />
                 <MenuItem x:Name="cmiLangChs" Header="Youtube Chinese Subtitle" IsChecked="False" Click="cmiLang_Click" />
                 <Separator/>
                 <MenuItem x:Name="cmiSaveWithBOM" Header="Save With UTF8-BOM" Click="cmiSaveWithBOM_Click" IsCheckable="True" IsChecked="True" />
-                <MenuItem x:Name="cmiSaveAs" Header="Save As..." Click="cmiSaveAs_Click" />
-                <MenuItem x:Name="cmiMerge"  Header="Merge Translated As..." Click="btnMerge_Click" />
-                <MenuItem x:Name="cmiReplace" Header="Replace Translated As..." Click="btnReplace_Click" />
+                <MenuItem x:Name="cmiPasteRemoveNullLine" Header="Remove Null Line When Paste" Click="cmiPasteRemoveNullLine_Click" IsCheckable="True" IsChecked="True" />
                 <Separator/>
                 <MenuItem x:Name="cmiExit" Header="Exit" Click="cmiExit_Click" />
             </ContextMenu>

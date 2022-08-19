@@ -1,7 +1,7 @@
-﻿<Application x:Class="SubTitles.Wpf.App"
+﻿<Application x:Class="SubTrans.Wpf.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:SubTitles.Wpf"
+             xmlns:local="clr-namespace:SubTrans.Wpf"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          

@@ -15,7 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace SubTitles
+namespace SubTrans
 {
     /// <summary>
     /// Window1.xaml 的交互逻辑
