@@ -23,6 +23,9 @@ using System.Xml.Serialization;
 
 namespace SubTitles
 {
+    public enum PhraseType { Auto, Manual, None };
+    public enum PhraseCategory { All, Anime, Movie, Drama, None };
+
     [XmlRoot(ElementName = "Vocabulary", IsNullable = false)]
     public partial class Terms
     {
@@ -33,18 +36,18 @@ namespace SubTitles
     [XmlRoot(ElementName = "Phrase", IsNullable = true)]
     public partial class Term
     {
-        //[XmlElement(ElementName = "Original", IsNullable = false)]
         [XmlAttribute(AttributeName = "Original")]
         public string Original { get; set; }
-        //[XmlElement(ElementName = "Translated", IsNullable = true)]
         [XmlAttribute(AttributeName = "Translated")]
         public string Translated { get; set; }
-        //[XmlElement(ElementName = "Language", IsNullable = true)]
         [XmlAttribute(AttributeName = "Language")]
         public string Language { get; set; }
-        //[XmlElement(ElementName = "Comment", IsNullable = true)]
         [XmlAttribute(AttributeName = "Comment")]
         public string Comment { get; set; }
+        [XmlAttribute(AttributeName = "Type")]
+        public PhraseType Type { get; set; } = PhraseType.Auto;
+        [XmlAttribute(AttributeName = "Catalog")]
+        public PhraseCategory Category { get; set; }
 
         public bool Equals(Term term)
         {
@@ -67,6 +70,8 @@ namespace SubTitles
         private static string AppExec = Assembly.GetEntryAssembly().Location;
         private static string AppPath = Path.GetDirectoryName(AppExec);
         private static string AppName = Path.GetFileNameWithoutExtension(AppExec);
+
+        private string[] exts = new string[] { ".ass", ".ssa", ".srt", ".vtt" };
 
         private Terms Phrase = new Terms();
         private string PhraseFile = Path.Combine(AppPath, $"{AppName}.phrase.xml");
@@ -170,18 +175,19 @@ namespace SubTitles
 
         #endregion
 
-        private string PhraseReplace(string text)
+        private string PhraseReplace(string text, PhraseType type = PhraseType.Auto)
         {
-            var result = text;
+            var result = string.Join("\\N", text.Split(new string[] { "\\N", "\\n" }, StringSplitOptions.None).Select(t => t.Trim()));
             try
             {
                 foreach (var phrase in Phrase.Items)
                 {
+                    if (phrase.Type != type) continue;
                     if (string.IsNullOrEmpty(phrase.Original)) continue;
                     if (string.IsNullOrEmpty(phrase.Translated)) continue;
                     if (Regex.IsMatch(phrase.Original, @"/.+?/i", RegexOptions.IgnoreCase))
                         result = Regex.Replace(result, phrase.Original.Trim('/'), phrase.Translated, RegexOptions.IgnoreCase);
-                    else if (Regex.IsMatch(phrase.Original, @"/.+?/"))
+                    else if (Regex.IsMatch(phrase.Original, @"/.+?/", RegexOptions.IgnoreCase))
                         result = Regex.Replace(result, phrase.Original.Trim('/'), phrase.Translated, RegexOptions.None);
                     else
                         result = result.Replace(phrase.Original, phrase.Translated);
@@ -191,7 +197,7 @@ namespace SubTitles
             return (result);
         }
 
-        private string FixBracketingError(string text)
+        private string FixBracketingError(string text, PhraseType type = PhraseType.Auto)
         {
             var result = text;
             try
@@ -222,11 +228,11 @@ namespace SubTitles
                         var regex = @"\}(.+?)\{";
                         result = Regex.Replace($"{prefix}{result}{suffix}", regex, m =>
                         {
-                            return (m.Value.Replace(m.Groups[1].Value, PhraseReplace(m.Groups[1].Value)));
+                            return (m.Value.Replace(m.Groups[1].Value, PhraseReplace(m.Groups[1].Value, type)));
                         }, RegexOptions.IgnoreCase);
                         result = result.Remove(result.Length - 1, suffix.Length).Remove(0, prefix.Length);
                     }
-                    else result = PhraseReplace(result);
+                    else result = PhraseReplace(result, type);
                 }
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -421,6 +427,7 @@ namespace SubTitles
         public MainWindow()
         {
             InitializeComponent();
+
             var apppath = Assembly.GetExecutingAssembly().Location;
             Icon = GetIcon(apppath.ToString());
             MainGrid.AllowDrop = true;
@@ -438,6 +445,13 @@ namespace SubTitles
                 SavePhrase(PhraseFile, Phrase);
             else
                 Phrase = LoadPhrase(PhraseFile);
+
+            var args = Environment.GetCommandLineArgs();
+            if (args.Length > 1)
+            {
+                var files = args.Skip(1).Where(f => exts.Contains(Path.GetExtension(f).ToLower()) && File.Exists(f));
+                if (files.Count() > 0) LoadSubTitle(files.First());
+            }
         }
 
         #region Drag/Drop Routines
@@ -526,13 +540,21 @@ namespace SubTitles
                 if (lvItems.Items.Count <= 0) return;
                 if (lvItems.SelectedItems.Count <= 0) return;
 
+                var items = new object[lvItems.SelectedItems.Count];
+                lvItems.SelectedItems.CopyTo(items, 0);
+                items = items.OrderBy(i => lvItems.Items.IndexOf(i)).ToArray();
+
                 StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < lvItems.SelectedItems.Count; i++)
+                foreach (var item in items)
                 {
-                    var idx = lvItems.Items.IndexOf(lvItems.SelectedItems[i]);
-                    var evt = ass.Events[idx];
-                    var t = Regex.Replace(evt.Text, @"\\[n|N]", " $0 ", RegexOptions.IgnoreCase);
-                    sb.AppendLine(t);
+                    if (item is ASS.EVENT)
+                    {
+                        var selected = item as ASS.EVENT;
+                        var idx = Convert.ToInt32(selected.ID) - 1;
+                        var evt = ass.Events[idx];
+                        var t = Regex.Replace(evt.Text, @"\\[h|n|N]", " $0 ", RegexOptions.IgnoreCase);
+                        sb.AppendLine(t);
+                    }
                 }
                 var text = sb.ToString();
                 Clipboard.SetDataObject(text);
@@ -545,23 +567,29 @@ namespace SubTitles
             if (lvItems.Items.Count <= 0) return;
             if (lvItems.SelectedItems.Count <= 0) return;
 
-            StringBuilder sb = new StringBuilder();
-            var texts = Clipboard.GetText();
-            var lines = texts.Split(new string[] { "\n\r", "\r\n", "\r", "\n", }, StringSplitOptions.None);
-
-            var idx_t = -1;
-            foreach (var item in lvItems.SelectedItems)
+            if (Clipboard.ContainsText())
             {
-                idx_t++;
-                if (item is ASS.EVENT)
-                {
-                    var selected = item as ASS.EVENT;
-                    var idx = Convert.ToInt32(selected.ID) - 1;
-                    if (idx_t >= lines.Length) continue;
+                StringBuilder sb = new StringBuilder();
+                var texts = Clipboard.GetText();
+                var lines = texts.Split(new string[] { "\n\r", "\r\n", "\r", "\n", }, StringSplitOptions.None);
 
-                    var evt = ass.Events[idx];
-                    evt.Translated = FixBracketingError(lines[idx_t]);
-                    events[idx].Translated = evt.Translated;
+                var items = new object[lvItems.SelectedItems.Count];
+                lvItems.SelectedItems.CopyTo(items, 0);
+                items = items.OrderBy(i => lvItems.Items.IndexOf(i)).ToArray();
+
+                var idx_t = 0;
+                foreach (var item in items)
+                {
+                    if (idx_t >= lines.Length) break;
+                    if (item is ASS.EVENT)
+                    {
+                        var selected = item as ASS.EVENT;
+                        var idx = Convert.ToInt32(selected.ID) - 1;
+                        var evt = ass.Events[idx];
+                        evt.Translated = FixBracketingError(lines[idx_t]);
+                        events[idx].Translated = evt.Translated;
+                        idx_t++;
+                    }
                 }
             }
         }
