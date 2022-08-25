@@ -2,8 +2,21 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:SubTrans.Wpf"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <FontFamily x:Key="MonoSpaceFamily">
+                "Sarasa Mono J, 等距更纱黑体 SC, FontAwesome, Iosevka, Consolas, Segoe UI Emoji, Segoe MDL2 Assets, 更纱黑体 SC, Segoe UI, Monospace"
+            </FontFamily>
+            <FontFamily x:Key="NormalFamily">
+                "Sarasa Gothic J, 更纱黑体 SC, FontAwesome, Segoe UI Emoji, Segoe MDL2 Assets, Segoe UI"
+            </FontFamily>
+            <FontFamily x:Key="SegoeIconFamily">
+                "Segoe MDL2 Assets, Segoe UI Emoji, Segoe UI"
+                <!--"Segoe MDL2 Assets"-->
+            </FontFamily>
+            <sys:Double x:Key="MonoSpaceSize">14</sys:Double>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

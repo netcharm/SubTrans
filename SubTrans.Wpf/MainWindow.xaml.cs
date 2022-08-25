@@ -197,7 +197,7 @@ namespace SubTrans
                     if (string.IsNullOrEmpty(phrase.Original)) continue;
                     if (string.IsNullOrEmpty(phrase.Translated)) continue;
                     if (Regex.IsMatch(phrase.Original, @"/.+?/i", RegexOptions.IgnoreCase))
-                        result = Regex.Replace(result, phrase.Original.Trim('/'), phrase.Translated, RegexOptions.IgnoreCase);
+                        result = Regex.Replace(result, phrase.Original.TrimEnd(new char[] { 'i', 'I' }).Trim('/'), phrase.Translated, RegexOptions.IgnoreCase);
                     else if (Regex.IsMatch(phrase.Original, @"/.+?/", RegexOptions.IgnoreCase))
                         result = Regex.Replace(result, phrase.Original.Trim('/'), phrase.Translated, RegexOptions.None);
                     else
@@ -578,13 +578,53 @@ namespace SubTrans
         }
         #endregion
 
+        private void MainForm_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (lvItems.SelectedItem != null)
+            {
+                if (e.ChangedButton == MouseButton.XButton2)
+                    lvItems.SelectedIndex = Math.Max(lvItems.SelectedIndex - 1, 0);
+                else if (e.ChangedButton == MouseButton.XButton1)
+                    lvItems.SelectedIndex = Math.Min(lvItems.SelectedIndex + 1, lvItems.Items.Count);
+            }
+        }
+
         private void MainForm_KeyUp(object sender, KeyEventArgs e)
         {
-            if (Keyboard.IsKeyDown(Key.LeftCtrl))//|| Keyboard.IsKeyDown(Key.RightCtrl))
+            if (e is KeyEventArgs)
             {
-                if (e.Key == Key.S) InvokeControl(cmiSaveAs);
-                else if (e.Key == Key.C) InvokeControl(btnCopy);
-                else if (e.Key == Key.V) InvokeControl(btnPaste);                
+                e.Handled = true;
+                if (Keyboard.IsKeyDown(Key.LeftCtrl))//|| Keyboard.IsKeyDown(Key.RightCtrl))
+                {
+                    if (e.Key == Key.S) InvokeControl(cmiSaveAs);
+                    else if (e.Key == Key.C) InvokeControl(btnCopy);
+                    else if (e.Key == Key.V) InvokeControl(btnPaste);
+                }
+                else if (e.Key == Key.Enter) lvItems_MouseDoubleClick(sender, null);
+            }
+        }
+
+        private void lvItems_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (e is MouseButtonEventArgs) e.Handled = true;
+            if (lvItems.SelectedItem != null && lvItems.SelectedItem is ASS.EVENT)
+            {
+                var item = lvItems.SelectedItem as ASS.EVENT;
+                var dlg = new EventDetail()
+                {
+                    Owner = this,
+                    Icon = Icon,
+                    ShowActivated = true,
+                    ShowInTaskbar = false,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Event = item,
+                };
+                if (dlg.ShowDialog() ?? false)
+                {
+                    item.Translated = dlg.Event.Translated;
+                    //item.Text
+                    //dlg.Close();
+                }
             }
         }
 
@@ -693,6 +733,22 @@ namespace SubTrans
             }
         }
 
+        private void btnMerge_Click(object sender, RoutedEventArgs e)
+        {
+            if (SaveWithBOM)
+                SaveASS(ASS.SaveFlags.Merge | ASS.SaveFlags.BOM);
+            else
+                SaveASS(ASS.SaveFlags.Merge);
+        }
+
+        private void btnReplace_Click(object sender, RoutedEventArgs e)
+        {
+            if (SaveWithBOM)
+                SaveASS(ASS.SaveFlags.Replace | ASS.SaveFlags.BOM);
+            else
+                SaveASS(ASS.SaveFlags.Replace);
+        }
+
         private void cmiPasteRemoveNullLine_Click(object sender, RoutedEventArgs e)
         {
             if (ass == null) return;
@@ -753,22 +809,6 @@ namespace SubTrans
             catch (Exception) { }
         }
 
-        private void btnMerge_Click(object sender, RoutedEventArgs e)
-        {
-            if (SaveWithBOM)
-                SaveASS(ASS.SaveFlags.Merge | ASS.SaveFlags.BOM);
-            else
-                SaveASS(ASS.SaveFlags.Merge);
-        }
-
-        private void btnReplace_Click(object sender, RoutedEventArgs e)
-        {
-            if (SaveWithBOM)
-                SaveASS(ASS.SaveFlags.Replace | ASS.SaveFlags.BOM);
-            else
-                SaveASS(ASS.SaveFlags.Replace);
-        }
-
         private void cmiSaveAs_Click(object sender, RoutedEventArgs e)
         {
             if(SaveWithBOM)
@@ -776,5 +816,18 @@ namespace SubTrans
             else
                 SaveASS(ASS.SaveFlags.None);
         }
+
+        private void cmiPhraseOprate_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender == cmiEditPhraseTable)
+            {
+                System.Diagnostics.Process.Start(PhraseFile);
+            }
+            else if (sender == cmiReloadPhraseTable)
+            {
+                Phrase = LoadPhrase(PhraseFile);
+            }
+        }
+
     }
 }

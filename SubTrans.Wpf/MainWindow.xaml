@@ -5,10 +5,10 @@
         xmlns:local="clr-namespace:SubTrans.Wpf"
         xmlns:local1="clr-namespace:SubTrans" x:Name="MainForm" x:Class="SubTrans.MainWindow"
         mc:Ignorable="d"
-        FontFamily="等距更纱黑体 SC, Segeo UI"
+        FontFamily="{DynamicResource MonoSpaceFamily}" FontSize="{DynamicResource MonoSpaceSize}"
         Title="Suntitle Translator" 
         Height="512" Width="768" MinWidth="640" MinHeight="400"
-        KeyUp="MainForm_KeyUp">
+        KeyUp="MainForm_KeyUp" PreviewMouseDown="MainForm_PreviewMouseDown">
 
     <Grid x:Name="MainGrid" DragOver="Grid_DragOver" Drop="Grid_Drop">
         <Grid.Resources>
@@ -58,6 +58,9 @@
                 <MenuItem x:Name="cmiSaveWithBOM" Header="Save With UTF8-BOM" Click="cmiSaveWithBOM_Click" IsCheckable="True" IsChecked="True" />
                 <MenuItem x:Name="cmiPasteRemoveNullLine" Header="Remove Null Line When Paste" Click="cmiPasteRemoveNullLine_Click" IsCheckable="True" IsChecked="True" />
                 <Separator/>
+                <MenuItem x:Name="cmiEditPhraseTable" Header="Edit Phrase Table" Click="cmiPhraseOprate_Click" />
+                <MenuItem x:Name="cmiReloadPhraseTable" Header="Reload Phrase Table" Click="cmiPhraseOprate_Click"  />
+                <Separator/>
                 <MenuItem x:Name="cmiExit" Header="Exit" Click="cmiExit_Click" />
             </ContextMenu>
         </Grid.ContextMenu>
@@ -69,7 +72,7 @@
                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="4,4,4,4"                  
                   IsTextSearchCaseSensitive="True" 
                   ItemsSource="{Binding Events, Mode=OneWay, BindsDirectlyToSource=True, IsAsync=True, NotifyOnTargetUpdated=True, NotifyOnSourceUpdated=True, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local1:MainWindow}}, ValidatesOnNotifyDataErrors=False}"
-                  SnapsToDevicePixels="True" AlternationCount="0" FontSize="14">
+                  SnapsToDevicePixels="True" AlternationCount="0" FontSize="14" MouseDoubleClick="lvItems_MouseDoubleClick">
             <ListView.View>
                 <GridView>
                     <GridViewColumn/>
