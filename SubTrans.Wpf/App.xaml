@@ -17,6 +17,19 @@
                 <!--"Segoe MDL2 Assets"-->
             </FontFamily>
             <sys:Double x:Key="MonoSpaceSize">14</sys:Double>
+
+            <Style x:Key="CheckBoxTextAlignLeft" TargetType="CheckBox">
+                <Style.Resources>
+                    <Style TargetType="Path">
+                        <Setter Property="FlowDirection" Value="LeftToRight" />
+                    </Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="FlowDirection" Value="LeftToRight" />
+                    </Style>
+                </Style.Resources>
+
+                <Setter Property="FlowDirection" Value="RightToLeft" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

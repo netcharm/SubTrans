@@ -1,0 +1,45 @@
+﻿<Window x:Class="SubTrans.FindReplace"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SubTrans"
+        mc:Ignorable="d"
+        Title="Find &amp; Replace" 
+        Height="320" Width="640" MinHeight="360" MinWidth="640"
+        HorizontalAlignment="Center" VerticalAlignment="Center"
+        FontFamily="{DynamicResource MonoSpaceFamily}" FontSize="{DynamicResource MonoSpaceSize}" 
+        Loaded="Window_Loaded" KeyUp="Window_KeyUp">
+    <Grid Margin="4">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height=".5*"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height=".5*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" x:Name="FindLabel" x:Uid="FindLabel" Text="Find:" Margin="0,4,4,0"/>
+            <TextBox Grid.Row="1" x:Name="FindText" x:Uid="FindText" Margin="0,4,4,0"/>
+            <TextBlock Grid.Row="2" x:Name="ReplaceLabel" x:Uid="ReplaceLabel" Text="Replace:" Margin="0,4,4,0"/>
+            <TextBox Grid.Row="3" x:Name="ReplaceText" x:Uid="ReplaceText" Margin="0,4,4,0"/>
+        </Grid>
+        <DockPanel Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Button x:Name="FindInAll" x:Uid="FindInAll" Content="Find In All" Margin="4,4,0,4" Padding="4" DockPanel.Dock="Top" Click="FindReplace_Click" />
+            <Button x:Name="FindInSelected" x:Uid="FindInSelected" Content="Find In Selected" Margin="4,4,0,4" Padding="4" DockPanel.Dock="Top" Click="FindReplace_Click" />
+            <Button x:Name="ReplaceCurrent" x:Uid="ReplaceCurrent" Content="Replace" Margin="4,16,0,4" Padding="4" DockPanel.Dock="Top" Click="FindReplace_Click" />
+            <Button x:Name="ReplaceInAll" x:Uid="ReplaceInAll" Content="Replace All" Margin="4,4,0,4" Padding="4" DockPanel.Dock="Top" Click="FindReplace_Click" />
+            <Button x:Name="ReplaceInSelected" x:Uid="ReplaceInSelected" Content="Replace Selected" Margin="4,4,0,4" Padding="4" DockPanel.Dock="Top" Click="FindReplace_Click" />
+            <TextBlock x:Name="FindReplaceStatus" x:Uid="FindReplaceStatus" HorizontalAlignment="Right"  DockPanel.Dock="Top" Margin="0,16,0,0" />
+            <DockPanel x:Name="FindReplaceOptions" x:Uid="FindReplaceOptions" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" DockPanel.Dock="Bottom"  >
+                <CheckBox x:Name="FindReplaceOptionsIgnoreCase" x:Uid="FindReplaceOptionsIgnoreCase" Content="Ignore Case" 
+                          Style="{DynamicResource CheckBoxTextAlignLeft}" Margin="4" DockPanel.Dock="Bottom" />
+                <CheckBox x:Name="FindReplaceOptionsUseRegex" x:Uid="FindReplaceOptionsRegex" Content="Use Regex" 
+                          Style="{DynamicResource CheckBoxTextAlignLeft}" Margin="4" DockPanel.Dock="Bottom" />
+            </DockPanel>            
+        </DockPanel>
+    </Grid>
+</Window>

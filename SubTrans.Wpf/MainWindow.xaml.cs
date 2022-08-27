@@ -24,15 +24,23 @@ using Microsoft.Win32;
 
 namespace SubTrans
 {
+    public enum FindReplaceRangeMode { None, Current, Selected, All };
+    public enum FindReplaceMode { None, Find, Replace };
+
+    public class FindReplaceOptions
+    {
+        public FindReplaceRangeMode Range { get; set; } = FindReplaceRangeMode.Current;
+        public bool IgnoreCase { get; set; } = false;
+        public bool UseRegex { get; set; } = false;
+        public FindReplaceMode Mode { get; set; } = FindReplaceMode.Find;
+        public string TextToFind { get; set; } = string.Empty;
+        public string TextToReplace { get; set; } = string.Empty;
+        public int FindResult { get; set; } = -3;
+        public List<bool> ReplaceResult { get; set; } = new List<bool>();
+    }
+
     public enum PhraseType { Auto, Manual, None };
     public enum PhraseCategory { All, Anime, Movie, Drama, None };
-
-    [XmlRoot(ElementName = "Vocabulary", IsNullable = false)]
-    public partial class Terms
-    {
-        [XmlElement(ElementName = "Phrases")]
-        public List<Term> Items { get; set; } = new List<Term>();
-    }
 
     [XmlRoot(ElementName = "Phrase", IsNullable = true)]
     public partial class Term
@@ -61,6 +69,13 @@ namespace SubTrans
             if (!(term is Term)) return (false);
             return (term.Original.Equals(Original) && term.Language.Equals(Language, StringComparison.CurrentCultureIgnoreCase));
         }
+    }
+
+    [XmlRoot(ElementName = "Vocabulary", IsNullable = false)]
+    public partial class Terms
+    {
+        [XmlElement(ElementName = "Phrases")]
+        public List<Term> Items { get; set; } = new List<Term>();
     }
 
     /// <summary>
@@ -440,13 +455,202 @@ namespace SubTrans
             FrameworkElementAutomationPeer peer = null;
             //typeof(System.Windows.Controls.Primitives.ButtonBase).GetMethod("OnClick", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(btnCopy, new object[0]);
             if (sender is Button) peer = new ButtonAutomationPeer(sender as Button);
-            else if(sender is MenuItem) peer = new MenuItemAutomationPeer(sender as MenuItem);
+            else if (sender is MenuItem) peer = new MenuItemAutomationPeer(sender as MenuItem);
             if (peer is FrameworkElementAutomationPeer)
             {
                 IInvokeProvider invokeProv = (peer as FrameworkElementAutomationPeer).GetPattern(PatternInterface.Invoke) as IInvokeProvider;
                 invokeProv.Invoke();
             }
         }
+
+        private FindReplaceOptions _last_find_replace_option_ = null;
+
+        private void OpenTranslatedEditor()
+        {
+            if (lvItems.SelectedItem != null && lvItems.SelectedItem is ASS.EVENT)
+            {
+                var item = lvItems.SelectedItem as ASS.EVENT;
+                var dlg = new EventDetail()
+                {
+                    Owner = this,
+                    Icon = Icon,
+                    ShowActivated = true,
+                    ShowInTaskbar = false,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Event = item,
+                };
+                if (dlg.ShowDialog() ?? false)
+                {
+                    item.Translated = dlg.Event.Translated;
+                    //item.Text
+                    //dlg.Close();
+                }
+            }
+        }
+
+        private void OpenFindReplaceEditor()
+        {
+            if (lvItems.Items.Count > 0)
+            {
+                var dlg = new FindReplace()
+                {
+                    Owner = this,
+                    Topmost = true,
+                    Icon = Icon,
+                    ShowActivated = true,
+                    ShowInTaskbar = true,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Options = _last_find_replace_option_ is FindReplaceOptions ? _last_find_replace_option_ : new FindReplaceOptions(),
+                    UpdateOptionAction = UpdateFindReplaceOptionAction,
+                    FindTextAction = FindTextAction,
+                    ReplaceTextAction = ReplaceTextAction,
+                    FindReplaceResultFunc = FindReplaceResultFunc,
+                    TextToFind = _last_find_replace_option_ is FindReplaceOptions ? _last_find_replace_option_.TextToFind : string.Empty,
+                    TextToReplace = _last_find_replace_option_ is FindReplaceOptions ? _last_find_replace_option_.TextToReplace : string.Empty,
+                };
+                dlg.Show();
+            }
+        }
+
+        private void FindText(FindReplaceOptions opt)
+        {
+            try
+            {
+                if (lvItems.Items.Count <= 0) return;
+                if (opt == null) opt = new FindReplaceOptions();
+
+                _last_find_replace_option_ = opt;
+                var text = opt.TextToFind;
+                if (string.IsNullOrEmpty(text)) return;
+
+                int _last_find_index_ = _last_find_replace_option_ is FindReplaceOptions ? _last_find_replace_option_.FindResult : -3;
+
+                var selected = new object[lvItems.SelectedItems.Count];
+                lvItems.SelectedItems.CopyTo(selected, 0);
+
+                var events = opt.Range == FindReplaceRangeMode.All || lvItems.SelectedItems.Count <= 0 ? lvItems.Items : lvItems.SelectedItems;
+                var items = new object[events.Count];
+                events.CopyTo(items, 0);
+                items = items.OrderBy(i => lvItems.Items.IndexOf(i)).ToArray();
+                var ids = items.Select(i => (i as ASS.EVENT).ID).ToArray();
+                if (_last_find_index_ >= Convert.ToInt32(ids.Last()) - 1) _last_find_index_ = -2;
+
+                foreach (var item in items)
+                {
+                    if (item is ASS.EVENT)
+                    {
+                        var e = item as ASS.EVENT;
+                        var idx = Convert.ToInt32(e.ID) - 1;
+                        if (idx <= _last_find_index_) continue;
+
+                        var evt = ass.Events[idx];
+                        if (opt.UseRegex)
+                        {
+                            var opt_r = opt.IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
+                            if (!string.IsNullOrEmpty(evt.Text) && Regex.IsMatch(evt.Text, $@"{text}", opt_r)) { _last_find_index_ = idx; break; }
+                            else if (!string.IsNullOrEmpty(evt.Translated) && Regex.IsMatch(evt.Translated, $@"{text}", opt_r)) { _last_find_index_ = idx; break; }
+                            else _last_find_index_ = -2;
+                        }
+                        else
+                        {
+                            var opt_r = opt.IgnoreCase ? StringComparison.CurrentCultureIgnoreCase : StringComparison.CurrentCulture;
+                            if (!string.IsNullOrEmpty(evt.Text) && evt.Text.IndexOf(text, opt_r) >= 0) { _last_find_index_ = idx; break; }
+                            else if (!string.IsNullOrEmpty(evt.Translated) && evt.Translated.IndexOf(text, opt_r) >= 0) { _last_find_index_ = idx; break; }
+                            else _last_find_index_ = -2;
+                        }
+                    }
+                }
+                if (_last_find_index_ >= 0 && _last_find_index_ < lvItems.Items.Count)
+                {
+                    lvItems.ScrollIntoView(lvItems.Items[_last_find_index_]);
+                }
+                foreach (var item in selected) lvItems.SelectedItems.Add(item);
+                _last_find_replace_option_.FindResult = _last_find_index_;
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
+        }
+
+        private bool ReplaceText(ASS.EVENT e, FindReplaceOptions opt)
+        {
+            var result = false;
+            if (e is ASS.EVENT && opt is FindReplaceOptions)
+            {
+                var src = opt.TextToFind;
+                var dst = opt.TextToReplace;
+                if (string.IsNullOrEmpty(src)) return (result);
+
+                var opt_r = opt.IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
+                var opt_t = opt.IgnoreCase ? StringComparison.CurrentCultureIgnoreCase : StringComparison.CurrentCulture;
+                var text_old = string.IsNullOrEmpty(e.Translated) ? e.Text : e.Translated;
+                var text_new = string.IsNullOrEmpty(e.Translated) ? e.Text : e.Translated;
+                if (opt.UseRegex)
+                {
+                    if (!string.IsNullOrEmpty(text_old))
+                    {
+                        text_new = Regex.Replace(text_old, $@"{src}", $@"{dst}", opt_r);
+                        if (!text_old.Equals(text_new, opt_t)) { e.Translated = text_new; result = true; }
+                    }
+                }
+                else
+                {
+                    //var opt_r = opt.IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
+                    //if (!string.IsNullOrEmpty(e.Translated))
+                    //    e.Translated = Regex.Replace(e.Translated, src, dst, opt_r);
+                    //else if (!string.IsNullOrEmpty(e.Text))
+                    //    e.Translated = Regex.Replace(e.Text, src, dst, opt_r);
+                    if (!string.IsNullOrEmpty(text_new))
+                    {
+                        var idx = -1;
+                        do
+                        {
+                            idx = text_new.IndexOf(src, idx < 0 ? 0 : idx + 1, opt_t);
+                            if (idx < 0) break;
+                            text_new = text_new.Remove(idx, src.Length).Insert(idx, dst);
+                        } while (idx >= 0);
+                        if (!text_old.Equals(text_new, opt_t)) { e.Translated = text_new; result = true; }
+                    }
+                }
+            }
+            return (result);
+        }
+
+        private IEnumerable<bool> ReplaceText(FindReplaceOptions opt)
+        {
+            var result = new List<bool>();
+            try
+            {
+                _last_find_replace_option_ = opt;                
+                _last_find_replace_option_.ReplaceResult.Clear();
+
+                if (opt.Range == FindReplaceRangeMode.Current && _last_find_replace_option_.FindResult >= 0 && _last_find_replace_option_.FindResult < lvItems.Items.Count)
+                {
+                    var item = lvItems.Items[_last_find_replace_option_.FindResult];
+                    if (item is ASS.EVENT) result.Add(ReplaceText(item as ASS.EVENT, opt));
+                }
+                else if (opt.Range == FindReplaceRangeMode.Selected)
+                {
+                    foreach (var item in lvItems.SelectedItems)
+                    {
+                        if (item is ASS.EVENT) result.Add(ReplaceText(item as ASS.EVENT, opt));
+                    }
+                }
+                else if (opt.Range == FindReplaceRangeMode.All)
+                {
+                    foreach (var item in lvItems.Items)
+                    {
+                        if (item is ASS.EVENT) result.Add(ReplaceText(item as ASS.EVENT, opt));
+                    }
+                }
+                _last_find_replace_option_.ReplaceResult.AddRange(result);
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            return (result);
+        }
+
+        private Action<FindReplaceOptions> UpdateFindReplaceOptionAction { get; set; } = null;
+        private Action<FindReplaceOptions> FindTextAction { get; set; } = null;
+        private Action<FindReplaceOptions> ReplaceTextAction { get; set; } = null;
+        private Func<string> FindReplaceResultFunc { get; set; } = null;
 
         #region Config Helper
         private string GetConfigValue(string key, object value = null)
@@ -519,11 +723,30 @@ namespace SubTrans
             Phrase.Items.Add(new Term() { Original = "三楼", Translated = "三层" });
             Phrase.Items.Add(new Term() { Original = "四楼", Translated = "四层" });
 #endif
+            if (UpdateFindReplaceOptionAction == null) UpdateFindReplaceOptionAction = new Action<FindReplaceOptions>((opt) => { _last_find_replace_option_ = opt; });
+            if (FindTextAction == null) FindTextAction = new Action<FindReplaceOptions>((opt) => { FindText(opt); });
+            if (ReplaceTextAction == null) ReplaceTextAction = new Action<FindReplaceOptions>((opt) => { ReplaceText(opt); });
+            if (FindReplaceResultFunc == null) FindReplaceResultFunc = new Func<string>(() => {
+                if (_last_find_replace_option_.Mode == FindReplaceMode.Find)
+                {
+                    var result = "Not Found!";
+                    var _last_find_index_ = _last_find_replace_option_ is FindReplaceOptions ? _last_find_replace_option_.FindResult : -3;
+                    if (_last_find_index_ < 0) return (result);
+                    else return ($"Found ID : {_last_find_index_ + 1}");
+                }
+                else if (_last_find_replace_option_.Mode == FindReplaceMode.Replace)
+                {
+                    return ($"Replaced : {_last_find_replace_option_.ReplaceResult.Where(r => r == true).Count()}");
+                }
+                else return (string.Empty);
+            });
 
             if (!File.Exists(PhraseFile))
                 SavePhrase(PhraseFile, Phrase);
             else
                 Phrase = LoadPhrase(PhraseFile);
+
+            lvItems.Focus();
 
             var args = Environment.GetCommandLineArgs();
             if (args.Length > 1)
@@ -594,11 +817,13 @@ namespace SubTrans
             if (e is KeyEventArgs)
             {
                 e.Handled = true;
-                if (Keyboard.IsKeyDown(Key.LeftCtrl))//|| Keyboard.IsKeyDown(Key.RightCtrl))
+                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
                 {
                     if (e.Key == Key.S) InvokeControl(cmiSaveAs);
                     else if (e.Key == Key.C) InvokeControl(btnCopy);
                     else if (e.Key == Key.V) InvokeControl(btnPaste);
+                    else if (e.Key == Key.F) OpenFindReplaceEditor();
+                    else if (e.Key == Key.R) OpenFindReplaceEditor();
                 }
                 else if (e.Key == Key.Enter) lvItems_MouseDoubleClick(sender, null);
             }
@@ -607,25 +832,7 @@ namespace SubTrans
         private void lvItems_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (e is MouseButtonEventArgs) e.Handled = true;
-            if (lvItems.SelectedItem != null && lvItems.SelectedItem is ASS.EVENT)
-            {
-                var item = lvItems.SelectedItem as ASS.EVENT;
-                var dlg = new EventDetail()
-                {
-                    Owner = this,
-                    Icon = Icon,
-                    ShowActivated = true,
-                    ShowInTaskbar = false,
-                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                    Event = item,
-                };
-                if (dlg.ShowDialog() ?? false)
-                {
-                    item.Translated = dlg.Event.Translated;
-                    //item.Text
-                    //dlg.Close();
-                }
-            }
+            OpenTranslatedEditor();
         }
 
         private void btnLoad_Click(object sender, RoutedEventArgs e)
@@ -803,7 +1010,7 @@ namespace SubTrans
                     if (!string.IsNullOrEmpty(evt.Translated))
                         evt.Translated = FixBracketingError(evt.Translated);
                     else if (!string.IsNullOrEmpty(evt.Text))
-                        evt.Text = FixBracketingError(evt.Text);
+                        evt.Translated = FixBracketingError(evt.Text);
                 }
             }
             catch (Exception) { }
@@ -811,7 +1018,7 @@ namespace SubTrans
 
         private void cmiSaveAs_Click(object sender, RoutedEventArgs e)
         {
-            if(SaveWithBOM)
+            if (SaveWithBOM)
                 SaveASS(ASS.SaveFlags.BOM);
             else
                 SaveASS(ASS.SaveFlags.None);
