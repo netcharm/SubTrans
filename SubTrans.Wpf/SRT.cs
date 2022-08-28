@@ -203,75 +203,14 @@ namespace SubTrans
 
         public string ToAssText(string title = "Untitled", string lang = "ENG")
         {
-            List<string> sb = new List<string>();
-
-            sb.Add($"[Script Info]");
-            sb.Add($"Title: {title}");
-            sb.Add("");
-            sb.Add($"[V4+ Styles]");
-            sb.Add($"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding");
-            //sb.AppendLine($"Style: Default,Tahoma,24,&H00FFFFFF,&HF0000000,&H00000000,&HF0000000,1,0,0,0,100,100,0,0.00,1,1,0,2,30,30,10,1");
-            if (lang.Equals("CHS", StringComparison.CurrentCultureIgnoreCase))
-            {
-                sb.Add($"{AssStyle.CHS_Default}");
-                sb.Add($"{AssStyle.CHS_Note}");
-                sb.Add($"{AssStyle.CHS_Title}");
-            }
-            else if (lang.Equals("CHT", StringComparison.CurrentCultureIgnoreCase))
-            {
-                sb.Add($"{AssStyle.CHT_Default}");
-                sb.Add($"{AssStyle.CHT_Note}");
-                sb.Add($"{AssStyle.CHT_Title}");
-            }
-            else
-            {
-                sb.Add($"{AssStyle.ENG_Default}");
-                sb.Add($"{AssStyle.ENG_Note}");
-                sb.Add($"{AssStyle.ENG_Title}");
-            }
-            sb.Add("");
-            sb.Add($"[Events]");
-            sb.Add($"Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text");
-
-            foreach (var t in Contents)
-            {
-                sb.Add($"Dialogue: 0,{t.NewStart.ToString(@"hh\:mm\:ss\.ff")},{t.NewEnd.ToString(@"hh\:mm\:ss\.ff")},Default,NTP,0000,0000,0000,,{t.MultiLingoText}");
-            }
-
-            return (string.Join(Environment.NewLine, sb));
+            return (string.Join(Environment.NewLine, ToAss(title, lang)));
         }
 
         public List<string> ToAss(string title = "Untitled", string lang="ENG")
         {
             List<string> sb = new List<string>();
 
-            sb.Add($"[Script Info]");
-            sb.Add($"Title: {title}");
-            sb.Add("");
-            sb.Add($"[V4+ Styles]");
-            sb.Add($"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding");
-            //sb.AppendLine($"Style: Default,Tahoma,24,&H00FFFFFF,&HF0000000,&H00000000,&HF0000000,1,0,0,0,100,100,0,0.00,1,1,0,2,30,30,10,1");
-            if (lang.Equals("CHS", StringComparison.CurrentCultureIgnoreCase))
-            {
-                sb.Add($"{AssStyle.CHS_Default}");
-                sb.Add($"{AssStyle.CHS_Note}");
-                sb.Add($"{AssStyle.CHS_Title}");
-            }
-            else if (lang.Equals("CHT", StringComparison.CurrentCultureIgnoreCase))
-            {
-                sb.Add($"{AssStyle.CHT_Default}");
-                sb.Add($"{AssStyle.CHT_Note}");
-                sb.Add($"{AssStyle.CHT_Title}");
-            }
-            else
-            {
-                sb.Add($"{AssStyle.ENG_Default}");
-                sb.Add($"{AssStyle.ENG_Note}");
-                sb.Add($"{AssStyle.ENG_Title}");
-            }
-            sb.Add("");
-            sb.Add($"[Events]");
-            sb.Add($"Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text");
+            sb.AddRange(ASS.GetDefaultHeader(title, language:lang));
 
             foreach (var t in Contents)
             {

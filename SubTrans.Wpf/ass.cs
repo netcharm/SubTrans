@@ -18,6 +18,24 @@ namespace SubTrans
         public string curr_text;
     }
 
+    public class LRCSubtitleItem
+    {
+        public TimeSpan TimeFrom { get; set; }
+        public TimeSpan TimeTo { get; set; }
+        public string Text { get; set; }
+    }
+
+    public class LRCSubtitle
+    {
+        public string Title { get; set; }
+        public string Artist { get; set; }
+        public string Album { get; set; }
+        public string Alias { get; set; }        
+        public string Author { get; set; }
+        public string Comment { get; set; }
+        public List<LRCSubtitleItem> Events { get; set; } = new List<LRCSubtitleItem>();
+    }
+
     public static class AssStyle
     {
         public static string ENG_Default { get; } = @"Style: Default,Lucida Calligraphy,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
@@ -37,6 +55,19 @@ namespace SubTrans
         public static string CHT_Title { get; } = @"Style: Title,Sarasa Gothic TC,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
         public static string CHT_Color { get; } = @"{\1c&HFFFFFF&\2c&HEDEDEE&\3c&H95C6F3&}";
         public static string CHT_Font { get; } = @"{\fnSarasa Gothic TC}";
+
+        public static string JPN_Default { get; } = @"Style: Default,Sarasa Gothic J,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string JPN_Note { get; } = @"Style: Note,宋体,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string JPN_Title { get; } = @"Style: Title,Sarasa Gothic J,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string JPN_Color { get; } = @"{\1c&HFFFFFF&\2c&HEDEDEE&\3c&H95C6F3&}";
+        public static string JPN_Font { get; } = @"{\fnSarasa Gothic J}";
+
+        public static string KOR_Default { get; } = @"Style: Default,Sarasa Gothic J,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string KOR_Note { get; } = @"Style: Note,宋体,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string KOR_Title { get; } = @"Style: Title,Sarasa Gothic J,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string KOR_Color { get; } = @"{\1c&HFFFFFF&\2c&HEDEDEE&\3c&H95C6F3&}";
+        public static string KOR_Font { get; } = @"{\fnSarasa Gothic J}";
+
     }
 
     public class ASS
@@ -464,6 +495,70 @@ namespace SubTrans
             set { styles = value; }
         }
 
+        public static string GuessLanguageFromTitle(string title)
+        {
+            var lang = "ENG";
+            if (!string.IsNullOrEmpty(title))
+            {
+                if (title.IndexOf(".ch", StringComparison.CurrentCultureIgnoreCase) > 0) lang = "CHS";
+                else if (title.IndexOf(".chs", StringComparison.CurrentCultureIgnoreCase) > 0) lang = "CHS";
+                else if (title.IndexOf(".cht", StringComparison.CurrentCultureIgnoreCase) > 0) lang = "CHT";
+                else if (title.IndexOf(".jp", StringComparison.CurrentCultureIgnoreCase) > 0) lang = "JPN";
+                else if (title.IndexOf(".jap", StringComparison.CurrentCultureIgnoreCase) > 0) lang = "JPN";
+                else if (title.IndexOf(".jpn", StringComparison.CurrentCultureIgnoreCase) > 0) lang = "JPN";
+                else if (title.IndexOf(".ko", StringComparison.CurrentCultureIgnoreCase) > 0) lang = "KOR";
+                else if (title.IndexOf(".kor", StringComparison.CurrentCultureIgnoreCase) > 0) lang = "KOR";
+            }
+            return (lang);
+        }
+
+        public static string[] GetDefaultHeader(string title, string comment = "", string language = "ENG")
+        {
+            List<string> lines = new List<string>();
+            lines.Add($"[Script Info]");
+            lines.Add($"Title: {title}");
+            if (!string.IsNullOrEmpty(comment))
+                lines.Add($"Comment: {comment}");
+            lines.Add($"");
+            lines.Add($"[V4+ Styles]");
+            lines.Add($"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding");
+            if (language.Equals("CHS", StringComparison.CurrentCultureIgnoreCase))
+            {
+                lines.Add($"{AssStyle.CHS_Default}");
+                lines.Add($"{AssStyle.CHS_Note}");
+                lines.Add($"{AssStyle.CHS_Title}");
+            }
+            else if (language.Equals("CHT", StringComparison.CurrentCultureIgnoreCase))
+            {
+                lines.Add($"{AssStyle.CHT_Default}");
+                lines.Add($"{AssStyle.CHT_Note}");
+                lines.Add($"{AssStyle.CHT_Title}");
+            }
+            else if (language.Equals("JPN", StringComparison.CurrentCultureIgnoreCase))
+            {
+                lines.Add($"{AssStyle.JPN_Default}");
+                lines.Add($"{AssStyle.JPN_Note}");
+                lines.Add($"{AssStyle.JPN_Title}");
+            }
+            else if (language.Equals("KOR", StringComparison.CurrentCultureIgnoreCase))
+            {
+                lines.Add($"{AssStyle.KOR_Default}");
+                lines.Add($"{AssStyle.KOR_Note}");
+                lines.Add($"{AssStyle.KOR_Title}");
+            }
+            else
+            {
+                lines.Add($"{AssStyle.ENG_Default}");
+                lines.Add($"{AssStyle.ENG_Note}");
+                lines.Add($"{AssStyle.ENG_Title}");
+            }
+            lines.Add($"");
+            lines.Add($"[Events]");
+            lines.Add($"Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text");
+
+            return (lines.ToArray());
+        }
+
         private void ParseScriptInfo(string v)
         {
             if (v.StartsWith(";", StringComparison.CurrentCultureIgnoreCase))
@@ -687,6 +782,10 @@ namespace SubTrans
                 {
                     await LoadFromSrt(lines, fn);
                 }
+                else if (ext.Equals(".lrc"))
+                {
+                    LoadFromLRC(lines, fn);
+                }
                 else if (ext.Equals(".ass") || ext.Equals(".ssa"))
                 {
                     Load(lines);
@@ -793,32 +892,7 @@ namespace SubTrans
             if (contents is string[])
             {
                 List<string> lines = new List<string>();
-                lines.Add($"[Script Info]");
-                lines.Add($"Title: {title}");
-                lines.Add($"");
-                lines.Add($"[V4+ Styles]");
-                lines.Add($"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding");
-                if (YoutubeLanguage.Equals("CHS", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    lines.Add($"{AssStyle.CHS_Default}");
-                    lines.Add($"{AssStyle.CHS_Note}");
-                    lines.Add($"{AssStyle.CHS_Title}");
-                }
-                else if (YoutubeLanguage.Equals("CHT", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    lines.Add($"{AssStyle.CHT_Default}");
-                    lines.Add($"{AssStyle.CHT_Note}");
-                    lines.Add($"{AssStyle.CHT_Title}");
-                }
-                else
-                {
-                    lines.Add($"{AssStyle.ENG_Default}");
-                    lines.Add($"{AssStyle.ENG_Note}");
-                    lines.Add($"{AssStyle.ENG_Title}");
-                }
-                lines.Add($"");
-                lines.Add($"[Events]");
-                lines.Add($"Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text");
+                lines.AddRange(GetDefaultHeader(title, language:YoutubeLanguage));
 
                 var c = contents.Length;
                 int th = 0, tm = 0, ts = 0;
@@ -861,6 +935,88 @@ namespace SubTrans
 
                 Load(lines.ToArray());
             }
+        }
+
+        public void LoadFromLRC(string[] contents, string title = "Untitled")
+        {
+            var pat_album = @"\[al(bum)?\s*:\s*(.*?)\]";
+            var pat_artist = @"\[ar(tist)?\s*:\s*(.*?)\]";
+            var pat_title = @"\[ti(tle)?\s*:\s*(.*?)\]";
+            var pat_alias = @"\[alias\s*:\s*(.*?)\]";
+            var pat_by = @"\[by\s*:\s*(.*?)\]";
+            var pat_lyric = @"((\[((\d{2}:)?\d{2}:\d{2}(\.\d{1,3})?)\])+)\s*(.*?)$";
+
+            var ts_sep = new string[] { "[" };
+            var ts_trim = new char[] { '[', ']' };
+
+            var lrc = new LRCSubtitle() { Title = title };
+            #region Pharsing lyric file
+            foreach (var line in contents)
+            {
+                try
+                {
+                    if (Regex.IsMatch(line, pat_album, RegexOptions.IgnoreCase))
+                        lrc.Album = Regex.Replace(line, pat_album, @"$2", RegexOptions.IgnoreCase);
+                    else if (Regex.IsMatch(line, pat_artist, RegexOptions.IgnoreCase))
+                        lrc.Artist = Regex.Replace(line, pat_artist, @"$2", RegexOptions.IgnoreCase);
+                    else if (Regex.IsMatch(line, pat_title, RegexOptions.IgnoreCase))
+                        lrc.Title = Regex.Replace(line, pat_title, @"$2", RegexOptions.IgnoreCase);
+                    else if (Regex.IsMatch(line, pat_alias, RegexOptions.IgnoreCase))
+                        lrc.Alias = Regex.Replace(line, pat_alias, @"$1", RegexOptions.IgnoreCase);
+                    else if (Regex.IsMatch(line, pat_by, RegexOptions.IgnoreCase))
+                        lrc.Author = Regex.Replace(line, pat_by, @"$1", RegexOptions.IgnoreCase);
+                    else if (Regex.IsMatch(line, pat_lyric, RegexOptions.IgnoreCase))
+                    {
+                        Regex.Replace(line, pat_lyric, m =>
+                        {
+                            var ts = m.Groups[1].Value.Split(ts_sep, StringSplitOptions.RemoveEmptyEntries).Select(t => t.Trim().Trim(ts_trim).Trim());
+                            foreach (var t in ts)
+                            {
+                                if (string.IsNullOrEmpty(t)) continue;
+                                //var tv = string.IsNullOrEmpty(m.Groups[3].Value) ? $"00:{m.Groups[2].Value}" : m.Groups[2].Value;
+                                var tc = t.ToArray().Where(c => c.Equals(':')).Count();
+                                var tv = tc == 1 ? $"00:{t}" : t;
+                                lrc.Events.Add(new LRCSubtitleItem()
+                                {
+                                    TimeFrom = TimeSpan.Parse(tv),
+                                    Text = m.Groups[6].Value
+                                });
+                            }
+                            return ("");
+                        }, RegexOptions.IgnoreCase);
+                    }
+                }
+                catch { }
+            }
+            #endregion
+            #region sort lyric by time and append lyric end time
+            lrc.Events = lrc.Events.OrderBy(e => e.TimeFrom.Ticks).ToList();
+            var last_from = TimeSpan.FromSeconds(20);
+            for(var i=lrc.Events.Count - 1; i >= 0; i--)
+            {
+                if (i == lrc.Events.Count - 1)
+                    lrc.Events[i].TimeTo = lrc.Events[i].TimeFrom + TimeSpan.FromSeconds(20);
+                else
+                    lrc.Events[i].TimeTo = last_from;
+                last_from = lrc.Events[i].TimeFrom;
+            }
+            #endregion
+            #region convert lrc to ass
+            var lines = new List<string>();
+            var lang = GuessLanguageFromTitle(title);
+            var comments = $"Album: {lrc.Album}, Artist: {lrc.Artist}, Alias: {lrc.Alias}, Made By: {lrc.Author}, Comments:{lrc.Comment}";
+            lines.AddRange(GetDefaultHeader(lrc.Title, comment:comments, language:lang));
+            foreach(var e in lrc.Events)
+            {
+                try
+                {
+                    if (string.IsNullOrEmpty(e.Text)) continue;
+                    lines.Add($"Dialogue: 0,{e.TimeFrom.ToString(@"hh\:mm\:ss\.ff")},{e.TimeTo.ToString(@"hh\:mm\:ss\.ff")},Default,NTP,0000,0000,0000,,{e.Text}");
+                }
+                catch (Exception ex) { System.Windows.MessageBox.Show(ex.Message); }
+            }
+            Load(lines.ToArray());
+            #endregion            
         }
 
         public void Save(string ass_file, SaveFlags flags = SaveFlags.Merge | SaveFlags.BOM)
