@@ -201,12 +201,12 @@ namespace SubTrans
             }
         }
 
-        public string ToAssText(string title = "Untitled", string lang = "ENG")
+        public string ToAssText(string title = "Untitled", SupportedLanguage lang = SupportedLanguage.ENG)
         {
             return (string.Join(Environment.NewLine, ToAss(title, lang)));
         }
 
-        public List<string> ToAss(string title = "Untitled", string lang="ENG")
+        public List<string> ToAss(string title = "Untitled", SupportedLanguage lang= SupportedLanguage.ENG)
         {
             List<string> sb = new List<string>();
 

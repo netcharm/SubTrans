@@ -24,6 +24,8 @@ using Microsoft.Win32;
 
 namespace SubTrans
 {
+    public enum SupportedLanguage { Any, CHS, CHT, JPN, KOR, ENG, Unknown };
+
     public enum FindReplaceRangeMode { None, Current, Selected, All };
     public enum FindReplaceMode { None, Find, Replace };
 
@@ -819,7 +821,8 @@ namespace SubTrans
                 e.Handled = true;
                 if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
                 {
-                    if (e.Key == Key.S) InvokeControl(cmiSaveAs);
+                    if (e.Key == Key.O) InvokeControl(btnLoad);
+                    else if (e.Key == Key.S) InvokeControl(cmiSaveAs);
                     else if (e.Key == Key.C) InvokeControl(btnCopy);
                     else if (e.Key == Key.V) InvokeControl(btnPaste);
                     else if (e.Key == Key.F) OpenFindReplaceEditor();
@@ -976,18 +979,51 @@ namespace SubTrans
             if (ass == null) return;
             if (sender == cmiLangEng)
             {
-                ass.YoutubeLanguage = "ENG";
+                ass.YoutubeLanguage = SupportedLanguage.ENG;
                 cmiLangEng.IsChecked = true;
                 cmiLangChs.IsChecked = false;
+                cmiLangCht.IsChecked = false;
+                cmiLangJpn.IsChecked = false;
+                cmiLangKor.IsChecked = false;
             }
             else if (sender == cmiLangChs)
             {
-                ass.YoutubeLanguage = "CHS";
+                ass.YoutubeLanguage = SupportedLanguage.CHS;
                 cmiLangEng.IsChecked = false;
                 cmiLangChs.IsChecked = true;
+                cmiLangCht.IsChecked = false;
+                cmiLangJpn.IsChecked = false;
+                cmiLangKor.IsChecked = false;
             }
-            ass.ChangeStyle();
-            YoutubeLanguage = ass.YoutubeLanguage;
+            else if (sender == cmiLangCht)
+            {
+                ass.YoutubeLanguage = SupportedLanguage.CHT;
+                cmiLangEng.IsChecked = false;
+                cmiLangChs.IsChecked = false;
+                cmiLangCht.IsChecked = true;
+                cmiLangJpn.IsChecked = false;
+                cmiLangKor.IsChecked = false;
+            }
+            else if (sender == cmiLangJpn)
+            {
+                ass.YoutubeLanguage = SupportedLanguage.JPN;
+                cmiLangEng.IsChecked = false;
+                cmiLangChs.IsChecked = false;
+                cmiLangCht.IsChecked = false;
+                cmiLangJpn.IsChecked = true;
+                cmiLangKor.IsChecked = false;
+            }
+            else if (sender == cmiLangKor)
+            {
+                ass.YoutubeLanguage = SupportedLanguage.KOR;
+                cmiLangEng.IsChecked = false;
+                cmiLangChs.IsChecked = false;
+                cmiLangCht.IsChecked = false;
+                cmiLangJpn.IsChecked = false;
+                cmiLangKor.IsChecked = true;
+            }
+            ass.ChangeStyle(ass.YoutubeLanguage);
+            YoutubeLanguage = ass.YoutubeLanguage.ToString();
             SetConfigValue(YoutubeLanguage_Key, YoutubeLanguage);
         }
 

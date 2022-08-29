@@ -38,36 +38,35 @@ namespace SubTrans
 
     public static class AssStyle
     {
-        public static string ENG_Default { get; } = @"Style: Default,Lucida Calligraphy,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string ENG_Note { get; } = @"Style: Note,Times New Roman,18,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string ENG_Title { get; } = @"Style: Title,Segoe,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string ENG_Color { get; } = @"{\1c&HFFFFFF&\2c&HEDEDEE&\3c&HF3DC95&}";
-        public static string ENG_Font { get; } = @"{\fnLucida Calligraphy}";
+        public static string ENG_Default { get; } = @"Style: Default,Lucida Calligraphy,24,&H20FFFFFF,&H20843815,&H40202020,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string ENG_Note { get; } = @"Style: Note,Times New Roman,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string ENG_Title { get; } = @"Style: Title,Segoe,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
+        public static string ENG_Color { get; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
+        public static string ENG_Font { get; } = @"{\fnLucida Calligraphy\fs24}";
 
-        public static string CHS_Default { get; } = @"Style: Default,更纱黑体 SC,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string CHS_Note { get; } = @"Style: Note,宋体,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string CHS_Title { get; } = @"Style: Title,更纱黑体 SC,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string CHS_Color { get; } = @"{\1c&HFFFFFF&\2c&HEDEDEE&\3c&H95C6F3&}";
-        public static string CHS_Font { get; } = @"{\fn更纱黑体 SC}";
+        public static string CHS_Default { get; } = @"Style: Default,更纱黑体 SC,24,&H20FFFFFF,&H20843815,&H40202020,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string CHS_Note { get; } = @"Style: Note,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHS_Title { get; } = @"Style: Title,更纱黑体 SC,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
+        public static string CHS_Color { get; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
+        public static string CHS_Font { get; } = @"{\fn更纱黑体 SC\fs24}";
 
-        public static string CHT_Default { get; } = @"Style: Default,Sarasa Gothic TC,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string CHT_Note { get; } = @"Style: Note,宋体,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string CHT_Title { get; } = @"Style: Title,Sarasa Gothic TC,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string CHT_Color { get; } = @"{\1c&HFFFFFF&\2c&HEDEDEE&\3c&H95C6F3&}";
-        public static string CHT_Font { get; } = @"{\fnSarasa Gothic TC}";
+        public static string CHT_Default { get; } = @"Style: Default,Sarasa Gothic TC,24,&H20FFFFFF,&H20843815,&H40202020,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string CHT_Note { get; } = @"Style: Note,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHT_Title { get; } = @"Style: Title,Sarasa Gothic TC,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
+        public static string CHT_Color { get; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
+        public static string CHT_Font { get; } = @"{\fnSarasa Gothic TC\fs24}";
 
-        public static string JPN_Default { get; } = @"Style: Default,Sarasa Gothic J,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string JPN_Note { get; } = @"Style: Note,宋体,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string JPN_Title { get; } = @"Style: Title,Sarasa Gothic J,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string JPN_Color { get; } = @"{\1c&HFFFFFF&\2c&HEDEDEE&\3c&H95C6F3&}";
-        public static string JPN_Font { get; } = @"{\fnSarasa Gothic J}";
+        public static string JPN_Default { get; } = @"Style: Default,Sarasa Gothic J,24,&H20FFFFFF,&H20843815,&H40202020,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string JPN_Note { get; } = @"Style: Note,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string JPN_Title { get; } = @"Style: Title,Sarasa Gothic J,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
+        public static string JPN_Color { get; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
+        public static string JPN_Font { get; } = @"{\fnSarasa Gothic J\fs24}";
 
-        public static string KOR_Default { get; } = @"Style: Default,Sarasa Gothic J,20,&H19000000,&H19843815,&H37A4F2F7,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string KOR_Note { get; } = @"Style: Note,宋体,22,&H19FFF907,&H19DC16C8,&H371E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string KOR_Title { get; } = @"Style: Title,Sarasa Gothic J,28,&H190055FF,&H1948560E,&H37EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string KOR_Color { get; } = @"{\1c&HFFFFFF&\2c&HEDEDEE&\3c&H95C6F3&}";
-        public static string KOR_Font { get; } = @"{\fnSarasa Gothic J}";
-
+        public static string KOR_Default { get; } = @"Style: Default,Sarasa Gothic K,24,&H20FFFFFF,&H20843815,&H40202020,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string KOR_Note { get; } = @"Style: Note,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string KOR_Title { get; } = @"Style: Title,Sarasa Gothic K,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
+        public static string KOR_Color { get; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
+        public static string KOR_Font { get; } = @"{\fnSarasa Gothic K\fs24}";
     }
 
     public class ASS
@@ -459,8 +458,9 @@ namespace SubTrans
             #endregion
         }
 
+        public string OriginalFile { get; set; } = string.Empty;
         public bool SaveWithUTF8BOM { get; set; } = true;
-        public string YoutubeLanguage { get; set; } = "ENG";
+        public SupportedLanguage YoutubeLanguage { get; set; } = SupportedLanguage.ENG;
 
         public SCRIPTINFO ScriptInfo = new SCRIPTINFO();
         private List<string> StylesRaw = new List<string>();
@@ -495,24 +495,41 @@ namespace SubTrans
             set { styles = value; }
         }
 
-        public static string GuessLanguageFromTitle(string title)
+        public static SupportedLanguage GuessLanguageFromTitle(string title)
         {
-            var lang = "ENG";
+            var lang = SupportedLanguage.Unknown;
             if (!string.IsNullOrEmpty(title))
             {
-                if (title.IndexOf(".ch", StringComparison.CurrentCultureIgnoreCase) > 0) lang = "CHS";
-                else if (title.IndexOf(".chs", StringComparison.CurrentCultureIgnoreCase) > 0) lang = "CHS";
-                else if (title.IndexOf(".cht", StringComparison.CurrentCultureIgnoreCase) > 0) lang = "CHT";
-                else if (title.IndexOf(".jp", StringComparison.CurrentCultureIgnoreCase) > 0) lang = "JPN";
-                else if (title.IndexOf(".jap", StringComparison.CurrentCultureIgnoreCase) > 0) lang = "JPN";
-                else if (title.IndexOf(".jpn", StringComparison.CurrentCultureIgnoreCase) > 0) lang = "JPN";
-                else if (title.IndexOf(".ko", StringComparison.CurrentCultureIgnoreCase) > 0) lang = "KOR";
-                else if (title.IndexOf(".kor", StringComparison.CurrentCultureIgnoreCase) > 0) lang = "KOR";
+                if (title.IndexOf(".ch", StringComparison.CurrentCultureIgnoreCase) > 0) lang = SupportedLanguage.CHS;
+                else if(title.EndsWith(".ch", StringComparison.CurrentCultureIgnoreCase)) lang = SupportedLanguage.CHS;
+
+                else if (title.IndexOf(".chs", StringComparison.CurrentCultureIgnoreCase) > 0) lang = SupportedLanguage.CHS;
+                else if (title.EndsWith(".chs", StringComparison.CurrentCultureIgnoreCase)) lang = SupportedLanguage.CHS;
+
+                else if (title.IndexOf(".cht", StringComparison.CurrentCultureIgnoreCase) > 0) lang = SupportedLanguage.CHT;
+                else if (title.EndsWith(".cht", StringComparison.CurrentCultureIgnoreCase)) lang = SupportedLanguage.CHT;
+
+                else if (title.IndexOf(".jp", StringComparison.CurrentCultureIgnoreCase) > 0) lang = SupportedLanguage.JPN;
+                else if (title.EndsWith(".jp", StringComparison.CurrentCultureIgnoreCase)) lang = SupportedLanguage.JPN;
+                else if (title.IndexOf(".jap", StringComparison.CurrentCultureIgnoreCase) > 0) lang = SupportedLanguage.JPN;
+                else if (title.EndsWith(".jap", StringComparison.CurrentCultureIgnoreCase)) lang = SupportedLanguage.JPN;
+                else if (title.IndexOf(".jpn", StringComparison.CurrentCultureIgnoreCase) > 0) lang = SupportedLanguage.JPN;
+                else if (title.EndsWith(".jpn", StringComparison.CurrentCultureIgnoreCase)) lang = SupportedLanguage.JPN;
+
+                else if (title.IndexOf(".ko", StringComparison.CurrentCultureIgnoreCase) > 0) lang = SupportedLanguage.KOR;
+                else if (title.EndsWith(".ko", StringComparison.CurrentCultureIgnoreCase)) lang = SupportedLanguage.KOR;
+                else if (title.IndexOf(".kor", StringComparison.CurrentCultureIgnoreCase) > 0) lang = SupportedLanguage.KOR;
+                else if (title.EndsWith(".kor", StringComparison.CurrentCultureIgnoreCase)) lang = SupportedLanguage.KOR;
+
+                else if (title.IndexOf(".en", StringComparison.CurrentCultureIgnoreCase) > 0) lang = SupportedLanguage.ENG;
+                else if (title.EndsWith(".en", StringComparison.CurrentCultureIgnoreCase)) lang = SupportedLanguage.ENG;
+                else if (title.IndexOf(".eng", StringComparison.CurrentCultureIgnoreCase) > 0) lang = SupportedLanguage.ENG;
+                else if (title.EndsWith(".eng", StringComparison.CurrentCultureIgnoreCase)) lang = SupportedLanguage.ENG;
             }
             return (lang);
         }
 
-        public static string[] GetDefaultHeader(string title, string comment = "", string language = "ENG")
+        public static string[] GetDefaultHeader(string title, string comment = "", SupportedLanguage language = SupportedLanguage.Unknown)
         {
             List<string> lines = new List<string>();
             lines.Add($"[Script Info]");
@@ -522,25 +539,25 @@ namespace SubTrans
             lines.Add($"");
             lines.Add($"[V4+ Styles]");
             lines.Add($"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding");
-            if (language.Equals("CHS", StringComparison.CurrentCultureIgnoreCase))
+            if (language == SupportedLanguage.CHS)
             {
                 lines.Add($"{AssStyle.CHS_Default}");
                 lines.Add($"{AssStyle.CHS_Note}");
                 lines.Add($"{AssStyle.CHS_Title}");
             }
-            else if (language.Equals("CHT", StringComparison.CurrentCultureIgnoreCase))
+            else if (language == SupportedLanguage.CHT)
             {
                 lines.Add($"{AssStyle.CHT_Default}");
                 lines.Add($"{AssStyle.CHT_Note}");
                 lines.Add($"{AssStyle.CHT_Title}");
             }
-            else if (language.Equals("JPN", StringComparison.CurrentCultureIgnoreCase))
+            else if (language == SupportedLanguage.JPN)
             {
                 lines.Add($"{AssStyle.JPN_Default}");
                 lines.Add($"{AssStyle.JPN_Note}");
                 lines.Add($"{AssStyle.JPN_Title}");
             }
-            else if (language.Equals("KOR", StringComparison.CurrentCultureIgnoreCase))
+            else if (language == SupportedLanguage.KOR)
             {
                 lines.Add($"{AssStyle.KOR_Default}");
                 lines.Add($"{AssStyle.KOR_Note}");
@@ -557,6 +574,39 @@ namespace SubTrans
             lines.Add($"Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text");
 
             return (lines.ToArray());
+        }
+
+        public static string GetStyleDefault(SupportedLanguage lang = SupportedLanguage.Unknown)
+        {
+            var result = AssStyle.ENG_Default;
+            if (lang == SupportedLanguage.CHS) result = AssStyle.CHS_Default;
+            else if (lang == SupportedLanguage.CHT) result = AssStyle.CHT_Default;
+            else if (lang == SupportedLanguage.JPN) result = AssStyle.JPN_Default;
+            else if (lang == SupportedLanguage.KOR) result = AssStyle.KOR_Default;
+            else if (lang == SupportedLanguage.ENG) result = AssStyle.ENG_Default;
+            return (result);
+        }
+
+        public static string GetStyleColor(SupportedLanguage lang = SupportedLanguage.Unknown)
+        {
+            var result = AssStyle.ENG_Color;
+            if (lang == SupportedLanguage.CHS) result = AssStyle.CHS_Color;
+            else if (lang == SupportedLanguage.CHT) result = AssStyle.CHT_Color;
+            else if (lang == SupportedLanguage.JPN) result = AssStyle.JPN_Color;
+            else if (lang == SupportedLanguage.KOR) result = AssStyle.KOR_Color;
+            else if (lang == SupportedLanguage.ENG) result = AssStyle.ENG_Color;
+            return (result);
+        }
+
+        public static string GetStyleFont(SupportedLanguage lang = SupportedLanguage.Unknown)
+        {
+            var result = AssStyle.ENG_Font;
+            if (lang == SupportedLanguage.CHS) result = AssStyle.CHS_Font;
+            else if (lang == SupportedLanguage.CHT) result = AssStyle.CHT_Font;
+            else if (lang == SupportedLanguage.JPN) result = AssStyle.JPN_Font;
+            else if (lang == SupportedLanguage.KOR) result = AssStyle.KOR_Font;
+            else if (lang == SupportedLanguage.ENG) result = AssStyle.ENG_Font;
+            return (result);
         }
 
         private void ParseScriptInfo(string v)
@@ -775,6 +825,7 @@ namespace SubTrans
 
             if (File.Exists(ass))
             {
+                OriginalFile = ass;
                 var ext = Path.GetExtension(ass).ToLower();
                 var fn = Path.GetFileNameWithoutExtension(ass);
                 var lines = File.ReadAllLines(ass);
@@ -944,13 +995,13 @@ namespace SubTrans
             var pat_title = @"\[ti(tle)?\s*:\s*(.*?)\]";
             var pat_alias = @"\[alias\s*:\s*(.*?)\]";
             var pat_by = @"\[by\s*:\s*(.*?)\]";
-            var pat_lyric = @"((\[((\d{2}:)?\d{2}:\d{2}(\.\d{1,3})?)\])+)\s*(.*?)$";
+            var pat_lyric = @"((\[((\d{1,2}:)?\d{1,2}:\d{1,2}(\.\d{1,3})?)\])+)\s*(.*?)$";
 
             var ts_sep = new string[] { "[" };
             var ts_trim = new char[] { '[', ']' };
 
             var lrc = new LRCSubtitle() { Title = title };
-            #region Pharsing lyric file
+            #region pharsing lyric contents
             foreach (var line in contents)
             {
                 try
@@ -979,7 +1030,7 @@ namespace SubTrans
                                 lrc.Events.Add(new LRCSubtitleItem()
                                 {
                                     TimeFrom = TimeSpan.Parse(tv),
-                                    Text = m.Groups[6].Value
+                                    Text = m.Groups[6].Value.Trim()
                                 });
                             }
                             return ("");
@@ -992,7 +1043,7 @@ namespace SubTrans
             #region sort lyric by time and append lyric end time
             lrc.Events = lrc.Events.OrderBy(e => e.TimeFrom.Ticks).ToList();
             var last_from = TimeSpan.FromSeconds(20);
-            for(var i=lrc.Events.Count - 1; i >= 0; i--)
+            for (var i = lrc.Events.Count - 1; i >= 0; i--)
             {
                 if (i == lrc.Events.Count - 1)
                     lrc.Events[i].TimeTo = lrc.Events[i].TimeFrom + TimeSpan.FromSeconds(20);
@@ -1005,15 +1056,15 @@ namespace SubTrans
             var lines = new List<string>();
             var lang = GuessLanguageFromTitle(title);
             var comments = $"Album: {lrc.Album}, Artist: {lrc.Artist}, Alias: {lrc.Alias}, Made By: {lrc.Author}, Comments:{lrc.Comment}";
-            lines.AddRange(GetDefaultHeader(lrc.Title, comment:comments, language:lang));
-            foreach(var e in lrc.Events)
+            lines.AddRange(GetDefaultHeader(lrc.Title, comment: comments, language: lang));
+            foreach (var e in lrc.Events)
             {
                 try
                 {
                     if (string.IsNullOrEmpty(e.Text)) continue;
                     lines.Add($"Dialogue: 0,{e.TimeFrom.ToString(@"hh\:mm\:ss\.ff")},{e.TimeTo.ToString(@"hh\:mm\:ss\.ff")},Default,NTP,0000,0000,0000,,{e.Text}");
                 }
-                catch (Exception ex) { System.Windows.MessageBox.Show(ex.Message); }
+                catch (Exception ex) { System.Windows.MessageBox.Show($"{ex.Message}{Environment.NewLine}[{e.TimeFrom}]{e.Text}"); }
             }
             Load(lines.ToArray());
             #endregion            
@@ -1029,6 +1080,23 @@ namespace SubTrans
                 SaveAsTxt(ass_file, flags);
             else
             {
+                var lang_src = GuessLanguageFromTitle(OriginalFile);
+                var lang_dst = GuessLanguageFromTitle(ass_file);
+                if (lang_src == SupportedLanguage.Unknown) lang_src = SupportedLanguage.ENG;
+                //if (lang_dst == SupportedLanguage.Unknown) lang_dst = lang_src == SupportedLanguage.ENG ? SupportedLanguage.CHS : SupportedLanguage.ENG;
+                if (lang_dst == SupportedLanguage.Unknown) lang_dst = SupportedLanguage.CHS;
+                if (flags.HasFlag(SaveFlags.Merge))
+                    ChangeStyle(lang_src);
+                else if (lang_dst != SupportedLanguage.Unknown && lang_dst != SupportedLanguage.Any)
+                    ChangeStyle(lang_dst);
+
+                var style_src = GetStyleDefault(lang_src);
+                var style_dst = GetStyleDefault(lang_dst);
+                var color_src = GetStyleColor(lang_src);
+                var color_dst = GetStyleColor(lang_dst);
+                var font_src = GetStyleFont(lang_src);
+                var font_dst = GetStyleFont(lang_dst);
+
                 StringBuilder sb = new StringBuilder();
 
                 #region Save Script Info Section
@@ -1083,9 +1151,9 @@ namespace SubTrans
                     if (flags.HasFlag(SaveFlags.Merge))
                     {
                         if (string.IsNullOrEmpty(events[current].Translated))
-                            line = $"{string.Join(",", evo)},{AssStyle.ENG_Color}{AssStyle.ENG_Font}{events[current].Text}";
+                            line = $"{string.Join(",", evo)},{color_src}{font_src}{events[current].Text}";
                         else
-                            line = $"{string.Join(",", evo)},{AssStyle.ENG_Color}{AssStyle.ENG_Font}{events[current].Text}\\N{AssStyle.CHS_Color}{AssStyle.CHS_Font}{events[current].Translated}";
+                            line = $"{string.Join(",", evo)},{color_src}{font_src}{events[current].Text}\\N{color_dst}{font_dst}{events[current].Translated}";
                     }
                     else if (flags.HasFlag(SaveFlags.Replace))
                     {
@@ -1244,27 +1312,40 @@ namespace SubTrans
             File.WriteAllText(ass_file, sb.ToString(), new UTF8Encoding(flags.HasFlag(SaveFlags.BOM)));
         }
 
-        public void ChangeStyle()
+        public void ChangeStyle(SupportedLanguage lang =  SupportedLanguage.Unknown)
         {
             if (StylesRaw.Count <= 2) return;
             try
             {
+                if (lang == SupportedLanguage.Unknown) lang = YoutubeLanguage;
                 for (int i = StylesRaw.Count - 1; i > 1; i--)
                 {
                     StylesRaw.RemoveAt(i);
                 }
 
-                if (YoutubeLanguage.Equals("CHS", StringComparison.CurrentCultureIgnoreCase))
+                if (lang == SupportedLanguage.CHS)
                 {
                     StylesRaw.Add($"{AssStyle.CHS_Default}");
                     StylesRaw.Add($"{AssStyle.CHS_Note}");
                     StylesRaw.Add($"{AssStyle.CHS_Title}");
                 }
-                else if (YoutubeLanguage.Equals("CHT", StringComparison.CurrentCultureIgnoreCase))
+                else if (lang == SupportedLanguage.CHT)
                 {
                     StylesRaw.Add($"{AssStyle.CHT_Default}");
                     StylesRaw.Add($"{AssStyle.CHT_Note}");
                     StylesRaw.Add($"{AssStyle.CHT_Title}");
+                }
+                else if (lang == SupportedLanguage.JPN)
+                {
+                    StylesRaw.Add($"{AssStyle.JPN_Default}");
+                    StylesRaw.Add($"{AssStyle.JPN_Note}");
+                    StylesRaw.Add($"{AssStyle.JPN_Title}");
+                }
+                else if (lang == SupportedLanguage.KOR)
+                {
+                    StylesRaw.Add($"{AssStyle.KOR_Default}");
+                    StylesRaw.Add($"{AssStyle.KOR_Note}");
+                    StylesRaw.Add($"{AssStyle.KOR_Title}");
                 }
                 else
                 {
@@ -1279,4 +1360,3 @@ namespace SubTrans
         }
     }
 }
-
