@@ -89,7 +89,7 @@ namespace SubTrans
         private static string AppPath = Path.GetDirectoryName(AppExec);
         private static string AppName = Path.GetFileNameWithoutExtension(AppExec);
 
-        private string[] exts = new string[] { ".ass", ".ssa", ".srt", ".vtt" };
+        private string[] exts = new string[] { ".ass", ".ssa", ".srt", ".vtt", ".lrc" };
 
         private const string YoutubeLanguage_Key = "YoutubeLanguage";
         private const string SaveWithBOM_Key = "SaveWithBOM";
@@ -97,12 +97,6 @@ namespace SubTrans
         private string YoutubeLanguage = Properties.Settings.Default.YoutubeLanguage;
         private bool SaveWithBOM = Properties.Settings.Default.SaveWithBOM;
         private bool PasteRemoveNullLine = Properties.Settings.Default.PasteRemoveNullLine;
-
-        private static Configuration config = ConfigurationManager.OpenExeConfiguration(AppExec);
-        private static AppSettingsSection appSection = config.AppSettings;
-
-        private Terms Phrase = new Terms();
-        private string PhraseFile = Path.Combine(AppPath, $"{AppName}.phrase.xml");
 
         ASS ass = new ASS();
         private ObservableCollection<ASS.EVENT> events = new ObservableCollection<ASS.EVENT>();
@@ -203,6 +197,54 @@ namespace SubTrans
 
         #endregion
 
+        #region Phrase Helper
+        private Terms Phrase = new Terms();
+        private string PhraseFile = Path.Combine(AppPath, $"{AppName}.phrase.xml");
+
+        private Terms LoadPhrase(string file = "")
+        {
+            var result = new Terms();
+            if (string.IsNullOrEmpty(file)) file = PhraseFile;
+            if (File.Exists(file))
+            {
+                try
+                {
+                    var xs = new XmlSerializer(typeof(Terms));
+                    using (StringReader tr = new StringReader(File.ReadAllText(file, Encoding.UTF8)))
+                    {
+                        result = (Terms)xs.Deserialize(tr);
+                    }
+                }
+                catch (Exception ex) { MessageBox.Show(this, ex.Message); }
+            }
+            return (result);
+        }
+
+        private void SavePhrase(string file = "", Terms terms = null)
+        {
+            if (string.IsNullOrEmpty(file)) file = PhraseFile;
+            if (terms == null) terms = Phrase;
+            if (terms is Terms)
+            {
+                try
+                {
+                    var xs = new XmlSerializer(typeof(Terms));
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        using (StreamWriter sw = new StreamWriter(ms, Encoding.UTF8))
+                        {
+                            using (XmlWriter xw = XmlWriter.Create(sw, new XmlWriterSettings() { Encoding = Encoding.UTF8, Indent = true, IndentChars = "  " }))
+                            {
+                                xs.Serialize(xw, terms);
+                            }
+                        }
+                        File.WriteAllBytes(file, ms.ToArray());
+                    }
+                }
+                catch (Exception ex) { MessageBox.Show(this, ex.Message); }
+            }
+        }
+
         private string PhraseReplace(string text, PhraseType type = PhraseType.Auto)
         {
             var result = string.Join("\\N", text.Split(new string[] { "\\N", "\\n" }, StringSplitOptions.None).Select(t => t.Trim()));
@@ -281,7 +323,9 @@ namespace SubTrans
             catch (Exception ex) { MessageBox.Show(ex.Message); }
             return (result);
         }
+        #endregion
 
+        #region Listview Helper
         private string GetValidFileName(string name)
         {
             string result = string.Empty;
@@ -347,8 +391,13 @@ namespace SubTrans
                 gv.Columns.Add(col);
             }
         }
+        #endregion
 
-        private async void LoadSubTitle(string subtitle)
+        #region Load/Save Subtitles Helper
+        private static Configuration config = ConfigurationManager.OpenExeConfiguration(AppExec);
+        private static AppSettingsSection appSection = config.AppSettings;
+
+        private async void LoadSubtitle(string subtitle)
         {
             try
             {
@@ -374,7 +423,20 @@ namespace SubTrans
             }
         }
 
-        private void SaveASS(ASS.SaveFlags flags = ASS.SaveFlags.BOM)
+        private void LoadSubtitle(IEnumerable<string> subtitles)
+        {
+            if (subtitles.Count() > 0) LoadSubtitle(subtitles.First());
+            if (subtitles.Count() > 1)
+            {
+                foreach (var subtitle in subtitles.Skip(1))
+                {
+                    var file = Path.IsPathRooted(subtitle) ? subtitle : Path.GetPathRoot(subtitle);
+                    if (File.Exists(subtitle)) System.Diagnostics.Process.Start(AppExec, $"\"{file}\"");
+                }
+            }
+        }
+
+        private void SaveSubtitle(ASS.SaveFlags flags = ASS.SaveFlags.BOM)
         {
             if (ass == null) return;
             else if (string.IsNullOrEmpty(LastFilename) && !string.IsNullOrEmpty(ass.ScriptInfo.Title))
@@ -407,64 +469,9 @@ namespace SubTrans
                 LastFilename = dlgSave.FileName;
             }
         }
+        #endregion
 
-        private Terms LoadPhrase(string file = "")
-        {
-            var result = new Terms();
-            if (string.IsNullOrEmpty(file)) file = PhraseFile;
-            if (File.Exists(file))
-            {
-                try
-                {
-                    var xs = new XmlSerializer(typeof(Terms));
-                    using (StringReader tr = new StringReader(File.ReadAllText(file, Encoding.UTF8)))
-                    {
-                        result = (Terms)xs.Deserialize(tr);
-                    }
-                }
-                catch (Exception ex) { MessageBox.Show(this, ex.Message); }
-            }
-            return (result);
-        }
-
-        private void SavePhrase(string file = "", Terms terms = null)
-        {
-            if (string.IsNullOrEmpty(file)) file = PhraseFile;
-            if (terms == null) terms = Phrase;
-            if (terms is Terms)
-            {
-                try
-                {
-                    var xs = new XmlSerializer(typeof(Terms));
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        using (StreamWriter sw = new StreamWriter(ms, Encoding.UTF8))
-                        {
-                            using (XmlWriter xw = XmlWriter.Create(sw, new XmlWriterSettings() { Encoding = Encoding.UTF8, Indent = true, IndentChars = "  " }))
-                            {
-                                xs.Serialize(xw, terms);
-                            }
-                        }
-                        File.WriteAllBytes(file, ms.ToArray());
-                    }
-                }
-                catch (Exception ex) { MessageBox.Show(this, ex.Message); }
-            }
-        }
-
-        private void InvokeControl(object sender)
-        {
-            FrameworkElementAutomationPeer peer = null;
-            //typeof(System.Windows.Controls.Primitives.ButtonBase).GetMethod("OnClick", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(btnCopy, new object[0]);
-            if (sender is Button) peer = new ButtonAutomationPeer(sender as Button);
-            else if (sender is MenuItem) peer = new MenuItemAutomationPeer(sender as MenuItem);
-            if (peer is FrameworkElementAutomationPeer)
-            {
-                IInvokeProvider invokeProv = (peer as FrameworkElementAutomationPeer).GetPattern(PatternInterface.Invoke) as IInvokeProvider;
-                invokeProv.Invoke();
-            }
-        }
-
+        #region Edit/Find/Replace Helper
         private FindReplaceOptions _last_find_replace_option_ = null;
 
         private void OpenTranslatedEditor()
@@ -653,8 +660,18 @@ namespace SubTrans
         private Action<FindReplaceOptions> FindTextAction { get; set; } = null;
         private Action<FindReplaceOptions> ReplaceTextAction { get; set; } = null;
         private Func<string> FindReplaceResultFunc { get; set; } = null;
+        #endregion
 
         #region Config Helper
+        private void InitDefaultStyle()
+        {
+            var props = typeof(AssStyle).GetProperties();
+            foreach(var prop in props)
+            {
+                prop.SetValue(prop, GetConfigValue(prop.Name, prop.GetValue(prop)));
+            }
+        }
+
         private string GetConfigValue(string key, object value = null)
         {
             string result = string.Empty;
@@ -700,6 +717,19 @@ namespace SubTrans
         }
         #endregion
 
+        private void InvokeControl(object sender)
+        {
+            FrameworkElementAutomationPeer peer = null;
+            //typeof(System.Windows.Controls.Primitives.ButtonBase).GetMethod("OnClick", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(btnCopy, new object[0]);
+            if (sender is Button) peer = new ButtonAutomationPeer(sender as Button);
+            else if (sender is MenuItem) peer = new MenuItemAutomationPeer(sender as MenuItem);
+            if (peer is FrameworkElementAutomationPeer)
+            {
+                IInvokeProvider invokeProv = (peer as FrameworkElementAutomationPeer).GetPattern(PatternInterface.Invoke) as IInvokeProvider;
+                invokeProv.Invoke();
+            }
+        }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -710,12 +740,25 @@ namespace SubTrans
             lvItems.ItemsSource = events;
             OriginalTitle = Title;
 
+            InitDefaultStyle();
+
             YoutubeLanguage = GetConfigValue(YoutubeLanguage_Key, YoutubeLanguage);
             bool.TryParse(GetConfigValue(SaveWithBOM_Key, SaveWithBOM), out SaveWithBOM);
             bool.TryParse(GetConfigValue(PasteRemoveNullLine_Key, PasteRemoveNullLine), out PasteRemoveNullLine);
 
-            if (YoutubeLanguage == "CHS") { cmiLangChs.IsChecked = true; cmiLangEng.IsChecked = false; }
-            else if (YoutubeLanguage == "ENG") { cmiLangChs.IsChecked = false; cmiLangEng.IsChecked = true; }
+            var lang = SupportedLanguage.ENG;
+            if (Enum.TryParse(YoutubeLanguage, out lang))
+            {
+                switch (lang)
+                {
+                    case SupportedLanguage.ENG: InvokeControl(cmiLangEng); break;
+                    case SupportedLanguage.CHS: InvokeControl(cmiLangChs); break;
+                    case SupportedLanguage.CHT: InvokeControl(cmiLangCht); break;
+                    case SupportedLanguage.JPN: InvokeControl(cmiLangJpn); break;
+                    case SupportedLanguage.KOR: InvokeControl(cmiLangKor); break;
+                    default: InvokeControl(cmiLangEng); break;
+                }
+            }
             cmiSaveWithBOM.IsChecked = SaveWithBOM;
             cmiPasteRemoveNullLine.IsChecked = PasteRemoveNullLine;
 
@@ -754,7 +797,7 @@ namespace SubTrans
             if (args.Length > 1)
             {
                 var files = args.Skip(1).Where(f => exts.Contains(Path.GetExtension(f).ToLower()) && File.Exists(f));
-                if (files.Count() > 0) LoadSubTitle(files.First());
+                LoadSubtitle(files);
             }
         }
 
@@ -783,22 +826,11 @@ namespace SubTrans
                 {
                     string[] dragFiles = (string[])e.Data.GetData(DataFormats.FileDrop, true);
                     if (dragFiles.Length > 0)
-                    {
-                        string dragFileName = dragFiles[0].ToString();
-                        string ext = Path.GetExtension(dragFileName).ToLower();
-
-                        string[] exts = { ".ass", ".ssa", ".srt", ".lrc" };
-
-                        if (exts.Contains(ext))
-                        {
-                            LoadSubTitle(dragFileName);
-                        }
+                    {                       
+                        LoadSubtitle(dragFiles.Where(f => exts.Contains(Path.GetExtension(f).ToLower()) && File.Exists(f)));
                     }
                 }
-                catch
-                {
-
-                }
+                catch { }
             }
         }
         #endregion
@@ -845,9 +877,11 @@ namespace SubTrans
             //dlgOpen.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|Text File|*.txt|All File|*.*";
             dlgOpen.Filter = "All Supported File|*.ass;*.ssa;*.srt;*.vtt;*.lrc|ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|VTT Fils|*.vtt|LRC File|*.lrc";
             dlgOpen.FilterIndex = 0;
+            dlgOpen.Multiselect = true;
             if (dlgOpen.ShowDialog() == true)
             {
-                LoadSubTitle(dlgOpen.FileName);
+                //LoadSubtitle(dlgOpen.FileName);
+                LoadSubtitle(dlgOpen.FileNames);
             }
         }
 
@@ -946,17 +980,17 @@ namespace SubTrans
         private void btnMerge_Click(object sender, RoutedEventArgs e)
         {
             if (SaveWithBOM)
-                SaveASS(ASS.SaveFlags.Merge | ASS.SaveFlags.BOM);
+                SaveSubtitle(ASS.SaveFlags.Merge | ASS.SaveFlags.BOM);
             else
-                SaveASS(ASS.SaveFlags.Merge);
+                SaveSubtitle(ASS.SaveFlags.Merge);
         }
 
         private void btnReplace_Click(object sender, RoutedEventArgs e)
         {
             if (SaveWithBOM)
-                SaveASS(ASS.SaveFlags.Replace | ASS.SaveFlags.BOM);
+                SaveSubtitle(ASS.SaveFlags.Replace | ASS.SaveFlags.BOM);
             else
-                SaveASS(ASS.SaveFlags.Replace);
+                SaveSubtitle(ASS.SaveFlags.Replace);
         }
 
         private void cmiPasteRemoveNullLine_Click(object sender, RoutedEventArgs e)
@@ -1055,9 +1089,9 @@ namespace SubTrans
         private void cmiSaveAs_Click(object sender, RoutedEventArgs e)
         {
             if (SaveWithBOM)
-                SaveASS(ASS.SaveFlags.BOM);
+                SaveSubtitle(ASS.SaveFlags.BOM);
             else
-                SaveASS(ASS.SaveFlags.None);
+                SaveSubtitle(ASS.SaveFlags.None);
         }
 
         private void cmiPhraseOprate_Click(object sender, RoutedEventArgs e)

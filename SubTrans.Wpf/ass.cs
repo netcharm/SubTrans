@@ -38,35 +38,38 @@ namespace SubTrans
 
     public static class AssStyle
     {
-        public static string ENG_Default { get; } = @"Style: Default,Lucida Calligraphy,24,&H20FFFFFF,&H20843815,&H40202020,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
-        public static string ENG_Note { get; } = @"Style: Note,Times New Roman,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string ENG_Title { get; } = @"Style: Title,Segoe,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
-        public static string ENG_Color { get; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
-        public static string ENG_Font { get; } = @"{\fnLucida Calligraphy\fs24}";
+        public static string FormatOfStyle { get; set; } = $"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding";
+        public static string FormatOfEvent { get; set; } = $"Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text";
 
-        public static string CHS_Default { get; } = @"Style: Default,更纱黑体 SC,24,&H20FFFFFF,&H20843815,&H40202020,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
-        public static string CHS_Note { get; } = @"Style: Note,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string CHS_Title { get; } = @"Style: Title,更纱黑体 SC,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
-        public static string CHS_Color { get; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
-        public static string CHS_Font { get; } = @"{\fn更纱黑体 SC\fs24}";
+        public static string ENG_Default { get; set; } = @"Style: Default,Lucida Calligraphy,24,&H20FFFFFF,&H20843815,&H40202020,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string ENG_Note { get; set; } = @"Style: Note,Times New Roman,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string ENG_Title { get; set; } = @"Style: Title,Segoe,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
+        public static string ENG_Color { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
+        public static string ENG_Font { get; set; } = @"{\fnLucida Calligraphy\fs24}";
 
-        public static string CHT_Default { get; } = @"Style: Default,Sarasa Gothic TC,24,&H20FFFFFF,&H20843815,&H40202020,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
-        public static string CHT_Note { get; } = @"Style: Note,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string CHT_Title { get; } = @"Style: Title,Sarasa Gothic TC,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
-        public static string CHT_Color { get; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
-        public static string CHT_Font { get; } = @"{\fnSarasa Gothic TC\fs24}";
+        public static string CHS_Default { get; set; } = @"Style: Default,更纱黑体 SC,24,&H20FFFFFF,&H20843815,&H40202020,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string CHS_Note { get; set; } = @"Style: Note,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHS_Title { get; set; } = @"Style: Title,更纱黑体 SC,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
+        public static string CHS_Color { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
+        public static string CHS_Font { get; set; } = @"{\fn更纱黑体 SC\fs24}";
 
-        public static string JPN_Default { get; } = @"Style: Default,Sarasa Gothic J,24,&H20FFFFFF,&H20843815,&H40202020,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
-        public static string JPN_Note { get; } = @"Style: Note,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string JPN_Title { get; } = @"Style: Title,Sarasa Gothic J,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
-        public static string JPN_Color { get; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
-        public static string JPN_Font { get; } = @"{\fnSarasa Gothic J\fs24}";
+        public static string CHT_Default { get; set; } = @"Style: Default,Sarasa Gothic TC,24,&H20FFFFFF,&H20843815,&H40202020,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string CHT_Note { get; set; } = @"Style: Note,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHT_Title { get; set; } = @"Style: Title,Sarasa Gothic TC,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
+        public static string CHT_Color { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
+        public static string CHT_Font { get; set; } = @"{\fnSarasa Gothic TC\fs24}";
 
-        public static string KOR_Default { get; } = @"Style: Default,Sarasa Gothic K,24,&H20FFFFFF,&H20843815,&H40202020,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
-        public static string KOR_Note { get; } = @"Style: Note,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string KOR_Title { get; } = @"Style: Title,Sarasa Gothic K,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
-        public static string KOR_Color { get; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
-        public static string KOR_Font { get; } = @"{\fnSarasa Gothic K\fs24}";
+        public static string JPN_Default { get; set; } = @"Style: Default,Sarasa Gothic J,24,&H20FFFFFF,&H20843815,&H40202020,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string JPN_Note { get; set; } = @"Style: Note,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string JPN_Title { get; set; } = @"Style: Title,Sarasa Gothic J,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
+        public static string JPN_Color { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
+        public static string JPN_Font { get; set; } = @"{\fnSarasa Gothic J\fs24}";
+
+        public static string KOR_Default { get; set; } = @"Style: Default,Sarasa Gothic K,24,&H20FFFFFF,&H20843815,&H40202020,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string KOR_Note { get; set; } = @"Style: Note,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string KOR_Title { get; set; } = @"Style: Title,Sarasa Gothic K,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
+        public static string KOR_Color { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
+        public static string KOR_Font { get; set; } = @"{\fnSarasa Gothic K\fs24}";
     }
 
     public class ASS
@@ -538,7 +541,7 @@ namespace SubTrans
                 lines.Add($"Comment: {comment}");
             lines.Add($"");
             lines.Add($"[V4+ Styles]");
-            lines.Add($"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding");
+            lines.Add(AssStyle.FormatOfStyle);
             if (language == SupportedLanguage.CHS)
             {
                 lines.Add($"{AssStyle.CHS_Default}");
@@ -571,7 +574,7 @@ namespace SubTrans
             }
             lines.Add($"");
             lines.Add($"[Events]");
-            lines.Add($"Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text");
+            lines.Add(AssStyle.FormatOfEvent);
 
             return (lines.ToArray());
         }
