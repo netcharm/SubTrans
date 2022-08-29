@@ -89,6 +89,8 @@ namespace SubTrans
         private static string AppPath = Path.GetDirectoryName(AppExec);
         private static string AppName = Path.GetFileNameWithoutExtension(AppExec);
 
+        private bool InInit { get; set; } = true;
+
         private string[] exts = new string[] { ".ass", ".ssa", ".srt", ".vtt", ".lrc" };
 
         private const string YoutubeLanguage_Key = "YoutubeLanguage";
@@ -401,7 +403,10 @@ namespace SubTrans
         {
             try
             {
-                LoadProgress.IsIndeterminate = true;
+                await Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    LoadProgress.IsIndeterminate = true;
+                }));
                 await ass.Load(subtitle);
                 InitListView(lvItems, ass.EventFields);
                 LastFilename = subtitle;
@@ -410,9 +415,13 @@ namespace SubTrans
                     events.Add(ass.Events[i]);
                 }
             }
+            catch (Exception ex) { MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
             finally
             {
-                LoadProgress.IsIndeterminate = false;
+                await Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    LoadProgress.IsIndeterminate = false;
+                }));
                 if (!string.IsNullOrEmpty(LastFilename))
                 {
                     await Dispatcher.BeginInvoke(new Action(() =>
@@ -431,7 +440,13 @@ namespace SubTrans
                 foreach (var subtitle in subtitles.Skip(1))
                 {
                     var file = Path.IsPathRooted(subtitle) ? subtitle : Path.GetPathRoot(subtitle);
-                    if (File.Exists(subtitle)) System.Diagnostics.Process.Start(AppExec, $"\"{file}\"");
+                    if (File.Exists(subtitle))
+                    {
+                        Dispatcher.Invoke(new Action(() =>
+                        {
+                            System.Diagnostics.Process.Start(AppExec, $"\"{file}\"");
+                        }));
+                    }
                 }
             }
         }
@@ -628,7 +643,7 @@ namespace SubTrans
             var result = new List<bool>();
             try
             {
-                _last_find_replace_option_ = opt;                
+                _last_find_replace_option_ = opt;
                 _last_find_replace_option_.ReplaceResult.Clear();
 
                 if (opt.Range == FindReplaceRangeMode.Current && _last_find_replace_option_.FindResult >= 0 && _last_find_replace_option_.FindResult < lvItems.Items.Count)
@@ -665,74 +680,92 @@ namespace SubTrans
         #region Config Helper
         private void InitDefaultStyle()
         {
-            var props = typeof(AssStyle).GetProperties();
-            foreach(var prop in props)
+            try
             {
-                prop.SetValue(prop, GetConfigValue(prop.Name, prop.GetValue(prop)));
+                var props = typeof(AssStyle).GetProperties();
+                foreach (var prop in props)
+                {
+                    prop.SetValue(prop, GetConfigValue(prop.Name, prop.GetValue(prop)));
+                }
             }
+            catch (Exception ex) { MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
         }
 
         private string GetConfigValue(string key, object value = null)
         {
             string result = string.Empty;
-            if (appSection is AppSettingsSection)
+            try
             {
-                if (appSection.Settings.AllKeys.Contains(key))
+                if (appSection is AppSettingsSection)
                 {
-                    result = appSection.Settings[key].Value;
-                }
-                else
-                {
-                    if (value != null)
-                        appSection.Settings.Add(key, value.ToString());
+                    if (appSection.Settings.AllKeys.Contains(key))
+                    {
+                        result = appSection.Settings[key].Value;
+                    }
                     else
-                        appSection.Settings.Add(key, string.Empty);
+                    {
+                        if (value != null)
+                            appSection.Settings.Add(key, value.ToString());
+                        else
+                            appSection.Settings.Add(key, string.Empty);
 
-                    config.Save();
+                        config.Save();
+                    }
                 }
             }
+            catch (Exception ex) { MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
             return (result);
         }
 
         private void SetConfigValue(string key, object value = null)
         {
             string result = string.Empty;
-            if (appSection is AppSettingsSection)
+            try
             {
-                if (appSection.Settings.AllKeys.Contains(key))
+                if (!InInit && IsLoaded && appSection is AppSettingsSection)
                 {
-                    if (value != null)
-                        appSection.Settings[key].Value = value.ToString();
-                    else
-                        appSection.Settings.Remove(key);
+                    if (appSection.Settings.AllKeys.Contains(key))
+                    {
+                        if (value != null)
+                            appSection.Settings[key].Value = value.ToString();
+                        else
+                            appSection.Settings.Remove(key);
 
-                    config.Save();
-                }
-                else if (value != null)
-                {
-                    appSection.Settings.Add(key, value.ToString());
-                    config.Save();
+                        config.Save();
+                    }
+                    else if (value != null)
+                    {
+                        appSection.Settings.Add(key, value.ToString());
+                        config.Save();
+                    }
                 }
             }
+            catch (Exception ex) { MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
         }
         #endregion
 
         private void InvokeControl(object sender)
         {
-            FrameworkElementAutomationPeer peer = null;
-            //typeof(System.Windows.Controls.Primitives.ButtonBase).GetMethod("OnClick", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(btnCopy, new object[0]);
-            if (sender is Button) peer = new ButtonAutomationPeer(sender as Button);
-            else if (sender is MenuItem) peer = new MenuItemAutomationPeer(sender as MenuItem);
-            if (peer is FrameworkElementAutomationPeer)
+            try
             {
-                IInvokeProvider invokeProv = (peer as FrameworkElementAutomationPeer).GetPattern(PatternInterface.Invoke) as IInvokeProvider;
-                invokeProv.Invoke();
+                FrameworkElementAutomationPeer peer = null;
+                //typeof(System.Windows.Controls.Primitives.ButtonBase).GetMethod("OnClick", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(btnCopy, new object[0]);
+                if (sender is Button) peer = new ButtonAutomationPeer(sender as Button);
+                else if (sender is MenuItem) peer = new MenuItemAutomationPeer(sender as MenuItem);
+                if (peer is FrameworkElementAutomationPeer)
+                {
+                    IInvokeProvider invokeProv = (peer as FrameworkElementAutomationPeer).GetPattern(PatternInterface.Invoke) as IInvokeProvider;
+                    invokeProv.Invoke();
+                }
             }
+            catch (Exception ex) { MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
         }
 
         public MainWindow()
         {
             InitializeComponent();
+
+            InInit = false;
 
             var apppath = Assembly.GetExecutingAssembly().Location;
             Icon = GetIcon(apppath.ToString());
@@ -771,7 +804,8 @@ namespace SubTrans
             if (UpdateFindReplaceOptionAction == null) UpdateFindReplaceOptionAction = new Action<FindReplaceOptions>((opt) => { _last_find_replace_option_ = opt; });
             if (FindTextAction == null) FindTextAction = new Action<FindReplaceOptions>((opt) => { FindText(opt); });
             if (ReplaceTextAction == null) ReplaceTextAction = new Action<FindReplaceOptions>((opt) => { ReplaceText(opt); });
-            if (FindReplaceResultFunc == null) FindReplaceResultFunc = new Func<string>(() => {
+            if (FindReplaceResultFunc == null) FindReplaceResultFunc = new Func<string>(() =>
+            {
                 if (_last_find_replace_option_.Mode == FindReplaceMode.Find)
                 {
                     var result = "Not Found!";
@@ -793,12 +827,17 @@ namespace SubTrans
 
             lvItems.Focus();
 
-            var args = Environment.GetCommandLineArgs();
-            if (args.Length > 1)
+            InInit = true;
+            try
             {
-                var files = args.Skip(1).Where(f => exts.Contains(Path.GetExtension(f).ToLower()) && File.Exists(f));
-                LoadSubtitle(files);
+                var args = Environment.GetCommandLineArgs();
+                if (args.Length > 1)
+                {
+                    var files = args.Skip(1).Where(f => exts.Contains(Path.GetExtension(f).ToLower()) && File.Exists(f));
+                    LoadSubtitle(files);
+                }
             }
+            catch (Exception ex) { MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
         }
 
         #region Drag/Drop Routines
@@ -826,11 +865,11 @@ namespace SubTrans
                 {
                     string[] dragFiles = (string[])e.Data.GetData(DataFormats.FileDrop, true);
                     if (dragFiles.Length > 0)
-                    {                       
+                    {
                         LoadSubtitle(dragFiles.Where(f => exts.Contains(Path.GetExtension(f).ToLower()) && File.Exists(f)));
                     }
                 }
-                catch { }
+                catch (Exception ex) { MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
             }
         }
         #endregion
