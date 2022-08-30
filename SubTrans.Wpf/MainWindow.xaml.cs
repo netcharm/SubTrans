@@ -722,16 +722,21 @@ namespace SubTrans
             string result = string.Empty;
             try
             {
-                if (!InInit && IsLoaded && appSection is AppSettingsSection)
+                if (appSection is AppSettingsSection)
                 {
                     if (appSection.Settings.AllKeys.Contains(key))
                     {
-                        if (value != null)
-                            appSection.Settings[key].Value = value.ToString();
-                        else
-                            appSection.Settings.Remove(key);
+                        var value_old = appSection.Settings[key].Value;
+                        var value_new = value.ToString();
+                        if (!value_old.Equals(value_new, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            if (value != null)
+                                appSection.Settings[key].Value = value_new;
+                            else
+                                appSection.Settings.Remove(key);
 
-                        config.Save();
+                            config.Save();
+                        }
                     }
                     else if (value != null)
                     {
@@ -782,14 +787,19 @@ namespace SubTrans
             var lang = SupportedLanguage.ENG;
             if (Enum.TryParse(YoutubeLanguage, out lang))
             {
+                cmiLangEng.IsChecked = false;
+                cmiLangChs.IsChecked = false;
+                cmiLangCht.IsChecked = false;
+                cmiLangJpn.IsChecked = false;
+                cmiLangKor.IsChecked = false;
                 switch (lang)
                 {
-                    case SupportedLanguage.ENG: InvokeControl(cmiLangEng); break;
-                    case SupportedLanguage.CHS: InvokeControl(cmiLangChs); break;
-                    case SupportedLanguage.CHT: InvokeControl(cmiLangCht); break;
-                    case SupportedLanguage.JPN: InvokeControl(cmiLangJpn); break;
-                    case SupportedLanguage.KOR: InvokeControl(cmiLangKor); break;
-                    default: InvokeControl(cmiLangEng); break;
+                    case SupportedLanguage.ENG: cmiLangEng.IsChecked = true; break;
+                    case SupportedLanguage.CHS: cmiLangChs.IsChecked = true; break;
+                    case SupportedLanguage.CHT: cmiLangCht.IsChecked = true; break;
+                    case SupportedLanguage.JPN: cmiLangJpn.IsChecked = true; break;
+                    case SupportedLanguage.KOR: cmiLangKor.IsChecked = true; break;
+                    default: cmiLangEng.IsChecked = true; break;
                 }
             }
             cmiSaveWithBOM.IsChecked = SaveWithBOM;
