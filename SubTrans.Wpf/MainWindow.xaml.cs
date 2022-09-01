@@ -482,6 +482,7 @@ namespace SubTrans
                     flags = flags | ASS.SaveFlags.TXT;
                 ass.Save(dlgSave.FileName, flags);
                 LastFilename = dlgSave.FileName;
+                Keyboard.ClearFocus();
             }
         }
         #endregion
@@ -685,6 +686,7 @@ namespace SubTrans
                 var props = typeof(AssStyle).GetProperties();
                 foreach (var prop in props)
                 {
+                    if (!prop.PropertyType.Name.Equals("string", StringComparison.CurrentCultureIgnoreCase)) continue;
                     prop.SetValue(prop, GetConfigValue(prop.Name, prop.GetValue(prop)));
                 }
             }
@@ -988,6 +990,8 @@ namespace SubTrans
                         var selected = item as ASS.EVENT;
                         var idx = Convert.ToInt32(selected.ID) - 1;
                         var evt = ass.Events[idx];
+                        if (string.IsNullOrEmpty(evt.Text.Trim()) && !string.IsNullOrEmpty(lines[idx_t].Trim())) continue;
+                        if (!string.IsNullOrEmpty(evt.Text.Trim()) && string.IsNullOrEmpty(lines[idx_t].Trim())) idx_t++;
                         evt.Translated = FixBracketingError(lines[idx_t]);
                         events[idx].Translated = evt.Translated;
                         idx_t++;
@@ -1119,6 +1123,7 @@ namespace SubTrans
         {
             try
             {
+                e.Handled = true;
                 if (lvItems.Items.Count <= 0) return;
                 //if (lvItems.SelectedItems.Count <= 0) return;
                 var items = lvItems.SelectedItems.Count <= 0 ? lvItems.Items : lvItems.SelectedItems;
@@ -1137,6 +1142,7 @@ namespace SubTrans
 
         private void cmiSaveAs_Click(object sender, RoutedEventArgs e)
         {
+            e.Handled = true;
             if (SaveWithBOM)
                 SaveSubtitle(ASS.SaveFlags.BOM);
             else

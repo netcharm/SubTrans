@@ -36,6 +36,14 @@ namespace SubTrans
         public List<LRCSubtitleItem> Events { get; set; } = new List<LRCSubtitleItem>();
     }
 
+    public class AssCustomStyle
+    {
+        public ASS.STYLE Style { get; set; } = ASS.STYLE.Parse(AssStyle.ENG_Default, AssStyle.FormatOfStyle);
+        public string Color { get { return ($"{{\\1c{Style.Field("PrimaryColour")}&\\2c{Style.Field("SecondaryColour")}&\\3c{Style.Field("OutlineColour")}&\\4c{Style.Field("BackColour")}&}}"); } }
+        public string InvertColor { get { return ($"{{\\1c{Style.Field("OutlineColour")}&\\2c{Style.Field("SecondaryColour")}&\\3c{Style.Field("PrimaryColour")}&\\4c{Style.Field("BackColour")}&}}"); } }
+        public string Font { get { return ($"{{\\fn{Style.Field("Fontname")}\\fs{Style.Field("Fontsize")}}}"); } }
+    }
+
     public static class AssStyle
     {
         public static string FormatOfStyle { get; set; } = $"Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding";
@@ -70,6 +78,147 @@ namespace SubTrans
         public static string KOR_Title { get; set; } = @"Style: Title,Sarasa Gothic K,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
         public static string KOR_Color { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
         public static string KOR_Font { get; set; } = @"{\fnSarasa Gothic K\fs24}";
+
+        public static AssCustomStyle chs_style_default = null;
+        public static AssCustomStyle CHS_Style_Default
+        {
+            get
+            {
+                if (chs_style_default == null) chs_style_default = new AssCustomStyle() { Style = ASS.STYLE.Parse(CHS_Default, FormatOfStyle) };
+                return (chs_style_default);
+            }
+        }
+        public static AssCustomStyle chs_style_note = null;
+        public static AssCustomStyle CHS_Style_Note
+        {
+            get
+            {
+                if (chs_style_note == null) chs_style_note = new AssCustomStyle() { Style = ASS.STYLE.Parse(CHS_Note, FormatOfStyle) };
+                return (chs_style_note);
+            }
+        }
+        public static AssCustomStyle chs_style_title = null;
+        public static AssCustomStyle CHS_Style_Title
+        {
+            get
+            {
+                if (chs_style_title == null) chs_style_title = new AssCustomStyle() { Style = ASS.STYLE.Parse(CHS_Title, FormatOfStyle) };
+                return (chs_style_title);
+            }
+        }
+
+        public static AssCustomStyle cht_style_default = null;
+        public static AssCustomStyle CHT_Style_Default
+        {
+            get
+            {
+                if (cht_style_default == null) cht_style_default = new AssCustomStyle() { Style = ASS.STYLE.Parse(CHT_Default, FormatOfStyle) };
+                return (cht_style_default);
+            }
+        }
+        public static AssCustomStyle cht_style_note = null;
+        public static AssCustomStyle CHT_Style_Note
+        {
+            get
+            {
+                if (cht_style_note == null) cht_style_note = new AssCustomStyle() { Style = ASS.STYLE.Parse(CHT_Note, FormatOfStyle) };
+                return (cht_style_note);
+            }
+        }
+        public static AssCustomStyle cht_style_title = null;
+        public static AssCustomStyle CHT_Style_Title
+        {
+            get
+            {
+                if (cht_style_title == null) cht_style_title = new AssCustomStyle() { Style = ASS.STYLE.Parse(CHT_Title, FormatOfStyle) };
+                return (cht_style_title);
+            }
+        }
+
+        public static AssCustomStyle jpn_style_default = null;
+        public static AssCustomStyle JPN_Style_Default
+        {
+            get
+            {
+                if (jpn_style_default == null) jpn_style_default = new AssCustomStyle() { Style = ASS.STYLE.Parse(JPN_Default, FormatOfStyle) };
+                return (jpn_style_default);
+            }
+        }
+        public static AssCustomStyle jpn_style_note = null;
+        public static AssCustomStyle JPN_Style_Note
+        {
+            get
+            {
+                if (jpn_style_note == null) jpn_style_note = new AssCustomStyle() { Style = ASS.STYLE.Parse(JPN_Note, FormatOfStyle) };
+                return (jpn_style_note);
+            }
+        }
+        public static AssCustomStyle jpn_style_title = null;
+        public static AssCustomStyle JPN_Style_Title
+        {
+            get
+            {
+                if (jpn_style_title == null) jpn_style_title = new AssCustomStyle() { Style = ASS.STYLE.Parse(JPN_Title, FormatOfStyle) };
+                return (jpn_style_title);
+            }
+        }
+
+        public static AssCustomStyle kor_style_default = null;
+        public static AssCustomStyle KOR_Style_Default
+        {
+            get
+            {
+                if (kor_style_default == null) kor_style_default = new AssCustomStyle() { Style = ASS.STYLE.Parse(KOR_Default, FormatOfStyle) };
+                return (kor_style_default);
+            }
+        }
+        public static AssCustomStyle kor_style_note = null;
+        public static AssCustomStyle KOR_Style_Note
+        {
+            get
+            {
+                if (kor_style_note == null) kor_style_note = new AssCustomStyle() { Style = ASS.STYLE.Parse(KOR_Note, FormatOfStyle) };
+                return (kor_style_note);
+            }
+        }
+        public static AssCustomStyle kor_style_title = null;
+        public static AssCustomStyle KOR_Style_Title
+        {
+            get
+            {
+                if (kor_style_title == null) kor_style_title = new AssCustomStyle() { Style = ASS.STYLE.Parse(KOR_Title, FormatOfStyle) };
+                return (kor_style_title);
+            }
+        }
+
+        public static AssCustomStyle eng_style_default = null;
+        public static AssCustomStyle ENG_Style_Default
+        {
+            get
+            {
+                if (eng_style_default == null) eng_style_default = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_Default, FormatOfStyle) };
+                return (eng_style_default);
+            }
+        }
+        public static AssCustomStyle eng_style_note = null;
+        public static AssCustomStyle ENG_Style_Note
+        {
+            get
+            {
+                if (eng_style_note == null) eng_style_note = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_Note, FormatOfStyle) };
+                return (eng_style_note);
+            }
+        }
+        public static AssCustomStyle eng_style_title = null;
+        public static AssCustomStyle ENG_Style_Title
+        {
+            get
+            {
+                if (eng_style_title == null) eng_style_title = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_Title, FormatOfStyle) };
+                return (eng_style_title);
+            }
+        }
+
     }
 
     public class ASS
@@ -143,7 +292,7 @@ namespace SubTrans
             // Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, 
             //         Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, 
             //         Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-            private string[] FIELD_ALLOWED = new string[] {
+            private static string[] FIELD_ALLOWED = new string[] {
                 "Name", "Fontname", "Fontsize",
                 "PrimaryColour", "SecondaryColour", "TertiaryColour", "OutlineColour", "BackColour",
                 "Bold", "Italic", "Underline", "StrikeOut",
@@ -151,6 +300,9 @@ namespace SubTrans
                 "MarginL", "MarginR", "MarginV",
                 "Encoding"
             };
+
+            public string FormatRaw { get; set; } = string.Empty;
+            public string[] Formats { get; set; } = FIELD_ALLOWED;
 
             private SortedDictionary<string, string> fields = new SortedDictionary<string, string>();
             public SortedDictionary<string, string> Fields
@@ -182,6 +334,46 @@ namespace SubTrans
                 {
                     fields[field] = value;
                 }
+            }
+
+            public void ParseFormats(string text)
+            {
+                if (text.StartsWith("Format", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    var fmt = FormatRaw.Split(':').Last();
+                    if (!string.IsNullOrEmpty(fmt))
+                    {
+                        var fmts = fmt.Split(',').Select(f => f.Trim());
+                        if (fmts.Count() > 1) Formats = fmts.ToArray();
+                    }
+                }
+            }
+
+            public void Parse(string style)
+            {
+
+            }
+
+            public static STYLE Parse(string style_text, string format)
+            {
+                var result = new STYLE();
+
+                var style_default = new STYLES();
+                if(format.StartsWith("Format")) style_default.ParseFormat(format);
+
+                if (style_text.StartsWith("Style:", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    result.Raw = style_text.Split(':').Last().Trim();
+
+                    var fields = style_default.Formats;
+                    var values = result.Raw.Split(',');
+
+                    for (int i = 0; i < fields.Length; i++)
+                    {
+                        result.Field(fields[i], values[i].Trim());
+                    }
+                }
+                return (result);
             }
 
             #region Style Properties
@@ -314,6 +506,41 @@ namespace SubTrans
             #endregion
         }
 
+        public class STYLES
+        {
+            public string FormatRaw { get; set; } = AssStyle.FormatOfStyle;
+            private string[] formats = null;
+            public string[] Formats
+            {
+                get
+                {
+                    if (formats == null) ParseFormat(FormatRaw);
+                    return (formats);
+                }
+            }
+            public List<STYLE> Items { get; set; } = new List<STYLE>();
+
+            public void ParseFormat(string text)
+            {
+                if (text.StartsWith("Format", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    var fmt = FormatRaw.Split(':').Last();
+                    if (!string.IsNullOrEmpty(fmt))
+                    {
+                        var fmts = fmt.Split(',').Select(f => f.Trim());
+                        if (fmts.Count() > 1) formats = fmts.ToArray();
+                    }
+                }
+            }
+
+            public void Clear()
+            {
+                if (Items is List<STYLE>) Items.Clear();
+                FormatRaw = AssStyle.FormatOfStyle;
+                formats = null;
+            }
+        }
+
         public class EVENT : INotifyPropertyChanged
         {
             // Format: Marked, Layer, Start, End, Style, Name,
@@ -361,6 +588,33 @@ namespace SubTrans
                 {
                     fields[field] = value;
                 }
+            }
+
+            public void Parse(string event_text)
+            {
+
+            }
+
+            public static EVENT Parse(string event_text, string format)
+            {
+                var result = new EVENT();
+
+                var event_default = new EVENTS();
+                if (format.StartsWith("Format")) event_default.ParseFormat(format);
+
+                if (event_text.StartsWith("Dialogue:", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    result.Raw = event_text.Split(':').Last().Trim();
+
+                    var fields = event_default.Formats;
+                    var values = result.Raw.Split(',');
+
+                    for (int i = 0; i < fields.Length; i++)
+                    {
+                        result.Field(fields[i], values[i].Trim());
+                    }
+                }
+                return (result);
             }
 
             #region Event Properties
@@ -459,6 +713,41 @@ namespace SubTrans
                 }
             }
             #endregion
+        }
+
+        public class EVENTS
+        {
+            public string FormatRaw { get; set; } = AssStyle.FormatOfEvent;
+            private string[] formats = null;
+            public string[] Formats
+            {
+                get
+                {
+                    if (formats == null) ParseFormat(FormatRaw);
+                    return (formats);
+                }
+            }
+            public List<EVENT> Items { get; set; } = new List<EVENT>();
+
+            public void ParseFormat(string text)
+            {
+                if (text.StartsWith("Format", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    var fmt = FormatRaw.Split(':').Last();
+                    if (!string.IsNullOrEmpty(fmt))
+                    {
+                        var fmts = fmt.Split(',').Select(f => f.Trim());
+                        if (fmts.Count() > 1) formats = fmts.ToArray();
+                    }
+                }
+            }
+
+            public void Clear()
+            {
+                if (Items is List<EVENT>) Items.Clear();
+                FormatRaw = AssStyle.FormatOfEvent;
+                formats = null;
+            }
         }
 
         public string OriginalFile { get; set; } = string.Empty;
@@ -710,9 +999,12 @@ namespace SubTrans
 
         private void ParseStyle(string v)
         {
+            var style_default = new STYLES();
+
             if (v.StartsWith("Format:", StringComparison.CurrentCultureIgnoreCase))
             {
-                style_format = v.Split(':')[1].Trim();
+                style_default.ParseFormat(v);
+                style_format = v.Split(':').Last().Trim();
                 style_fields = style_format.Split(',');
                 for (int i = 0; i < style_fields.Length; i++)
                 {
@@ -722,9 +1014,9 @@ namespace SubTrans
             else if (v.StartsWith("Style:", StringComparison.CurrentCultureIgnoreCase))
             {
                 var style = new STYLE();
-                style.Raw = v.Split(':')[1].Trim();
+                style.Raw = v.Split(':').Last().Trim();
 
-                var fields = style_fields;
+                var fields = style_fields == null ? style_default.Formats : style_fields;
                 var values = style.Raw.Split(',');
 
                 for (int i = 0; i < fields.Length; i++)
@@ -739,8 +1031,10 @@ namespace SubTrans
 
         private void ParseEvent(string v)
         {
+            var event_default = new EVENTS();
             if (v.StartsWith("Format:", StringComparison.CurrentCultureIgnoreCase))
             {
+                event_default.ParseFormat(v);
                 event_format = v.Split(':')[1].Trim();
                 event_fields = ("Type," + event_format).Split(',');
                 for (int i = 0; i < event_fields.Length; i++)
@@ -753,7 +1047,7 @@ namespace SubTrans
                 var evt = new EVENT();
                 evt.Raw = v.Substring("Dialogue:".Length).Trim();
 
-                var fields = event_fields;
+                var fields = event_fields == null ? event_default.Formats : event_fields;
                 var values = ("Dialogue," + evt.Raw).Split(',');
 
                 for (int i = 0; i < fields.Length - 1; i++)
@@ -1323,41 +1617,43 @@ namespace SubTrans
                 if (lang == SupportedLanguage.Unknown) lang = YoutubeLanguage;
                 for (int i = StylesRaw.Count - 1; i > 1; i--)
                 {
-                    StylesRaw.RemoveAt(i);
+                    if (Regex.IsMatch(StylesRaw[i], @"Style: ?(Default|Note|Title) ?,", RegexOptions.IgnoreCase))
+                        StylesRaw.RemoveAt(i);
                 }
+
+                var style_default = AssStyle.ENG_Default;
+                var style_note = AssStyle.ENG_Note;
+                var style_title = AssStyle.ENG_Title;
 
                 if (lang == SupportedLanguage.CHS)
                 {
-                    StylesRaw.Add($"{AssStyle.CHS_Default}");
-                    StylesRaw.Add($"{AssStyle.CHS_Note}");
-                    StylesRaw.Add($"{AssStyle.CHS_Title}");
+                    style_default = AssStyle.CHS_Default;
+                    style_note = AssStyle.CHS_Note;
+                    style_title = AssStyle.CHS_Title;
                 }
                 else if (lang == SupportedLanguage.CHT)
                 {
-                    StylesRaw.Add($"{AssStyle.CHT_Default}");
-                    StylesRaw.Add($"{AssStyle.CHT_Note}");
-                    StylesRaw.Add($"{AssStyle.CHT_Title}");
+                    style_default = AssStyle.CHT_Default;
+                    style_note = AssStyle.CHT_Note;
+                    style_title = AssStyle.CHT_Title;
                 }
                 else if (lang == SupportedLanguage.JPN)
                 {
-                    StylesRaw.Add($"{AssStyle.JPN_Default}");
-                    StylesRaw.Add($"{AssStyle.JPN_Note}");
-                    StylesRaw.Add($"{AssStyle.JPN_Title}");
+                    style_default = AssStyle.JPN_Default;
+                    style_note = AssStyle.JPN_Note;
+                    style_title = AssStyle.JPN_Title;
                 }
                 else if (lang == SupportedLanguage.KOR)
                 {
-                    StylesRaw.Add($"{AssStyle.KOR_Default}");
-                    StylesRaw.Add($"{AssStyle.KOR_Note}");
-                    StylesRaw.Add($"{AssStyle.KOR_Title}");
-                }
-                else
-                {
-                    StylesRaw.Add($"{AssStyle.ENG_Default}");
-                    StylesRaw.Add($"{AssStyle.ENG_Note}");
-                    StylesRaw.Add($"{AssStyle.ENG_Title}");
+                    style_default = AssStyle.KOR_Default;
+                    style_note = AssStyle.KOR_Note;
+                    style_title = AssStyle.KOR_Title;
                 }
 
-                StylesRaw.Add("");
+                var styles = new List<string>() { style_default, style_note, style_title };
+                StylesRaw.InsertRange(2, styles);
+
+                if (!string.IsNullOrEmpty(StylesRaw.Last())) StylesRaw.Add("");
             }
             catch (Exception) { }
         }
