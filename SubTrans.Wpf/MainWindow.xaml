@@ -52,6 +52,16 @@
                 <MenuItem x:Name="cmiMerge"  Header="Merge Translated As..." Click="btnMerge_Click" />
                 <MenuItem x:Name="cmiReplace" Header="Replace Translated As..." Click="btnReplace_Click" />
                 <Separator/>
+                <MenuItem x:Name="cmiSetStyle" Header="Set Style To" >
+                    <MenuItem x:Name="cmiSetStyleDefault" Header="Default" IsChecked="False" Click="cmiSetStyle_Click" />
+                    <MenuItem x:Name="cmiSetStyleDefaultM" Header="Male" IsChecked="False" Click="cmiSetStyle_Click" />
+                    <MenuItem x:Name="cmiSetStyleDefaultF" Header="Female" IsChecked="False" Click="cmiSetStyle_Click" />
+                    <MenuItem x:Name="cmiSetStyleTitle" Header="Title" IsChecked="False" Click="cmiSetStyle_Click" />
+                    <MenuItem x:Name="cmiSetStyleNote" Header="Note" IsChecked="False" Click="cmiSetStyle_Click" />
+                    <MenuItem x:Name="cmiSetStyleComment" Header="Comment" IsChecked="False" Click="cmiSetStyle_Click" />
+                    <Separator x:Name="cmiSetStyleSep"/>
+                </MenuItem>
+                <Separator/>
                 <MenuItem x:Name="cmiLangEng" Header="Youtube English Subtitle" IsChecked="True" Click="cmiLang_Click" />
                 <MenuItem x:Name="cmiLangChs" Header="Youtube ChineseS Subtitle" IsChecked="False" Click="cmiLang_Click" />
                 <MenuItem x:Name="cmiLangCht" Header="Youtube ChineseT Subtitle" IsChecked="False" Click="cmiLang_Click" />

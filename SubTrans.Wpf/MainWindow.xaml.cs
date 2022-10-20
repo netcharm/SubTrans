@@ -399,6 +399,43 @@ namespace SubTrans
         private static Configuration config = ConfigurationManager.OpenExeConfiguration(AppExec);
         private static AppSettingsSection appSection = config.AppSettings;
 
+        private static string CustomStylePrefix = "CustomStyle_";
+        private async void InitCustomStyle(ASS ass)
+        {
+            if (ass is ASS)
+            {
+                await Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    UIElement[] menus = new UIElement[cmiSetStyle.Items.Count];
+                    cmiSetStyle.Items.CopyTo(menus, 0);
+                    foreach (var m in menus)
+                    {
+                        if (m is MenuItem)
+                        {
+                            var menu = m as MenuItem;
+                            if (menu.Tag is string && (menu.Tag as string).StartsWith(CustomStylePrefix)) cmiSetStyle.Items.Remove(menu);
+                        }
+                    }
+                    var styles = ass.GetCustomStyles();
+                    if (styles.Count() > 0)
+                    {
+                        cmiSetStyleSep.Visibility = Visibility.Visible;
+                        foreach (var style in styles)
+                        {
+                            try
+                            {
+                                var menu = new MenuItem() { Tag = $"{CustomStylePrefix}{style}", Header = style };
+                                menu.Click += cmiSetStyle_Click;
+                                cmiSetStyle.Items.Add(menu);
+                            }
+                            catch { }
+                        }
+                    }
+                    else cmiSetStyleSep.Visibility = Visibility.Collapsed;
+                }));
+            }
+        }
+
         private async void LoadSubtitle(string subtitle)
         {
             try
@@ -429,6 +466,7 @@ namespace SubTrans
                         Title = $"{OriginalTitle} - {LastFilename}";
                     }));
                 }
+                InitCustomStyle(ass);
             }
         }
 
@@ -1163,5 +1201,39 @@ namespace SubTrans
             }
         }
 
+        private void cmiSetStyle_Click(object sender, RoutedEventArgs e)
+        {
+            if (lvItems.Items.Count <= 0) return;
+            if (lvItems.SelectedItems.Count <= 0) return;
+
+            var style = "Default";
+            if (sender == cmiSetStyleDefault) style = "Default";
+            else if (sender == cmiSetStyleDefaultM) style = "DefaultM";
+            else if (sender == cmiSetStyleDefaultF) style = "DefaultF";
+            else if (sender == cmiSetStyleNote) style = "Note";
+            else if (sender == cmiSetStyleTitle) style = "Title";
+            else if (sender == cmiSetStyleComment) style = "Comment";
+            else if (sender is MenuItem)
+            {
+                var menu = sender as MenuItem;
+                if (menu.Tag is string && (menu.Tag as string).StartsWith(CustomStylePrefix))
+                {
+                    style = (menu.Tag as string).Replace(CustomStylePrefix, "");
+                }
+            }
+
+            var items = new object[lvItems.SelectedItems.Count];
+            lvItems.SelectedItems.CopyTo(items, 0);
+            items = items.OrderBy(i => lvItems.Items.IndexOf(i)).ToArray();
+
+            foreach (var item in items)
+            {
+                if (item is ASS.EVENT)
+                {
+                    var selected = item as ASS.EVENT;
+                    selected.Style = style;
+                }
+            }
+        }
     }
 }
