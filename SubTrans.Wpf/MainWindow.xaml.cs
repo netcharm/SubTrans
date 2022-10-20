@@ -687,7 +687,9 @@ namespace SubTrans
                 foreach (var prop in props)
                 {
                     if (!prop.PropertyType.Name.Equals("string", StringComparison.CurrentCultureIgnoreCase)) continue;
-                    prop.SetValue(prop, GetConfigValue(prop.Name, prop.GetValue(prop)));
+                    var value = GetConfigValue(prop.Name, prop.GetValue(prop));
+                    if (string.IsNullOrEmpty(value.Trim())) continue;
+                    prop.SetValue(prop, value);
                 }
             }
             catch (Exception ex) { MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
