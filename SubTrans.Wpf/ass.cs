@@ -77,8 +77,8 @@ namespace SubTrans
         public static string CHT_DefaultM { get; set; } = @"Style: DefaultM,Sarasa Gothic TC,24,&H20FFFFFF,&H20AD4C00,&H40FF7F7F,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
         public static string CHT_DefaultF { get; set; } = @"Style: DefaultF,Sarasa Gothic TC,24,&H20FFFFFF,&H20AD4C00,&H407F7FFF,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
         public static string CHT_Title { get; set; } = @"Style: Title,Sarasa Gothic TC,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
-        public static string CHT_Note { get; set; } = @"Style: Note,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string CHT_Comment { get; set; } = @"Style: Comment,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHT_Note { get; set; } = @"Style: Note,PMingLiU,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHT_Comment { get; set; } = @"Style: Comment,PMingLiU,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
         public static string CHT_Color { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
         public static string CHT_Font { get; set; } = @"{\fnSarasa Gothic TC\fs24}";
 
@@ -86,8 +86,8 @@ namespace SubTrans
         public static string JPN_DefaultM { get; set; } = @"Style: DefaultM,Sarasa Gothic J,24,&H20FFFFFF,&H20AD4C00,&H40FF7F7F,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
         public static string JPN_DefaultF { get; set; } = @"Style: DefaultF,Sarasa Gothic J,24,&H20FFFFFF,&H20AD4C00,&H407F7FFF,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
         public static string JPN_Title { get; set; } = @"Style: Title,Sarasa Gothic J,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
-        public static string JPN_Note { get; set; } = @"Style: Note,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string JPN_Comment { get; set; } = @"Style: Comment,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string JPN_Note { get; set; } = @"Style: Note,MS PMincho,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string JPN_Comment { get; set; } = @"Style: Comment,MS PMincho,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
         public static string JPN_Color { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
         public static string JPN_Font { get; set; } = @"{\fnSarasa Gothic J\fs24}";
 
@@ -95,8 +95,8 @@ namespace SubTrans
         public static string KOR_DefaultM { get; set; } = @"Style: DefaultM,Sarasa Gothic K,24,&H20FFFFFF,&H20AD4C00,&H40FF7F7F,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
         public static string KOR_DefaultF { get; set; } = @"Style: DefaultF,Sarasa Gothic K,24,&H20FFFFFF,&H20AD4C00,&H407F7FFF,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
         public static string KOR_Title { get; set; } = @"Style: Title,Sarasa Gothic K,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
-        public static string KOR_Note { get; set; } = @"Style: Note,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
-        public static string KOR_Comment { get; set; } = @"Style: Comment,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string KOR_Note { get; set; } = @"Style: Note,BatangChe,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string KOR_Comment { get; set; } = @"Style: Comment,BatangChe,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
         public static string KOR_Color { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
         public static string KOR_Font { get; set; } = @"{\fnSarasa Gothic K\fs24}";
 
@@ -1807,7 +1807,7 @@ namespace SubTrans
                 if (lang == SupportedLanguage.Unknown) lang = YoutubeLanguage;
                 for (int i = StylesRaw.Count - 1; i > 1; i--)
                 {
-                    if (Regex.IsMatch(StylesRaw[i], @"Style: ?(Default|Note|Title) ?,", RegexOptions.IgnoreCase))
+                    if (Regex.IsMatch(StylesRaw[i], @"Style: ?(Default(M|F)?|Note|Title) ?,", RegexOptions.IgnoreCase))
                         StylesRaw.RemoveAt(i);
                 }
 
