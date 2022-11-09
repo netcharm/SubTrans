@@ -46,7 +46,41 @@ namespace SubTrans
 
     public static class AssStyle
     {
-        private static string[] DefaultStyles = new string[] { "Default", "DefaultM", "DefaultF", "Title", "Note", "Comment" };
+        private static string FontSize { get; } = "24";
+
+        private static string PrimaryColour { get; } = "&H20FFFFFF";
+        private static string SecondaryColour { get; } = "&H20FFFFFF";
+        private static string OutlineColour { get; } = "&H40000000";
+        private static string BackColour { get; } = "&HA0BCBCBD";
+
+        private static string Bold { get; } = "0";
+        private static string Italic { get; } = "0";
+        private static string Underline { get; } = "0";
+        private static string StrikeOut { get; } = "0";
+
+        private static string ScaleX { get; } = "100";
+        private static string ScaleY { get; } = "100";
+
+        private static string Spacing { get; } = "0";
+        private static string Angle { get; } = "0";
+
+        private static string BorderStyle { get; } = "1";
+        private static string Outline { get; } = "2";
+        private static string Shadow { get; } = "2";
+
+        private static string Alignment { get; } = "2";
+        private static string MarginL { get; } = "10";
+        private static string MarginR { get; } = "10";
+        private static string MarginV { get; } = "10";
+
+        private static string Encoding { get; } = "1";
+
+        private static string[] DefaultStyles = new string[]
+        {
+            "Default", "DefaultM", "DefaultF", "Title", "Note", "Comment",
+            //"DefaultAlt", "DefaultAltM", "DefaultAltF", "TitleAlt", "NoteAlt", "CommentAlt"
+        };
+
         public static bool Contains(string style)
         {
             return(DefaultStyles.Contains(style, StringComparer.CurrentCultureIgnoreCase));
@@ -64,6 +98,15 @@ namespace SubTrans
         public static string ENG_Color { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
         public static string ENG_Font { get; set; } = @"{\fnLucida Calligraphy\fs24}";
 
+        public static string ENG_DefaultAlt { get; set; } = @"Style: DefaultAlt,Lucida Calligraphy,24,&H20FFFFFF,&H20FFFFFF,&H40000040,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string ENG_DefaultAltM { get; set; } = @"Style: DefaultAltM,Lucida Calligraphy,24,&H20FFFFFF,&H20AD4C00,&H40FF7F7F,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string ENG_DefaultAltF { get; set; } = @"Style: DefaultAltF,Lucida Calligraphy,24,&H20FFFFFF,&H20843815,&H40202020,&HA0A6A6A8,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string ENG_TitleAlt { get; set; } = @"Style: TitleAlt,Segoe,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
+        public static string ENG_NoteAlt { get; set; } = @"Style: NoteAlt,Times New Roman,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string ENG_CommentAlt { get; set; } = @"Style: CommentAlt,Times New Roman,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string ENG_ColorAlt { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
+        public static string ENG_FontAlt { get; set; } = @"{\fnLucida Calligraphy\fs24}";
+
         public static string CHS_Default { get; set; } = @"Style: Default,更纱黑体 SC,24,&H20FFFFFF,&H20FFFFFF,&H40000000,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
         public static string CHS_DefaultM { get; set; } = @"Style: DefaultM,更纱黑体 SC,24,&H20FFFFFF,&H20AD4C00,&H40FF7F7F,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
         public static string CHS_DefaultF { get; set; } = @"Style: DefaultF,更纱黑体 SC,24,&H20FFFFFF,&H20AD4C00,&H407F7FFF,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
@@ -72,6 +115,15 @@ namespace SubTrans
         public static string CHS_Comment { get; set; } = @"Style: Comment,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
         public static string CHS_Color { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
         public static string CHS_Font { get; set; } = @"{\fn更纱黑体 SC\fs24}";
+
+        public static string CHS_DefaultAlt { get; set; } = @"Style: DefaultAlt,更纱黑体 SC,24,&H20FFFFFF,&H20FFFFFF,&H40000040,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHS_DefaultAltM { get; set; } = @"Style: DefaultAltM,更纱黑体 SC,24,&H20FFFFFF,&H20AD4C00,&H40FF7F7F,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHS_DefaultAltF { get; set; } = @"Style: DefaultAltF,更纱黑体 SC,24,&H20FFFFFF,&H20AD4C00,&H407F7FFF,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHS_TitleAlt { get; set; } = @"Style: TitleAlt,更纱黑体 SC,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
+        public static string CHS_NoteAlt { get; set; } = @"Style: NoteAlt,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHS_CommentAlt { get; set; } = @"Style: CommentAlt,宋体,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHS_ColorAlt { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
+        public static string CHS_FontAlt { get; set; } = @"{\fn更纱黑体 SC\fs24}";
 
         public static string CHT_Default { get; set; } = @"Style: Default,Sarasa Gothic TC,24,&H20FFFFFF,&H20FFFFFF,&H40000000,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
         public static string CHT_DefaultM { get; set; } = @"Style: DefaultM,Sarasa Gothic TC,24,&H20FFFFFF,&H20AD4C00,&H40FF7F7F,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
@@ -82,6 +134,15 @@ namespace SubTrans
         public static string CHT_Color { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
         public static string CHT_Font { get; set; } = @"{\fnSarasa Gothic TC\fs24}";
 
+        public static string CHT_DefaultAlt { get; set; } = @"Style: DefaultAlt,Sarasa Gothic TC,24,&H20FFFFFF,&H20FFFFFF,&H40000040,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string CHT_DefaultAltM { get; set; } = @"Style: DefaultAltM,Sarasa Gothic TC,24,&H20FFFFFF,&H20AD4C00,&H40FF7F7F,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string CHT_DefaultAltF { get; set; } = @"Style: DefaultAltF,Sarasa Gothic TC,24,&H20FFFFFF,&H20AD4C00,&H407F7FFF,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string CHT_TitleAlt { get; set; } = @"Style: TitleAlt,Sarasa Gothic TC,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
+        public static string CHT_NoteAlt { get; set; } = @"Style: NoteAlt,PMingLiU,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHT_CommentAlt { get; set; } = @"Style: CommentAlt,PMingLiU,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string CHT_ColorAlt { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
+        public static string CHT_FontAlt { get; set; } = @"{\fnSarasa Gothic TC\fs24}";
+
         public static string JPN_Default { get; set; } = @"Style: Default,Sarasa Gothic J,24,&H20FFFFFF,&H20FFFFFF,&H40000000,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
         public static string JPN_DefaultM { get; set; } = @"Style: DefaultM,Sarasa Gothic J,24,&H20FFFFFF,&H20AD4C00,&H40FF7F7F,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
         public static string JPN_DefaultF { get; set; } = @"Style: DefaultF,Sarasa Gothic J,24,&H20FFFFFF,&H20AD4C00,&H407F7FFF,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
@@ -91,6 +152,15 @@ namespace SubTrans
         public static string JPN_Color { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
         public static string JPN_Font { get; set; } = @"{\fnSarasa Gothic J\fs24}";
 
+        public static string JPN_DefaultAlt { get; set; } = @"Style: DefaultAlt,Sarasa Gothic J,24,&H20FFFFFF,&H20FFFFFF,&H40000040,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string JPN_DefaultAltM { get; set; } = @"Style: DefaultAltM,Sarasa Gothic J,24,&H20FFFFFF,&H20AD4C00,&H40FF7F7F,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string JPN_DefaultAltF { get; set; } = @"Style: DefaultAltF,Sarasa Gothic J,24,&H20FFFFFF,&H20AD4C00,&H407F7FFF,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string JPN_TitleAlt { get; set; } = @"Style: TitleAlt,Sarasa Gothic J,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
+        public static string JPN_NoteAlt { get; set; } = @"Style: NoteAlt,MS PMincho,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string JPN_CommentAlt { get; set; } = @"Style: CommentAlt,MS PMincho,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string JPN_ColorAlt { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
+        public static string JPN_FontAlt { get; set; } = @"{\fnSarasa Gothic J\fs24}";
+
         public static string KOR_Default { get; set; } = @"Style: Default,Sarasa Gothic K,24,&H20FFFFFF,&H20FFFFFF,&H40000000,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
         public static string KOR_DefaultM { get; set; } = @"Style: DefaultM,Sarasa Gothic K,24,&H20FFFFFF,&H20AD4C00,&H40FF7F7F,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
         public static string KOR_DefaultF { get; set; } = @"Style: DefaultF,Sarasa Gothic K,24,&H20FFFFFF,&H20AD4C00,&H407F7FFF,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
@@ -99,6 +169,70 @@ namespace SubTrans
         public static string KOR_Comment { get; set; } = @"Style: Comment,BatangChe,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
         public static string KOR_Color { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
         public static string KOR_Font { get; set; } = @"{\fnSarasa Gothic K\fs24}";
+
+        public static string KOR_DefaultAlt { get; set; } = @"Style: DefaultAlt,Sarasa Gothic K,24,&H20FFFFFF,&H20FFFFFF,&H40000040,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string KOR_DefaultAltM { get; set; } = @"Style: DefaultAltM,Sarasa Gothic K,24,&H20FFFFFF,&H20AD4C00,&H40FF7F7F,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string KOR_DefaultAltF { get; set; } = @"Style: DefaultAltF,Sarasa Gothic K,24,&H20FFFFFF,&H20AD4C00,&H407F7FFF,&HA0BCBCBD,0,0,0,0,100,100,0,0,1,3,2,2,10,10,10,1";
+        public static string KOR_TitleAlt { get; set; } = @"Style: TitleAlt,Sarasa Gothic K,28,&H200055FF,&H2048560E,&H40EAF196,&HA0969696,0,0,0,0,100,100,0,0,1,4,2,2,10,10,10,1";
+        public static string KOR_NoteAlt { get; set; } = @"Style: NoteAlt,BatangChe,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string KOR_CommentAlt { get; set; } = @"Style: CommentAlt,BatangChe,20,&H20FFF907,&H20DC16C8,&H401E4454,&HA0969696,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1";
+        public static string KOR_ColorAlt { get; set; } = @"{\1c&H20FFF0F0&\2c&H20843815&\3c&H20000000&\4c&HA0A6A6A8&}";
+        public static string KOR_FontAlt { get; set; } = @"{\fnSarasa Gothic K\fs24}";
+
+        private static AssCustomStyle eng_style_default = null;
+        public static AssCustomStyle ENG_Style_Default
+        {
+            get
+            {
+                if (eng_style_default == null) eng_style_default = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_Default, FormatOfStyle) };
+                return (eng_style_default);
+            }
+        }
+        private static AssCustomStyle eng_style_default_m = null;
+        public static AssCustomStyle ENG_Style_DefaultMale
+        {
+            get
+            {
+                if (eng_style_default_m == null) eng_style_default_m = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_DefaultM, FormatOfStyle) };
+                return (eng_style_default_m);
+            }
+        }
+        private static AssCustomStyle eng_style_default_f = null;
+        public static AssCustomStyle ENG_Style_DefaultFemale
+        {
+            get
+            {
+                if (eng_style_default_f == null) eng_style_default_f = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_DefaultF, FormatOfStyle) };
+                return (eng_style_default_f);
+            }
+        }
+        private static AssCustomStyle eng_style_title = null;
+        public static AssCustomStyle ENG_Style_Title
+        {
+            get
+            {
+                if (eng_style_title == null) eng_style_title = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_Title, FormatOfStyle) };
+                return (eng_style_title);
+            }
+        }
+        private static AssCustomStyle eng_style_note = null;
+        public static AssCustomStyle ENG_Style_Note
+        {
+            get
+            {
+                if (eng_style_note == null) eng_style_note = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_Note, FormatOfStyle) };
+                return (eng_style_note);
+            }
+        }
+        private static AssCustomStyle eng_style_comment = null;
+        public static AssCustomStyle ENG_Style_Comment
+        {
+            get
+            {
+                if (eng_style_comment == null) eng_style_comment = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_Comment, FormatOfStyle) };
+                return (eng_style_comment);
+            }
+        }
 
         private static AssCustomStyle chs_style_default = null;
         public static AssCustomStyle CHS_Style_Default
@@ -320,58 +454,278 @@ namespace SubTrans
             }
         }
 
-        private static AssCustomStyle eng_style_default = null;
-        public static AssCustomStyle ENG_Style_Default
+        private static AssCustomStyle eng_style_default_alt = null;
+        public static AssCustomStyle ENG_Style_DefaultAlt
         {
             get
             {
-                if (eng_style_default == null) eng_style_default = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_Default, FormatOfStyle) };
-                return (eng_style_default);
+                if (eng_style_default_alt == null) eng_style_default_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_DefaultAlt, FormatOfStyle) };
+                return (eng_style_default_alt);
             }
         }
-        private static AssCustomStyle eng_style_default_m = null;
-        public static AssCustomStyle ENG_Style_DefaultMale
+        private static AssCustomStyle eng_style_default_alt_m = null;
+        public static AssCustomStyle ENG_Style_DefaultAltMale
         {
             get
             {
-                if (eng_style_default_m == null) eng_style_default_m = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_DefaultM, FormatOfStyle) };
-                return (eng_style_default_m);
+                if (eng_style_default_alt_m == null) eng_style_default_alt_m = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_DefaultAltM, FormatOfStyle) };
+                return (eng_style_default_alt_m);
             }
         }
-        private static AssCustomStyle eng_style_default_f = null;
-        public static AssCustomStyle ENG_Style_DefaultFemale
+        private static AssCustomStyle eng_style_default_alt_f = null;
+        public static AssCustomStyle ENG_Style_DefaultAltFemale
         {
             get
             {
-                if (eng_style_default_f == null) eng_style_default_f = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_DefaultF, FormatOfStyle) };
-                return (eng_style_default_f);
+                if (eng_style_default_alt_f == null) eng_style_default_alt_f = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_DefaultAltF, FormatOfStyle) };
+                return (eng_style_default_alt_f);
             }
         }
-        private static AssCustomStyle eng_style_title = null;
-        public static AssCustomStyle ENG_Style_Title
+        private static AssCustomStyle eng_style_title_alt = null;
+        public static AssCustomStyle ENG_Style_TitleAlt
         {
             get
             {
-                if (eng_style_title == null) eng_style_title = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_Title, FormatOfStyle) };
-                return (eng_style_title);
+                if (eng_style_title_alt == null) eng_style_title_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_TitleAlt, FormatOfStyle) };
+                return (eng_style_title_alt);
             }
         }
-        private static AssCustomStyle eng_style_note = null;
-        public static AssCustomStyle ENG_Style_Note
+        private static AssCustomStyle eng_style_note_alt = null;
+        public static AssCustomStyle ENG_Style_NoteAlt
         {
             get
             {
-                if (eng_style_note == null) eng_style_note = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_Note, FormatOfStyle) };
-                return (eng_style_note);
+                if (eng_style_note_alt == null) eng_style_note_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_NoteAlt, FormatOfStyle) };
+                return (eng_style_note_alt);
             }
         }
-        private static AssCustomStyle eng_style_comment = null;
-        public static AssCustomStyle ENG_Style_Comment
+        private static AssCustomStyle eng_style_comment_alt = null;
+        public static AssCustomStyle ENG_Style_CommentAlt
         {
             get
             {
-                if (eng_style_comment == null) eng_style_comment = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_Comment, FormatOfStyle) };
-                return (eng_style_comment);
+                if (eng_style_comment_alt == null) eng_style_comment_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(ENG_CommentAlt, FormatOfStyle) };
+                return (eng_style_comment_alt);
+            }
+        }
+
+        private static AssCustomStyle chs_style_default_alt = null;
+        public static AssCustomStyle CHS_Style_DefaultAlt
+        {
+            get
+            {
+                if (chs_style_default_alt == null) chs_style_default_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(CHS_DefaultAlt, FormatOfStyle) };
+                return (chs_style_default_alt);
+            }
+        }
+        private static AssCustomStyle chs_style_default_alt_m = null;
+        public static AssCustomStyle CHS_Style_DefaultAltMale
+        {
+            get
+            {
+                if (chs_style_default_alt_m == null) chs_style_default_alt_m = new AssCustomStyle() { Style = ASS.STYLE.Parse(CHS_DefaultAltM, FormatOfStyle) };
+                return (chs_style_default_alt_m);
+            }
+        }
+        private static AssCustomStyle chs_style_default_alt_f = null;
+        public static AssCustomStyle CHS_Style_DefaultAltFemale
+        {
+            get
+            {
+                if (chs_style_default_alt_f == null) chs_style_default_alt_f = new AssCustomStyle() { Style = ASS.STYLE.Parse(CHS_DefaultAltF, FormatOfStyle) };
+                return (chs_style_default_alt_f);
+            }
+        }
+        private static AssCustomStyle chs_style_title_alt = null;
+        public static AssCustomStyle CHS_Style_TitleAlt
+        {
+            get
+            {
+                if (chs_style_title_alt == null) chs_style_title_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(CHS_TitleAlt, FormatOfStyle) };
+                return (chs_style_title_alt);
+            }
+        }
+        private static AssCustomStyle chs_style_note_alt = null;
+        public static AssCustomStyle CHS_Style_NoteAlt
+        {
+            get
+            {
+                if (chs_style_note_alt == null) chs_style_note_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(CHS_NoteAlt, FormatOfStyle) };
+                return (chs_style_note_alt);
+            }
+        }
+        private static AssCustomStyle chs_style_comment_alt = null;
+        public static AssCustomStyle CHS_Style_CommentAlt
+        {
+            get
+            {
+                if (chs_style_comment_alt == null) chs_style_comment_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(CHS_CommentAlt, FormatOfStyle) };
+                return (chs_style_comment_alt);
+            }
+        }
+
+        private static AssCustomStyle cht_style_default_alt = null;
+        public static AssCustomStyle CHT_Style_DefaultAlt
+        {
+            get
+            {
+                if (cht_style_default_alt == null) cht_style_default_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(CHT_DefaultAlt, FormatOfStyle) };
+                return (cht_style_default_alt);
+            }
+        }
+        private static AssCustomStyle cht_style_default_alt_m = null;
+        public static AssCustomStyle CHT_Style_DefaultAltMale
+        {
+            get
+            {
+                if (cht_style_default_alt_m == null) cht_style_default_alt_m = new AssCustomStyle() { Style = ASS.STYLE.Parse(CHT_DefaultAltM, FormatOfStyle) };
+                return (cht_style_default_alt_m);
+            }
+        }
+        private static AssCustomStyle cht_style_default_alt_f = null;
+        public static AssCustomStyle CHT_Style_DefaultAltFemale
+        {
+            get
+            {
+                if (cht_style_default_alt_f == null) cht_style_default_alt_f = new AssCustomStyle() { Style = ASS.STYLE.Parse(CHT_DefaultAltF, FormatOfStyle) };
+                return (cht_style_default_alt_f);
+            }
+        }
+        private static AssCustomStyle cht_style_title_alt = null;
+        public static AssCustomStyle CHT_Style_TitleAlt
+        {
+            get
+            {
+                if (cht_style_title_alt == null) cht_style_title_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(CHT_TitleAlt, FormatOfStyle) };
+                return (cht_style_title_alt);
+            }
+        }
+        private static AssCustomStyle cht_style_note_alt = null;
+        public static AssCustomStyle CHT_Style_NoteAlt
+        {
+            get
+            {
+                if (cht_style_note_alt == null) cht_style_note_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(CHT_NoteAlt, FormatOfStyle) };
+                return (cht_style_note_alt);
+            }
+        }
+        private static AssCustomStyle cht_style_comment_alt = null;
+        public static AssCustomStyle CHT_Style_CommentAlt
+        {
+            get
+            {
+                if (cht_style_comment_alt == null) cht_style_comment_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(CHT_CommentAlt, FormatOfStyle) };
+                return (cht_style_comment_alt);
+            }
+        }
+
+        private static AssCustomStyle jpn_style_default_alt = null;
+        public static AssCustomStyle JPN_Style_DefaultAlt
+        {
+            get
+            {
+                if (jpn_style_default_alt == null) jpn_style_default_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(JPN_DefaultAlt, FormatOfStyle) };
+                return (jpn_style_default_alt);
+            }
+        }
+        private static AssCustomStyle jpn_style_default_alt_m = null;
+        public static AssCustomStyle JPN_Style_DefaultAltMale
+        {
+            get
+            {
+                if (jpn_style_default_alt_m == null) jpn_style_default_alt_m = new AssCustomStyle() { Style = ASS.STYLE.Parse(JPN_DefaultAltM, FormatOfStyle) };
+                return (jpn_style_default_alt_m);
+            }
+        }
+        private static AssCustomStyle jpn_style_default_alt_f = null;
+        public static AssCustomStyle JPN_Style_DefaultAltFemale
+        {
+            get
+            {
+                if (jpn_style_default_alt_f == null) jpn_style_default_alt_f = new AssCustomStyle() { Style = ASS.STYLE.Parse(JPN_DefaultAltF, FormatOfStyle) };
+                return (jpn_style_default_alt_f);
+            }
+        }
+        private static AssCustomStyle jpn_style_note_alt = null;
+        public static AssCustomStyle JPN_Style_NoteAlt
+        {
+            get
+            {
+                if (jpn_style_note_alt == null) jpn_style_note_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(JPN_NoteAlt, FormatOfStyle) };
+                return (jpn_style_note_alt);
+            }
+        }
+        private static AssCustomStyle jpn_style_title_alt = null;
+        public static AssCustomStyle JPN_Style_TitleAlt
+        {
+            get
+            {
+                if (jpn_style_title_alt == null) jpn_style_title_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(JPN_TitleAlt, FormatOfStyle) };
+                return (jpn_style_title_alt);
+            }
+        }
+        private static AssCustomStyle jpn_style_comment_alt = null;
+        public static AssCustomStyle JPN_Style_CommentAlt
+        {
+            get
+            {
+                if (jpn_style_comment_alt == null) jpn_style_comment_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(JPN_CommentAlt, FormatOfStyle) };
+                return (jpn_style_comment_alt);
+            }
+        }
+
+        private static AssCustomStyle kor_style_default_alt = null;
+        public static AssCustomStyle KOR_Style_DefaultAlt
+        {
+            get
+            {
+                if (kor_style_default_alt == null) kor_style_default_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(KOR_DefaultAlt, FormatOfStyle) };
+                return (kor_style_default_alt);
+            }
+        }
+        private static AssCustomStyle kor_style_default_alt_m = null;
+        public static AssCustomStyle KOR_Style_DefaultAltMale
+        {
+            get
+            {
+                if (kor_style_default_alt_m == null) kor_style_default_alt_m = new AssCustomStyle() { Style = ASS.STYLE.Parse(KOR_DefaultAltM, FormatOfStyle) };
+                return (kor_style_default_alt_m);
+            }
+        }
+        private static AssCustomStyle kor_style_default_alt_f = null;
+        public static AssCustomStyle KOR_Style_DefaultAltFemale
+        {
+            get
+            {
+                if (kor_style_default_alt_f == null) kor_style_default_alt_f = new AssCustomStyle() { Style = ASS.STYLE.Parse(KOR_DefaultAltF, FormatOfStyle) };
+                return (kor_style_default_alt_f);
+            }
+        }
+        private static AssCustomStyle kor_style_title_alt = null;
+        public static AssCustomStyle KOR_Style_TitleAlt
+        {
+            get
+            {
+                if (kor_style_title_alt == null) kor_style_title_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(KOR_TitleAlt, FormatOfStyle) };
+                return (kor_style_title_alt);
+            }
+        }
+        private static AssCustomStyle kor_style_note_alt = null;
+        public static AssCustomStyle KOR_Style_NoteAlt
+        {
+            get
+            {
+                if (kor_style_note_alt == null) kor_style_note_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(KOR_NoteAlt, FormatOfStyle) };
+                return (kor_style_note_alt);
+            }
+        }
+        private static AssCustomStyle kor_style_comment_alt = null;
+        public static AssCustomStyle KOR_Style_CommentAlt
+        {
+            get
+            {
+                if (kor_style_comment_alt == null) kor_style_comment_alt = new AssCustomStyle() { Style = ASS.STYLE.Parse(KOR_CommentAlt, FormatOfStyle) };
+                return (kor_style_comment_alt);
             }
         }
     }
@@ -1816,6 +2170,14 @@ namespace SubTrans
                 var style_default_f = AssStyle.ENG_DefaultF;
                 var style_note = AssStyle.ENG_Note;
                 var style_title = AssStyle.ENG_Title;
+                var style_comment = AssStyle.ENG_Comment;
+
+                var style_default_alt = AssStyle.ENG_DefaultAlt;
+                var style_default_alt_m = AssStyle.ENG_DefaultAltM;
+                var style_default_alt_f = AssStyle.ENG_DefaultAltF;
+                var style_note_alt = AssStyle.ENG_NoteAlt;
+                var style_title_alt = AssStyle.ENG_TitleAlt;
+                var style_comment_alt = AssStyle.ENG_CommentAlt;
 
                 if (lang == SupportedLanguage.CHS)
                 {
@@ -1824,6 +2186,14 @@ namespace SubTrans
                     style_default_f = AssStyle.CHS_DefaultF;
                     style_note = AssStyle.CHS_Note;
                     style_title = AssStyle.CHS_Title;
+                    style_comment = AssStyle.CHS_Comment;
+
+                    style_default_alt = AssStyle.CHS_DefaultAlt;
+                    style_default_alt_m = AssStyle.CHS_DefaultAltM;
+                    style_default_alt_f = AssStyle.CHS_DefaultAltF;
+                    style_note_alt = AssStyle.CHS_NoteAlt;
+                    style_title_alt = AssStyle.CHS_TitleAlt;
+                    style_comment_alt = AssStyle.CHS_CommentAlt;
                 }
                 else if (lang == SupportedLanguage.CHT)
                 {
@@ -1832,6 +2202,14 @@ namespace SubTrans
                     style_default_f = AssStyle.CHT_DefaultF;
                     style_note = AssStyle.CHT_Note;
                     style_title = AssStyle.CHT_Title;
+                    style_comment = AssStyle.CHT_Comment;
+
+                    style_default_alt = AssStyle.CHT_DefaultAlt;
+                    style_default_alt_m = AssStyle.CHT_DefaultAltM;
+                    style_default_alt_f = AssStyle.CHT_DefaultAltF;
+                    style_note_alt = AssStyle.CHT_NoteAlt;
+                    style_title_alt = AssStyle.CHT_TitleAlt;
+                    style_comment_alt = AssStyle.CHT_CommentAlt;
                 }
                 else if (lang == SupportedLanguage.JPN)
                 {
@@ -1840,6 +2218,14 @@ namespace SubTrans
                     style_default_f = AssStyle.JPN_DefaultF;
                     style_note = AssStyle.JPN_Note;
                     style_title = AssStyle.JPN_Title;
+                    style_comment = AssStyle.JPN_Comment;
+
+                    style_default_alt = AssStyle.JPN_DefaultAlt;
+                    style_default_alt_m = AssStyle.JPN_DefaultAltM;
+                    style_default_alt_f = AssStyle.JPN_DefaultAltF;
+                    style_note_alt = AssStyle.JPN_NoteAlt;
+                    style_title_alt = AssStyle.JPN_TitleAlt;
+                    style_comment_alt = AssStyle.JPN_CommentAlt;
                 }
                 else if (lang == SupportedLanguage.KOR)
                 {
@@ -1848,9 +2234,21 @@ namespace SubTrans
                     style_default_f = AssStyle.KOR_DefaultF;
                     style_note = AssStyle.KOR_Note;
                     style_title = AssStyle.KOR_Title;
+                    style_comment = AssStyle.KOR_Comment;
+
+                    style_default_alt = AssStyle.KOR_DefaultAlt;
+                    style_default_alt_m = AssStyle.KOR_DefaultAltM;
+                    style_default_alt_f = AssStyle.KOR_DefaultAltF;
+                    style_note_alt = AssStyle.KOR_NoteAlt;
+                    style_title_alt = AssStyle.KOR_TitleAlt;
+                    style_comment_alt = AssStyle.KOR_CommentAlt;
                 }
 
-                var styles = new List<string>() { style_default, style_default_m, style_default_f, style_note, style_title };
+                var styles = new List<string>()
+                {
+                    style_default, style_default_m, style_default_f, style_note, style_title, style_comment,
+                    style_default_alt, style_default_alt_m, style_default_alt_f, style_note_alt, style_title_alt, style_comment_alt,
+                };
                 StylesRaw.InsertRange(2, styles);
                 StylesRaw = StylesRaw.Distinct().Where(l => !string.IsNullOrEmpty(l.Trim())).ToList();
 
