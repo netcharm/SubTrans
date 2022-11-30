@@ -24,7 +24,7 @@
             <TextBlock x:Name="OriginalTitle" x:Uid="OriginalTitle" Grid.Row="0" Text="Original:" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,0,0,4" />
             <TextBox x:Name="OriginalContent" x:Uid="OriginalContent" Grid.Row="1" 
                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-                     TextWrapping="WrapWithOverflow" IsReadOnly="True" />
+                     TextWrapping="WrapWithOverflow" IsReadOnly="True" GotFocus="EventContent_GotFocus" />
         </Grid>
         <Grid x:Name="pTranslated" Grid.Row="1" Margin="4">
             <Grid.RowDefinitions>
@@ -34,8 +34,40 @@
             <TextBlock x:Name="TransTitle" x:Uid="TransTitle" Grid.Row="0" Text="Translated:" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,0,0,4" />
             <TextBox x:Name="TransContent" x:Uid="TransContent" Grid.Row="1" 
                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
-                     TextWrapping="WrapWithOverflow" />
+                     TextWrapping="WrapWithOverflow" GotFocus="EventContent_GotFocus" />
         </Grid>
+        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Left" Margin="0,4,4,4">
+            <Button x:Name="btnSpeechAuto" x:Uid="btnSpeechAuto" ToolTip="Auto Detect" Width="20" Margin="4,0,0,4" Click="btnSpeech_Click">
+                <Button.Content>
+                    <TextBlock Text="&#xE164;" FontSize="16" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button.Content>
+            </Button>
+            <Button x:Name="btnSpeechCHS" x:Uid="btnSpeechCHS" ToolTip="ChineseS" Width="20" Margin="4,0,0,4" Click="btnSpeech_Click">
+                <Button.Content>
+                    <TextBlock Text="&#xE88D;" FontSize="16" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button.Content>
+            </Button>
+            <Button x:Name="btnSpeechCHT" x:Uid="btnSpeechCHT" ToolTip="ChineseT" Width="20" Margin="4,0,0,4" Click="btnSpeech_Click">
+                <Button.Content>
+                    <TextBlock Text="&#xE88C;" FontSize="16" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button.Content>
+            </Button>
+            <Button x:Name="btnSpeechJAP" x:Uid="btnSpeechJAP" ToolTip="Japanese" Width="20" Margin="4,0,0,4" Click="btnSpeech_Click">
+                <Button.Content>
+                    <TextBlock Text="&#xE986;" FontSize="16" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button.Content>
+            </Button>
+            <Button x:Name="btnSpeechKOR" x:Uid="btnSpeechKOR" ToolTip="Korean" Width="20" Margin="4,0,0,4" Click="btnSpeech_Click">
+                <Button.Content>
+                    <TextBlock Text="&#xE97D;" FontSize="16" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button.Content>
+            </Button>
+            <Button x:Name="btnSpeechENG" x:Uid="btnSpeechENG" ToolTip="English" Width="20" Margin="4,0,0,4" Click="btnSpeech_Click">
+                <Button.Content>
+                    <TextBlock Text="&#xE8D2;" FontSize="16" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button.Content>
+            </Button>
+        </StackPanel>
         <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right" Margin="4">
             <Button x:Name="btnCancel" x:Uid="btnOK" Content="Cancel" Width="64" Margin="4,0,0,4" Click="btnCancel_Click"/>
             <Button x:Name="btnOK" x:Uid="btnOK" Content="OK" Width="64" Margin="4,0,0,4" Click="btnOK_Click"/>

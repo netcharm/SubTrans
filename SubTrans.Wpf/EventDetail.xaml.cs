@@ -66,5 +66,41 @@ namespace SubTrans
             //Close();
         }
 
+        private string SpeechText = string.Empty;
+        private void EventContent_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (OriginalContent.IsFocused) SpeechText = OriginalContent.Text;
+            else if (TransContent.IsFocused) SpeechText = TransContent.Text;
+            else SpeechText = string.Empty;
+        }
+
+        private void btnSpeech_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender == btnSpeechAuto)
+            {
+                MainWindow.Text2Voice(SpeechText);
+            }
+            else if (sender == btnSpeechCHS)
+            {
+                MainWindow.Text2Voice(SpeechText, "zh-hans");
+            }
+            else if(sender == btnSpeechCHT)
+            {
+                MainWindow.Text2Voice(SpeechText, "zh-hant");
+            }
+            else if (sender == btnSpeechJAP)
+            {
+                MainWindow.Text2Voice(SpeechText, "ja");
+            }
+            else if (sender == btnSpeechKOR)
+            {
+                MainWindow.Text2Voice(SpeechText, "ko");
+            }
+            else if (sender == btnSpeechENG)
+            {
+                MainWindow.Text2Voice(SpeechText, "en");
+            }
+        }
+
     }
 }

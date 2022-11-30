@@ -39,7 +39,7 @@
             </DataTemplate>
         </Grid.Resources>
         <Grid.ContextMenu>
-            <ContextMenu HasDropShadow="True">
+            <ContextMenu HasDropShadow="True" FontFamily="{DynamicResource MonoSpaceFamily}" FontSize="{DynamicResource MonoSpaceSize}">
                 <MenuItem x:Name="cmiLoadASS" Header="Load ASS" Click="btnLoad_Click" />
                 <Separator/>
                 <MenuItem x:Name="cmiPasteYoutube" Header="Paste Youtube Subtitles" Click="btnPasteYoutube_Click" />
@@ -60,6 +60,13 @@
                     <MenuItem x:Name="cmiSetStyleNote" Header="Note" IsChecked="False" Click="cmiSetStyle_Click" />
                     <MenuItem x:Name="cmiSetStyleComment" Header="Comment" IsChecked="False" Click="cmiSetStyle_Click" />
                     <Separator x:Name="cmiSetStyleSep"/>
+                </MenuItem>
+                <MenuItem x:Name="cmiEvents" Header="Events Actions">
+                    <MenuItem x:Name="cmiEventsAdd" Header="Add" Click="cmiEvents_Click" Visibility="Collapsed" />
+                    <MenuItem x:Name="cmiEventsDel" Header="Remove" Click="cmiEvents_Click" />
+                    <MenuItem x:Name="cmiEventsMerge" Header="Merge" Click="cmiEvents_Click" />
+                    <Separator/>
+                    <MenuItem x:Name="cmiEventsClear" Header="Clear Translate" Click="cmiEvents_Click" />
                 </MenuItem>
                 <Separator/>
                 <MenuItem x:Name="cmiLangEng" Header="Youtube English Subtitle" IsChecked="True" Click="cmiLang_Click" />

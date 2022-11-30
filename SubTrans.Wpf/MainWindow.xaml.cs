@@ -525,7 +525,7 @@ namespace SubTrans
         }
         #endregion
 
-        #region Edit/Find/Replace Helper
+        #region Edit/Find/Replace/Speech Helper
         private FindReplaceOptions _last_find_replace_option_ = null;
 
         private void OpenTranslatedEditor()
@@ -714,6 +714,50 @@ namespace SubTrans
         private Action<FindReplaceOptions> FindTextAction { get; set; } = null;
         private Action<FindReplaceOptions> ReplaceTextAction { get; set; } = null;
         private Func<string> FindReplaceResultFunc { get; set; } = null;
+
+        private void Text2Voice(bool auto = true)
+        {
+            if (lvItems.SelectedIndex >= 0 && lvItems.SelectedIndex < lvItems.Items.Count)
+            {                
+                var item = lvItems.SelectedItem as ASS.EVENT;
+                if (auto && !string.IsNullOrEmpty(item.Translated.Trim())) Text2Voice(item.Translated.Trim());
+                else if(!string.IsNullOrEmpty(item.Text.Trim())) Text2Voice(item.Text.Trim());
+            }
+        }
+
+        static internal void Text2Voice(string text, string lang = "auto")
+        {
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+                Speech.SimpleCultureDetect = false;
+            else
+                Speech.SimpleCultureDetect = true;
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+                Speech.AltPlayMixedCulture = true;
+            else
+                Speech.AltPlayMixedCulture = false;
+
+            Speech.AutoChangeSpeechSpeed = false;
+
+            string culture = string.IsNullOrEmpty(lang) || lang.Equals("auto", StringComparison.CurrentCulture) ? "unk" : lang;
+
+            //var slice_words = new List<string>();
+            //slice_words.AddRange(Speech.Slice(text.Split(Speech.LineBreak, StringSplitOptions.RemoveEmptyEntries), culture));
+
+            //var tip = string.Join(", ", slice_words);
+            //tip = Regex.Replace(tip, @"((.+?, ){5})", $"$1{Environment.NewLine}", RegexOptions.IgnoreCase);
+            //if (slice_words.Count > 0)
+            //{
+            //    hint.SetToolTip(edResult, null);
+            //    hint.Show(tip, edResult, edResult.Left, edResult.Bottom, 5000);
+            //    hint.SetToolTip(edResult, tip);
+            //}
+
+            Speech.Stop();
+            if (Speech.IsReady())
+            {
+                Speech.Play(text.Split(Speech.LineBreak, StringSplitOptions.RemoveEmptyEntries), culture);
+            }
+        }
         #endregion
 
         #region Config Helper
@@ -950,7 +994,21 @@ namespace SubTrans
                     else if (e.Key == Key.V) InvokeControl(btnPaste);
                     else if (e.Key == Key.F) OpenFindReplaceEditor();
                     else if (e.Key == Key.R) OpenFindReplaceEditor();
+
+                    else if (e.Key == Key.N) cmiEvents_Click(cmiEventsAdd, e);
+                    else if (e.Key == Key.M) cmiEvents_Click(cmiEventsMerge, e);
+                    else if (e.Key == Key.D) cmiEvents_Click(cmiEventsDel, e);
+                    else if (e.Key == Key.T) cmiEvents_Click(cmiEventsClear, e);
                 }
+#if DEBUG
+                else if (e.Key == Key.N) cmiEvents_Click(cmiEventsAdd, e);
+                else if (e.Key == Key.M) cmiEvents_Click(cmiEventsMerge, e);
+                else if (e.Key == Key.D) cmiEvents_Click(cmiEventsDel, e);
+                else if (e.Key == Key.T) cmiEvents_Click(cmiEventsClear, e);
+#endif
+                else if (e.Key == Key.Space) Text2Voice(true);
+                else if (e.Key == Key.OemComma) Text2Voice(false);
+                else if (e.Key == Key.OemPeriod) Text2Voice(true);
                 else if (e.Key == Key.Enter) lvItems_MouseDoubleClick(sender, null);
             }
         }
@@ -983,6 +1041,8 @@ namespace SubTrans
                 if (lvItems.Items.Count <= 0) return;
                 if (lvItems.SelectedItems.Count <= 0) return;
 
+                bool IsTrans = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
+
                 var items = new object[lvItems.SelectedItems.Count];
                 lvItems.SelectedItems.CopyTo(items, 0);
                 items = items.OrderBy(i => lvItems.Items.IndexOf(i)).ToArray();
@@ -995,7 +1055,7 @@ namespace SubTrans
                         var selected = item as ASS.EVENT;
                         var idx = Convert.ToInt32(selected.ID) - 1;
                         var evt = ass.Events[idx];
-                        var t = Regex.Replace(evt.Text, @"\\[h|n|N]", " $0 ", RegexOptions.IgnoreCase);
+                        var t = Regex.Replace(IsTrans ? evt.Translated : evt.Text, @"\\[h|n|N]", " $0 ", RegexOptions.IgnoreCase);
                         sb.AppendLine(t);
                     }
                 }
@@ -1029,11 +1089,19 @@ namespace SubTrans
                     {
                         var selected = item as ASS.EVENT;
                         var idx = Convert.ToInt32(selected.ID) - 1;
+                        if (idx < 0 || idx >= ass.Events.Count) break;
                         var evt = ass.Events[idx];
-                        if (string.IsNullOrEmpty(evt.Text.Trim()) && !string.IsNullOrEmpty(lines[idx_t].Trim())) continue;
-                        if (!string.IsNullOrEmpty(evt.Text.Trim()) && string.IsNullOrEmpty(lines[idx_t].Trim())) idx_t++;
-                        evt.Translated = FixBracketingError(lines[idx_t]);
+
+                        if (PasteRemoveNullLine)
+                        {
+                            if (string.IsNullOrEmpty(evt.Text.Trim()) && !string.IsNullOrEmpty(lines[idx_t].Trim())) continue;
+                            if (!string.IsNullOrEmpty(evt.Text.Trim()) && string.IsNullOrEmpty(lines[idx_t].Trim())) idx_t++;
+                        }
+                        if (idx_t >= lines.Length) break;
+
+                        evt.Translated = string.IsNullOrEmpty(lines[idx_t]) ? string.Empty : FixBracketingError(lines[idx_t]);
                         events[idx].Translated = evt.Translated;
+
                         idx_t++;
                     }
                 }
@@ -1232,6 +1300,71 @@ namespace SubTrans
                 {
                     var selected = item as ASS.EVENT;
                     selected.Style = style;
+                }
+            }
+        }
+
+        private void cmiEvents_Click(object sender, RoutedEventArgs e)
+        {
+            if (lvItems.Items.Count <= 0) return;
+            if (lvItems.SelectedItems.Count <= 0) return;
+
+            var items = new object[lvItems.SelectedItems.Count];
+            lvItems.SelectedItems.CopyTo(items, 0);
+            items = items.OrderBy(i => lvItems.Items.IndexOf(i)).ToArray();
+
+            if (sender == cmiEventsAdd)
+            {
+
+            }
+            else if (sender == cmiEventsDel)
+            {
+                foreach (var item in items) ass.Events.Remove(item as ASS.EVENT);
+                for (var i = 0; i < lvItems.Items.Count; i++) { events[i].ID = $"{i + 1}"; ass.Events[i].ID = $"{i + 1}"; };
+            }
+            else if (sender == cmiEventsMerge)
+            {
+                var kvs = items.Select(i => new KeyValuePair<int, ASS.EVENT>(lvItems.Items.IndexOf(i), i as ASS.EVENT));
+                var last_idx = -1;
+                var groups = new List<List<KeyValuePair<int, ASS.EVENT>>>();
+                //if (groups.Count == 0) groups.Add(new List<KeyValuePair<int, ASS.EVENT>>());
+
+                foreach (var kv in kvs)
+                {
+                    var k = kv.Key;
+                    var v = kv.Value;
+
+                    if (last_idx < 0 || k - last_idx > 1) groups.Add(new List<KeyValuePair<int, ASS.EVENT>>());
+                    groups.Last().Add(kv);
+                    last_idx = k;
+                }
+                foreach (var group in groups)
+                {
+                    if (group.Count > 1)
+                    {
+                        var first = group.First().Value;
+                        var last = group.Last().Value;
+                        first.End = last.End;
+                        first.Text = string.Join("\\n", group.Select(evt => evt.Value.Text).Distinct());
+                        foreach (var item in group.Skip(1))
+                        {
+                            ass.Events.Remove(item.Value);
+                            events.Remove(item.Value);
+                        }
+                    }
+                }              
+                for (var i = 0; i < lvItems.Items.Count; i++) { events[i].ID = $"{i + 1}"; ass.Events[i].ID = $"{i + 1}"; };
+            }
+            else if(sender == cmiEventsClear)
+            {
+                foreach (var item in items)
+                {
+                    var evt = item as ASS.EVENT;
+                    var idx = Convert.ToInt32(evt.ID) - 1;
+                    if (idx < 0 || idx >= ass.Events.Count) break;
+
+                    evt.Translated = string.Empty;
+                    ass.Events[idx].Translated = string.Empty;
                 }
             }
         }

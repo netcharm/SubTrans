@@ -1131,7 +1131,7 @@ namespace SubTrans
             public string ID
             {
                 get { return id; }
-                set { id = value; }
+                set { id = value; NotifyPropertyChanged("ID"); }
             }
             private string raw = string.Empty;
             public string Raw
