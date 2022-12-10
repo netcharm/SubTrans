@@ -502,7 +502,7 @@ namespace SubTrans
                 dlgSave.InitialDirectory = Path.GetDirectoryName(LastFilename);
             dlgSave.DefaultExt = ".ass";
             dlgSave.FileName = Path.GetFileNameWithoutExtension(LastFilename);
-            dlgSave.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|WebVTT File|*.vtt|Lyric File|*.lrc|Text File|*.txt";
+            dlgSave.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|WebVTT File|*.vtt|Lyric File|*.lrc|Text File|*.txt|Pure Text File|*.txt";
             dlgSave.FilterIndex = 0;
             if (dlgSave.ShowDialog() == true)
             {
@@ -518,6 +518,8 @@ namespace SubTrans
                     flags = flags | ASS.SaveFlags.LRC;
                 else if (dlgSave.FilterIndex == 6)
                     flags = flags | ASS.SaveFlags.TXT;
+                else if (dlgSave.FilterIndex == 7)
+                    flags = flags | ASS.SaveFlags.TXT | ASS.SaveFlags.NOTIME | ASS.SaveFlags.NOLINEBREAK;
                 ass.Save(dlgSave.FileName, flags);
                 LastFilename = dlgSave.FileName;
                 Keyboard.ClearFocus();

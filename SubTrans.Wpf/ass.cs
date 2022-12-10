@@ -735,7 +735,7 @@ namespace SubTrans
         private enum Sections { ScriptInfo = 0, Styles = 1, Events = 2, Fonts = 3, Graphics = 4, Unknown = -1 };
 
         [Flags]
-        public enum SaveFlags { None = 0, Replace = 1, Merge = 2, SRT = 4, VTT = 8, LRC = 16, TXT = 32, ASS = 64, BOM = 256 };
+        public enum SaveFlags { None = 0, Replace = 1, Merge = 2, SRT = 4, VTT = 8, LRC = 16, TXT = 32, ASS = 64, BOM = 256, NOTIME = 32768, NOLINEBREAK = 65536 };
 
         public class SCRIPTINFO
         {
@@ -2128,7 +2128,8 @@ namespace SubTrans
 
             foreach (var e in events)
             {
-                sb.AppendLine(e.Start);
+                if (!flags.HasFlag(SaveFlags.NOTIME))
+                    sb.AppendLine(e.Start);
                 if (flags.HasFlag(SaveFlags.Merge))
                 {
                     if (string.IsNullOrEmpty(e.Translated))
@@ -2147,7 +2148,8 @@ namespace SubTrans
                 {
                     sb.AppendLine(e.Text);
                 }
-                sb.AppendLine();
+                if (!flags.HasFlag(SaveFlags.NOLINEBREAK))
+                    sb.AppendLine();
             }
 
             File.WriteAllText(ass_file, sb.ToString(), new UTF8Encoding(flags.HasFlag(SaveFlags.BOM)));
