@@ -2163,7 +2163,7 @@ namespace SubTrans
                 if (lang == SupportedLanguage.Unknown) lang = YoutubeLanguage;
                 for (int i = StylesRaw.Count - 1; i > 1; i--)
                 {
-                    if (Regex.IsMatch(StylesRaw[i], @"Style: ?(Default(M|F)?|Note|Title) ?,", RegexOptions.IgnoreCase))
+                    if (Regex.IsMatch(StylesRaw[i], @"Style: ?(Default(Alt)?(M|F)?|Note(Alt)?|Title(Alt)?|Comment(Alt)?) ?,", RegexOptions.IgnoreCase))
                         StylesRaw.RemoveAt(i);
                 }
 
