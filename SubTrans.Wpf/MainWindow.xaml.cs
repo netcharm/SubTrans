@@ -1315,14 +1315,16 @@ namespace SubTrans
             lvItems.SelectedItems.CopyTo(items, 0);
             items = items.OrderBy(i => lvItems.Items.IndexOf(i)).ToArray();
 
+            e.Handled = false;
             if (sender == cmiEventsAdd)
             {
-
+                //e.Handled = true;
             }
             else if (sender == cmiEventsDel)
             {
-                foreach (var item in items) ass.Events.Remove(item as ASS.EVENT);
-                for (var i = 0; i < lvItems.Items.Count; i++) { events[i].ID = $"{i + 1}"; ass.Events[i].ID = $"{i + 1}"; };
+                foreach (var item in items) { ass.Events.Remove(item as ASS.EVENT); events.Remove(item as ASS.EVENT); }
+                for (var i = 0; i < ass.Events.Count; i++) { events[i].ID = $"{i + 1}"; ass.Events[i].ID = $"{i + 1}"; };
+                e.Handled = true;
             }
             else if (sender == cmiEventsMerge)
             {
@@ -1355,7 +1357,8 @@ namespace SubTrans
                         }
                     }
                 }              
-                for (var i = 0; i < lvItems.Items.Count; i++) { events[i].ID = $"{i + 1}"; ass.Events[i].ID = $"{i + 1}"; };
+                for (var i = 0; i < ass.Events.Count; i++) { events[i].ID = $"{i + 1}"; ass.Events[i].ID = $"{i + 1}"; };
+                e.Handled = true;
             }
             else if(sender == cmiEventsClear)
             {
@@ -1368,6 +1371,12 @@ namespace SubTrans
                     evt.Translated = string.Empty;
                     ass.Events[idx].Translated = string.Empty;
                 }
+                e.Handled = true;
+            }
+            if (e.Handled && _last_find_replace_option_ is FindReplaceOptions)
+            {
+                _last_find_replace_option_.FindResult = 0;
+                if (_last_find_replace_option_.ReplaceResult is List<bool>) _last_find_replace_option_.ReplaceResult.Clear();
             }
         }
     }
