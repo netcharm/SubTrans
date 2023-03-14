@@ -25,6 +25,7 @@ using Microsoft.Win32;
 namespace SubTrans
 {
     public enum SupportedLanguage { Any, CHS, CHT, JPN, KOR, ENG, Unknown };
+    public enum SplitMode { ByCount, BySymbol };
 
     public enum FindReplaceRangeMode { None, Current, Selected, All };
     public enum FindReplaceMode { None, Find, Replace };
@@ -94,11 +95,30 @@ namespace SubTrans
         private string[] exts = new string[] { ".ass", ".ssa", ".srt", ".vtt", ".lrc" };
 
         private const string YoutubeLanguage_Key = "YoutubeLanguage";
-        private const string SaveWithBOM_Key = "SaveWithBOM";
-        private const string PasteRemoveNullLine_Key = "PasteRemoveNullLine";
         private string YoutubeLanguage = Properties.Settings.Default.YoutubeLanguage;
+
+        private const string SaveWithBOM_Key = "SaveWithBOM";
         private bool SaveWithBOM = Properties.Settings.Default.SaveWithBOM;
+
+        private const string PasteRemoveNullLine_Key = "PasteRemoveNullLine";
         private bool PasteRemoveNullLine = Properties.Settings.Default.PasteRemoveNullLine;
+
+        private const string SplitCharMode_Key = "SplitCharMode";
+        private SplitMode SplitCharMode = SplitMode.BySymbol;
+
+        private const string SplitCharCount_Key = "SplitCharCount";
+        private int SplitCharCount = Properties.Settings.Default.SplitCharCount;
+
+        private const string SplitCharSymbols_Key = "SplitCharSymbols";
+        private string SplitCharSymbols = string.Join("", new char[] {
+            ',', '.', '!', '?', '~',
+            '！', '？', '、', '。', '；', '～',
+            '…', '⋯', '⁇', '⁈', '⁉', '⸺', '⸻',
+            '❤', '♩', '♪', '♫', '♬', '✨'
+        });
+
+        private const string OriginalEdiable_Key = "OriginalEdiable";
+        private bool OriginalEdiable = Properties.Settings.Default.OriginalEditable;
 
         ASS ass = new ASS();
         private ObservableCollection<ASS.EVENT> events = new ObservableCollection<ASS.EVENT>();
@@ -542,13 +562,12 @@ namespace SubTrans
                     ShowActivated = true,
                     ShowInTaskbar = false,
                     WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    OriginalEditable = OriginalEdiable,
                     Event = item,
                 };
                 if (dlg.ShowDialog() ?? false)
                 {
                     item.Translated = dlg.Event.Translated;
-                    //item.Text
-                    //dlg.Close();
                 }
             }
         }
@@ -658,21 +677,10 @@ namespace SubTrans
                 }
                 else
                 {
-                    //var opt_r = opt.IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
-                    //if (!string.IsNullOrEmpty(e.Translated))
-                    //    e.Translated = Regex.Replace(e.Translated, src, dst, opt_r);
-                    //else if (!string.IsNullOrEmpty(e.Text))
-                    //    e.Translated = Regex.Replace(e.Text, src, dst, opt_r);
                     if (!string.IsNullOrEmpty(text_new))
                     {
-                        var idx = -1;
-                        do
-                        {
-                            idx = text_new.IndexOf(src, idx < 0 ? 0 : idx + 1, opt_t);
-                            if (idx < 0) break;
-                            text_new = text_new.Remove(idx, src.Length).Insert(idx, dst);
-                        } while (idx >= 0);
-                        if (!text_old.Equals(text_new, opt_t)) { e.Translated = text_new; result = true; }
+                        text_new = text_new.Replace(src, dst);
+                        if (text_old.Length != text_new.Length || !text_old.Equals(text_new, opt_t)) { e.Translated = text_new; result = true; }
                     }
                 }
             }
@@ -720,10 +728,10 @@ namespace SubTrans
         private void Text2Voice(bool auto = true)
         {
             if (lvItems.SelectedIndex >= 0 && lvItems.SelectedIndex < lvItems.Items.Count)
-            {                
+            {
                 var item = lvItems.SelectedItem as ASS.EVENT;
                 if (auto && !string.IsNullOrEmpty(item.Translated.Trim())) Text2Voice(item.Translated.Trim());
-                else if(!string.IsNullOrEmpty(item.Text.Trim())) Text2Voice(item.Text.Trim());
+                else if (!string.IsNullOrEmpty(item.Text.Trim())) Text2Voice(item.Text.Trim());
             }
         }
 
@@ -760,6 +768,85 @@ namespace SubTrans
                 Speech.Play(text.Split(Speech.LineBreak, StringSplitOptions.RemoveEmptyEntries), culture);
             }
         }
+
+        private void CopyText(bool translate = false)
+        {
+            try
+            {
+                if (lvItems.Items.Count <= 0) return;
+                if (lvItems.SelectedItems.Count <= 0) return;
+
+                var items = new object[lvItems.SelectedItems.Count];
+                lvItems.SelectedItems.CopyTo(items, 0);
+                items = items.OrderBy(i => lvItems.Items.IndexOf(i)).ToArray();
+
+                StringBuilder sb = new StringBuilder();
+                foreach (var item in items)
+                {
+                    if (item is ASS.EVENT)
+                    {
+                        var selected = item as ASS.EVENT;
+                        var idx = Convert.ToInt32(selected.ID) - 1;
+                        var evt = ass.Events[idx];
+                        var t = Regex.Replace(translate ? evt.Translated : evt.Text, @"\\[h|n|N]", " $0 ", RegexOptions.IgnoreCase);
+                        sb.AppendLine(t);
+                    }
+                }
+                var text = sb.ToString();
+                Clipboard.SetDataObject(text);
+            }
+            catch (Exception) { }
+        }
+        private void PasteText(bool translate = true)
+        {
+            if (lvItems.Items.Count <= 0) return;
+            if (lvItems.SelectedItems.Count <= 0) return;
+
+            if (Clipboard.ContainsText())
+            {
+                StringBuilder sb = new StringBuilder();
+                var texts = Clipboard.GetText();
+                var lines = texts.Split(new string[] { "\n\r", "\r\n", "\r", "\n", }, StringSplitOptions.None);
+                if (PasteRemoveNullLine) lines = lines.Where(l => !string.IsNullOrEmpty(l.Trim())).ToArray();
+
+                var items = new object[lvItems.SelectedItems.Count];
+                lvItems.SelectedItems.CopyTo(items, 0);
+                items = items.OrderBy(i => lvItems.Items.IndexOf(i)).ToArray();
+
+                var idx_t = 0;
+                foreach (var item in items)
+                {
+                    if (idx_t >= lines.Length) break;
+                    if (item is ASS.EVENT)
+                    {
+                        var selected = item as ASS.EVENT;
+                        var idx = Convert.ToInt32(selected.ID) - 1;
+                        if (idx < 0 || idx >= ass.Events.Count) break;
+                        var evt = ass.Events[idx];
+
+                        if (PasteRemoveNullLine)
+                        {
+                            if (string.IsNullOrEmpty(evt.Text.Trim()) && !string.IsNullOrEmpty(lines[idx_t].Trim())) continue;
+                            if (!string.IsNullOrEmpty(evt.Text.Trim()) && string.IsNullOrEmpty(lines[idx_t].Trim())) idx_t++;
+                        }
+                        if (idx_t >= lines.Length) break;
+
+                        if (translate)
+                        {
+                            evt.Translated = string.IsNullOrEmpty(lines[idx_t]) ? string.Empty : FixBracketingError(lines[idx_t]);
+                            events[idx].Translated = evt.Translated;
+                        }
+                        else
+                        {
+                            evt.Text = string.IsNullOrEmpty(lines[idx_t]) ? string.Empty : FixBracketingError(lines[idx_t]);
+                            events[idx].Text = evt.Text;
+                        }
+
+                        idx_t++;
+                    }
+                }
+            }
+        }
         #endregion
 
         #region Config Helper
@@ -788,7 +875,8 @@ namespace SubTrans
                 {
                     if (appSection.Settings.AllKeys.Contains(key))
                     {
-                        result = appSection.Settings[key].Value;
+                        var v = appSection.Settings[key].Value;
+                        result = string.IsNullOrEmpty(v) ? value.ToString() : v;
                     }
                     else
                     {
@@ -797,6 +885,7 @@ namespace SubTrans
                         else
                             appSection.Settings.Add(key, string.Empty);
 
+                        result = value.ToString();
                         config.Save();
                     }
                 }
@@ -835,6 +924,50 @@ namespace SubTrans
             }
             catch (Exception ex) { MessageBox.Show($"{ex.Message}{Environment.NewLine}{ex.StackTrace}"); }
         }
+        
+        private void LoadConfig(bool reload=false)
+        {
+            if (reload)
+            {
+                config = ConfigurationManager.OpenExeConfiguration(AppExec);
+                appSection = config.AppSettings;
+            }
+
+            bool.TryParse(GetConfigValue(OriginalEdiable_Key, OriginalEdiable), out OriginalEdiable);
+            bool.TryParse(GetConfigValue(SaveWithBOM_Key, SaveWithBOM), out SaveWithBOM);
+            bool.TryParse(GetConfigValue(PasteRemoveNullLine_Key, PasteRemoveNullLine), out PasteRemoveNullLine);
+            Enum.TryParse(GetConfigValue(SplitCharMode_Key, SplitCharMode.ToString()), out SplitCharMode);
+            int.TryParse(GetConfigValue(SplitCharCount_Key, SplitCharCount), out SplitCharCount);
+            SplitCharSymbols = GetConfigValue(SplitCharSymbols_Key, SplitCharSymbols);
+
+            YoutubeLanguage = GetConfigValue(YoutubeLanguage_Key, YoutubeLanguage);
+
+            var lang = SupportedLanguage.ENG;
+            if (Enum.TryParse(YoutubeLanguage, out lang))
+            {
+                cmiLangEng.IsChecked = false;
+                cmiLangChs.IsChecked = false;
+                cmiLangCht.IsChecked = false;
+                cmiLangJpn.IsChecked = false;
+                cmiLangKor.IsChecked = false;
+                switch (lang)
+                {
+                    case SupportedLanguage.ENG: cmiLangEng.IsChecked = true; break;
+                    case SupportedLanguage.CHS: cmiLangChs.IsChecked = true; break;
+                    case SupportedLanguage.CHT: cmiLangCht.IsChecked = true; break;
+                    case SupportedLanguage.JPN: cmiLangJpn.IsChecked = true; break;
+                    case SupportedLanguage.KOR: cmiLangKor.IsChecked = true; break;
+                    default: cmiLangEng.IsChecked = true; break;
+                }
+            }
+            cmiSaveWithBOM.IsChecked = SaveWithBOM;
+            cmiPasteRemoveNullLine.IsChecked = PasteRemoveNullLine;
+
+            if (!File.Exists(PhraseFile))
+                SavePhrase(PhraseFile, Phrase);
+            else
+                Phrase = LoadPhrase(PhraseFile);
+        }
         #endregion
 
         private void InvokeControl(object sender)
@@ -868,30 +1001,7 @@ namespace SubTrans
 
             InitDefaultStyle();
 
-            YoutubeLanguage = GetConfigValue(YoutubeLanguage_Key, YoutubeLanguage);
-            bool.TryParse(GetConfigValue(SaveWithBOM_Key, SaveWithBOM), out SaveWithBOM);
-            bool.TryParse(GetConfigValue(PasteRemoveNullLine_Key, PasteRemoveNullLine), out PasteRemoveNullLine);
-
-            var lang = SupportedLanguage.ENG;
-            if (Enum.TryParse(YoutubeLanguage, out lang))
-            {
-                cmiLangEng.IsChecked = false;
-                cmiLangChs.IsChecked = false;
-                cmiLangCht.IsChecked = false;
-                cmiLangJpn.IsChecked = false;
-                cmiLangKor.IsChecked = false;
-                switch (lang)
-                {
-                    case SupportedLanguage.ENG: cmiLangEng.IsChecked = true; break;
-                    case SupportedLanguage.CHS: cmiLangChs.IsChecked = true; break;
-                    case SupportedLanguage.CHT: cmiLangCht.IsChecked = true; break;
-                    case SupportedLanguage.JPN: cmiLangJpn.IsChecked = true; break;
-                    case SupportedLanguage.KOR: cmiLangKor.IsChecked = true; break;
-                    default: cmiLangEng.IsChecked = true; break;
-                }
-            }
-            cmiSaveWithBOM.IsChecked = SaveWithBOM;
-            cmiPasteRemoveNullLine.IsChecked = PasteRemoveNullLine;
+            LoadConfig();
 
 #if DEBUG
             Phrase.Items.Add(new Term() { Original = "一楼", Translated = "一层" });
@@ -917,11 +1027,6 @@ namespace SubTrans
                 }
                 else return (string.Empty);
             });
-
-            if (!File.Exists(PhraseFile))
-                SavePhrase(PhraseFile, Phrase);
-            else
-                Phrase = LoadPhrase(PhraseFile);
 
             lvItems.Focus();
 
@@ -997,17 +1102,17 @@ namespace SubTrans
                     else if (e.Key == Key.F) OpenFindReplaceEditor();
                     else if (e.Key == Key.R) OpenFindReplaceEditor();
 
-                    else if (e.Key == Key.N) cmiEvents_Click(cmiEventsAdd, e);
-                    else if (e.Key == Key.M) cmiEvents_Click(cmiEventsMerge, e);
-                    else if (e.Key == Key.D) cmiEvents_Click(cmiEventsDel, e);
-                    else if (e.Key == Key.T) cmiEvents_Click(cmiEventsClear, e);
+                    //else if (e.Key == Key.N) cmiEvents_Click(cmiEventsAdd, e);
+                    //else if (e.Key == Key.M) cmiEvents_Click(cmiEventsMerge, e);
+                    //else if (e.Key == Key.D) cmiEvents_Click(cmiEventsDel, e);
+                    else if (e.Key == Key.Back) cmiEvents_Click(cmiEventsClear, e);
                 }
-#if DEBUG
-                else if (e.Key == Key.N) cmiEvents_Click(cmiEventsAdd, e);
-                else if (e.Key == Key.M) cmiEvents_Click(cmiEventsMerge, e);
-                else if (e.Key == Key.D) cmiEvents_Click(cmiEventsDel, e);
-                else if (e.Key == Key.T) cmiEvents_Click(cmiEventsClear, e);
-#endif
+
+                else if (e.Key == Key.OemOpenBrackets) cmiEvents_Click(cmiEventsSplit, e);
+                else if (e.Key == Key.OemCloseBrackets) cmiEvents_Click(cmiEventsMerge, e);
+                else if (e.Key == Key.Insert) cmiEvents_Click(cmiEventsAdd, e);
+                else if (e.Key == Key.Delete) cmiEvents_Click(cmiEventsDel, e);
+
                 else if (e.Key == Key.Space) Text2Voice(true);
                 else if (e.Key == Key.OemComma) Text2Voice(false);
                 else if (e.Key == Key.OemPeriod) Text2Voice(true);
@@ -1038,76 +1143,12 @@ namespace SubTrans
 
         private void btnCopy_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                if (lvItems.Items.Count <= 0) return;
-                if (lvItems.SelectedItems.Count <= 0) return;
-
-                bool IsTrans = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
-
-                var items = new object[lvItems.SelectedItems.Count];
-                lvItems.SelectedItems.CopyTo(items, 0);
-                items = items.OrderBy(i => lvItems.Items.IndexOf(i)).ToArray();
-
-                StringBuilder sb = new StringBuilder();
-                foreach (var item in items)
-                {
-                    if (item is ASS.EVENT)
-                    {
-                        var selected = item as ASS.EVENT;
-                        var idx = Convert.ToInt32(selected.ID) - 1;
-                        var evt = ass.Events[idx];
-                        var t = Regex.Replace(IsTrans ? evt.Translated : evt.Text, @"\\[h|n|N]", " $0 ", RegexOptions.IgnoreCase);
-                        sb.AppendLine(t);
-                    }
-                }
-                var text = sb.ToString();
-                Clipboard.SetDataObject(text);
-            }
-            catch (Exception) { }
+            CopyText(Keyboard.Modifiers.HasFlag(ModifierKeys.Shift));
         }
 
         private void btnPaste_Click(object sender, RoutedEventArgs e)
         {
-            if (lvItems.Items.Count <= 0) return;
-            if (lvItems.SelectedItems.Count <= 0) return;
-
-            if (Clipboard.ContainsText())
-            {
-                StringBuilder sb = new StringBuilder();
-                var texts = Clipboard.GetText();
-                var lines = texts.Split(new string[] { "\n\r", "\r\n", "\r", "\n", }, StringSplitOptions.None);
-                if (PasteRemoveNullLine) lines = lines.Where(l => !string.IsNullOrEmpty(l.Trim())).ToArray();
-
-                var items = new object[lvItems.SelectedItems.Count];
-                lvItems.SelectedItems.CopyTo(items, 0);
-                items = items.OrderBy(i => lvItems.Items.IndexOf(i)).ToArray();
-
-                var idx_t = 0;
-                foreach (var item in items)
-                {
-                    if (idx_t >= lines.Length) break;
-                    if (item is ASS.EVENT)
-                    {
-                        var selected = item as ASS.EVENT;
-                        var idx = Convert.ToInt32(selected.ID) - 1;
-                        if (idx < 0 || idx >= ass.Events.Count) break;
-                        var evt = ass.Events[idx];
-
-                        if (PasteRemoveNullLine)
-                        {
-                            if (string.IsNullOrEmpty(evt.Text.Trim()) && !string.IsNullOrEmpty(lines[idx_t].Trim())) continue;
-                            if (!string.IsNullOrEmpty(evt.Text.Trim()) && string.IsNullOrEmpty(lines[idx_t].Trim())) idx_t++;
-                        }
-                        if (idx_t >= lines.Length) break;
-
-                        evt.Translated = string.IsNullOrEmpty(lines[idx_t]) ? string.Empty : FixBracketingError(lines[idx_t]);
-                        events[idx].Translated = evt.Translated;
-
-                        idx_t++;
-                    }
-                }
-            }
+            PasteText(!Keyboard.Modifiers.HasFlag(ModifierKeys.Shift));
         }
 
         private void btnPasteYoutube_Click(object sender, RoutedEventArgs e)
@@ -1226,7 +1267,10 @@ namespace SubTrans
 
         private void cmiExit_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            if (sender == cmiReload)
+                LoadConfig(reload: true);
+            else if (sender == cmiExit)
+                Close();
         }
 
         private void cmiFixBracket_Click(object sender, RoutedEventArgs e)
@@ -1323,7 +1367,6 @@ namespace SubTrans
             else if (sender == cmiEventsDel)
             {
                 foreach (var item in items) { ass.Events.Remove(item as ASS.EVENT); events.Remove(item as ASS.EVENT); }
-                for (var i = 0; i < ass.Events.Count; i++) { events[i].ID = $"{i + 1}"; ass.Events[i].ID = $"{i + 1}"; };
                 e.Handled = true;
             }
             else if (sender == cmiEventsMerge)
@@ -1356,11 +1399,87 @@ namespace SubTrans
                             events.Remove(item.Value);
                         }
                     }
-                }              
-                for (var i = 0; i < ass.Events.Count; i++) { events[i].ID = $"{i + 1}"; ass.Events[i].ID = $"{i + 1}"; };
+                }                
                 e.Handled = true;
             }
-            else if(sender == cmiEventsClear)
+            else if (sender == cmiEventsSplit)
+            {
+                var symbols = SplitCharSymbols.ToList().Distinct().ToArray();
+                var shift = Keyboard.Modifiers == ModifierKeys.Shift;
+                var split_mode = SplitCharMode;
+                var time_fmt = "HH:mm:ss.ff";
+
+                switch (SplitCharMode)
+                {
+                    case SplitMode.ByCount:
+                        split_mode = shift ? SplitMode.BySymbol : SplitMode.ByCount;
+                        break;
+                    case SplitMode.BySymbol:
+                        split_mode = shift ? SplitMode.ByCount : SplitMode.BySymbol;
+                        break;
+                }
+
+                foreach (var item in items.Reverse())
+                {
+                    var evt = item as ASS.EVENT;
+                    var idx = Convert.ToInt32(evt.ID) - 1;
+
+                    var evts = new List<ASS.EVENT>();
+
+                    if (split_mode == SplitMode.ByCount)
+                    {
+                        var length = evt.Text.Length;
+                        if (length <= SplitCharCount) continue;
+                        var total = length % SplitCharCount == 0 ? evt.Text.Length / SplitCharCount : evt.Text.Length / SplitCharCount + 1;
+                        var times = evt.EndTime - evt.StartTime;
+                        if (times.TotalMilliseconds <= 0) continue;
+                        var times_ms = times.TotalMilliseconds / total;
+
+                        for (var i = 0; i < total; i++)
+                        {
+                            var start = evt.StartTime;
+                            var evt_new  = evt.Clone();
+
+                            evt_new.Text = evt.Text.Substring(i * SplitCharCount, Math.Min(length - i * SplitCharCount, SplitCharCount));
+                            evt_new.Translated = evt.Translated;
+                            evt_new.Start = (start + TimeSpan.FromMilliseconds(i * times_ms)).ToString(time_fmt);
+                            evt_new.End = (start + TimeSpan.FromMilliseconds((i + 1) * times_ms - 10)).ToString(time_fmt);
+                            evts.Add(evt_new);
+                        }
+                    }
+                    else if(split_mode == SplitMode.BySymbol)
+                    {
+                        var lines = evt.Text.Split(symbols);
+                        var total = lines.Count();
+                        if (total > 1)
+                        {
+                            var times = evt.EndTime - evt.StartTime;
+                            if (times.TotalMilliseconds <= 0) continue;
+                            var times_ms = times.TotalMilliseconds / total;
+
+                            for (var i = 0; i < total; i++)
+                            {
+                                var start = evt.StartTime;
+                                var evt_new  = evt.Clone();
+
+                                evt_new.Text = lines[i];
+                                evt_new.Translated = evt.Translated;
+                                evt_new.Start = (start + TimeSpan.FromMilliseconds(i * times_ms)).ToString(time_fmt);
+                                evt_new.End = (start + TimeSpan.FromMilliseconds((i + 1) * times_ms - 10)).ToString(time_fmt);
+                                evts.Add(evt_new);
+                            }
+                        }
+                    }
+
+                    ass.Events.InsertRange(idx, evts);
+                    ass.Events.Remove(evt);
+                    evts.Reverse();
+                    foreach (var ev in evts) events.Insert(idx, ev);
+                    events.Remove(evt);
+                }
+                e.Handled = true;
+            }
+            else if (sender == cmiEventsClear)
             {
                 foreach (var item in items)
                 {
@@ -1373,6 +1492,7 @@ namespace SubTrans
                 }
                 e.Handled = true;
             }
+            if (e.Handled) { for (var i = 0; i < ass.Events.Count; i++) { events[i].ID = $"{i + 1}"; ass.Events[i].ID = $"{i + 1}"; }; }
             if (e.Handled && _last_find_replace_option_ is FindReplaceOptions)
             {
                 _last_find_replace_option_.FindResult = 0;

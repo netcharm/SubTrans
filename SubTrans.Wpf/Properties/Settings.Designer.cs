@@ -292,5 +292,41 @@ namespace SubTrans.Properties {
                 return ((string)(this["KOR_Font"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("16")]
+        public int SplitCharCount {
+            get {
+                return ((int)(this["SplitCharCount"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool OriginalEditable {
+            get {
+                return ((bool)(this["OriginalEditable"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SplitCharMode {
+            get {
+                return ((string)(this["SplitCharMode"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SplitCharSymbols {
+            get {
+                return ((string)(this["SplitCharSymbols"]));
+            }
+        }
     }
 }

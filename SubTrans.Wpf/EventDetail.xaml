@@ -36,7 +36,7 @@
                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                      TextWrapping="WrapWithOverflow" GotFocus="EventContent_GotFocus" />
         </Grid>
-        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Left" Margin="0,4,4,4">
+        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,4,4,4">
             <Button x:Name="btnSpeechAuto" x:Uid="btnSpeechAuto" ToolTip="Auto Detect" Width="20" Margin="4,0,0,4" Click="btnSpeech_Click">
                 <Button.Content>
                     <TextBlock Text="&#xE164;" FontSize="16" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -67,6 +67,7 @@
                     <TextBlock Text="&#xE8D2;" FontSize="16" FontFamily="Segoe MDL2 Assets" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Button.Content>
             </Button>
+            <CheckBox x:Name="chkOriginalEditable" x:Uid="chkOriginalEditable" Content="Original Editable" ToolTip="Original Editable" Margin="4,0,0,4" VerticalAlignment="Center" Click="btnSpeech_Click"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right" Margin="4">
             <Button x:Name="btnCancel" x:Uid="btnOK" Content="Cancel" Width="64" Margin="4,0,0,4" Click="btnCancel_Click"/>

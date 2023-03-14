@@ -1101,7 +1101,21 @@ namespace SubTrans
 
             public void Parse(string event_text)
             {
+                var event_default = new EVENTS();
 
+                //if (format.StartsWith("Format")) event_default.ParseFormat(format); 
+                if (event_text.StartsWith("Dialogue:", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    Raw = event_text.Split(':').Last().Trim();
+
+                    var fields = event_default.Formats;
+                    var values = Raw.Split(',');
+
+                    for (int i = 0; i < fields.Length; i++)
+                    {
+                        Field(fields[i], values[i].Trim());
+                    }
+                }
             }
 
             public static EVENT Parse(string event_text, string format)
@@ -1124,6 +1138,41 @@ namespace SubTrans
                     }
                 }
                 return (result);
+            }
+
+            public static EVENT FromEvent(EVENT evt)
+            {                
+                return (evt is EVENT ? evt.Clone() : new EVENT());
+            }
+
+            public EVENT Clone()
+            {
+                var result = new EVENT();
+
+                foreach (var field in Fields)
+                    result.Field(field.Key, Field(field.Key));
+
+                return (result);
+            }
+
+            public DateTime StartTime
+            {
+                get
+                {
+                    DateTime value;
+                    DateTime.TryParse(Start, out value);
+                    return (value);
+                }
+            }
+
+            public DateTime EndTime
+            {
+                get
+                {
+                    DateTime value;
+                    DateTime.TryParse(End, out value);
+                    return (value);
+                }
             }
 
             #region Event Properties

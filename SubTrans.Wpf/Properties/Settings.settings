@@ -92,5 +92,17 @@
     <Setting Name="KOR_Font" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="SplitCharCount" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">16</Value>
+    </Setting>
+    <Setting Name="OriginalEditable" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="SplitCharMode" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="SplitCharSymbols" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

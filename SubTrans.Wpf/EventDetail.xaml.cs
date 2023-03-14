@@ -20,6 +20,7 @@ namespace SubTrans
     public partial class EventDetail : Window
     {
         public ASS.EVENT Event { get; set; } = null;
+        public bool OriginalEditable { get; set; } = false;
 
         public EventDetail()
         {
@@ -30,6 +31,8 @@ namespace SubTrans
         {
             if (Event is ASS.EVENT)
             {
+                chkOriginalEditable.IsChecked = OriginalEditable;
+                OriginalContent.IsReadOnly = !OriginalEditable;
                 OriginalContent.Text = Event.Text;
                 TransContent.Text = Event.Translated;
             }
@@ -60,6 +63,7 @@ namespace SubTrans
         {
             if (Event is ASS.EVENT)
             {
+                if (!Event.Text.Equals(OriginalContent.Text)) Event.Text = OriginalContent.Text;
                 Event.Translated = TransContent.Text;
                 DialogResult = true;
             }
@@ -84,7 +88,7 @@ namespace SubTrans
             {
                 MainWindow.Text2Voice(SpeechText, "zh-hans");
             }
-            else if(sender == btnSpeechCHT)
+            else if (sender == btnSpeechCHT)
             {
                 MainWindow.Text2Voice(SpeechText, "zh-hant");
             }
@@ -100,6 +104,14 @@ namespace SubTrans
             {
                 MainWindow.Text2Voice(SpeechText, "en");
             }
+            else if (sender == chkOriginalEditable)
+            {
+                if (sender is CheckBox)
+                {
+                    OriginalEditable = (sender as CheckBox).IsChecked ?? false;
+                    OriginalContent.IsReadOnly = !OriginalEditable;
+                }
+            }            
         }
 
     }

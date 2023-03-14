@@ -65,6 +65,7 @@
                     <MenuItem x:Name="cmiEventsAdd" Header="Add" Click="cmiEvents_Click" Visibility="Collapsed" />
                     <MenuItem x:Name="cmiEventsDel" Header="Remove" Click="cmiEvents_Click" />
                     <MenuItem x:Name="cmiEventsMerge" Header="Merge" Click="cmiEvents_Click" />
+                    <MenuItem x:Name="cmiEventsSplit" Header="Split" Click="cmiEvents_Click" />
                     <Separator/>
                     <MenuItem x:Name="cmiEventsClear" Header="Clear Translate" Click="cmiEvents_Click" />
                 </MenuItem>
@@ -81,6 +82,7 @@
                 <MenuItem x:Name="cmiEditPhraseTable" Header="Edit Phrase Table" Click="cmiPhraseOprate_Click" />
                 <MenuItem x:Name="cmiReloadPhraseTable" Header="Reload Phrase Table" Click="cmiPhraseOprate_Click"  />
                 <Separator/>
+                <MenuItem x:Name="cmiReload" Header="Reload Config" Click="cmiExit_Click" />
                 <MenuItem x:Name="cmiExit" Header="Exit" Click="cmiExit_Click" />
             </ContextMenu>
         </Grid.ContextMenu>
