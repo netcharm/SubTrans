@@ -112,7 +112,7 @@ namespace SubTrans
         private const string SplitCharSymbols_Key = "SplitCharSymbols";
         private string SplitCharSymbols = string.Join("", new char[] {
             ',', '.', '!', '?', '~',
-            '！', '？', '、', '。', '；', '～',
+            '！', '？', '，', '、', '。', '；', '～',
             '…', '⋯', '⁇', '⁈', '⁉', '⸺', '⸻',
             '❤', '♩', '♪', '♫', '♬', '✨'
         });
@@ -692,29 +692,35 @@ namespace SubTrans
             var result = new List<bool>();
             try
             {
-                _last_find_replace_option_ = opt;
-                _last_find_replace_option_.ReplaceResult.Clear();
+                if (ass is ASS)
+                {
+                    _last_find_replace_option_ = opt;
+                    _last_find_replace_option_.ReplaceResult.Clear();
 
-                if (opt.Range == FindReplaceRangeMode.Current && _last_find_replace_option_.FindResult >= 0 && _last_find_replace_option_.FindResult < lvItems.Items.Count)
-                {
-                    var item = lvItems.Items[_last_find_replace_option_.FindResult];
-                    if (item is ASS.EVENT) result.Add(ReplaceText(item as ASS.EVENT, opt));
-                }
-                else if (opt.Range == FindReplaceRangeMode.Selected)
-                {
-                    foreach (var item in lvItems.SelectedItems)
+                    var back_ass = ass.Clone();
+
+                    if (opt.Range == FindReplaceRangeMode.Current && _last_find_replace_option_.FindResult >= 0 && _last_find_replace_option_.FindResult < lvItems.Items.Count)
                     {
+                        var item = lvItems.Items[_last_find_replace_option_.FindResult];
                         if (item is ASS.EVENT) result.Add(ReplaceText(item as ASS.EVENT, opt));
                     }
-                }
-                else if (opt.Range == FindReplaceRangeMode.All)
-                {
-                    foreach (var item in lvItems.Items)
+                    else if (opt.Range == FindReplaceRangeMode.Selected)
                     {
-                        if (item is ASS.EVENT) result.Add(ReplaceText(item as ASS.EVENT, opt));
+                        foreach (var item in lvItems.SelectedItems)
+                        {
+                            if (item is ASS.EVENT) result.Add(ReplaceText(item as ASS.EVENT, opt));
+                        }
                     }
+                    else if (opt.Range == FindReplaceRangeMode.All)
+                    {
+                        foreach (var item in lvItems.Items)
+                        {
+                            if (item is ASS.EVENT) result.Add(ReplaceText(item as ASS.EVENT, opt));
+                        }
+                    }
+                    _last_find_replace_option_.ReplaceResult.AddRange(result);
+                    if (result.Count > 0) MakeBackup(back_ass);
                 }
-                _last_find_replace_option_.ReplaceResult.AddRange(result);
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
             return (result);
@@ -769,7 +775,7 @@ namespace SubTrans
             }
         }
 
-        private void CopyText(bool translate = false)
+        private void MakeCopyText(bool translate = false)
         {
             try
             {
@@ -797,7 +803,8 @@ namespace SubTrans
             }
             catch (Exception) { }
         }
-        private void PasteText(bool translate = true)
+
+        private void MakePasteText(bool translate = true)
         {
             if (lvItems.Items.Count <= 0) return;
             if (lvItems.SelectedItems.Count <= 0) return;
@@ -812,6 +819,8 @@ namespace SubTrans
                 var items = new object[lvItems.SelectedItems.Count];
                 lvItems.SelectedItems.CopyTo(items, 0);
                 items = items.OrderBy(i => lvItems.Items.IndexOf(i)).ToArray();
+
+                if (items.Count() > 0) MakeBackup();
 
                 var idx_t = 0;
                 foreach (var item in items)
@@ -846,6 +855,36 @@ namespace SubTrans
                     }
                 }
             }
+        }
+
+        private ASS _ass_ = new ASS();
+        private List<ASS.EVENT> _events_ = new List<ASS.EVENT>();
+        private void MakeBackup(ASS sub = null)
+        {
+            try
+            {
+                if (sub is ASS) _ass_ = sub.Clone();
+                else if (ass is ASS) _ass_ = ass.Clone();
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
+        }
+
+        private void MakeUndo()
+        {
+            try
+            {
+                if (_ass_ is ASS)
+                {
+                    ass = _ass_.Clone();
+
+                    events.Clear();
+                    for (int i = 0; i < ass.Events.Count; i++)
+                    {
+                        events.Add(ass.Events[i]);
+                    }
+                }
+            }
+            catch(Exception ex) { MessageBox.Show(ex.Message); }
         }
         #endregion
 
@@ -1106,6 +1145,8 @@ namespace SubTrans
                     //else if (e.Key == Key.M) cmiEvents_Click(cmiEventsMerge, e);
                     //else if (e.Key == Key.D) cmiEvents_Click(cmiEventsDel, e);
                     else if (e.Key == Key.Back) cmiEvents_Click(cmiEventsClear, e);
+
+                    else if (e.Key == Key.Z) MakeUndo();
                 }
 
                 else if (e.Key == Key.OemOpenBrackets) cmiEvents_Click(cmiEventsSplit, e);
@@ -1143,12 +1184,12 @@ namespace SubTrans
 
         private void btnCopy_Click(object sender, RoutedEventArgs e)
         {
-            CopyText(Keyboard.Modifiers.HasFlag(ModifierKeys.Shift));
+            MakeCopyText(Keyboard.Modifiers.HasFlag(ModifierKeys.Shift));
         }
 
         private void btnPaste_Click(object sender, RoutedEventArgs e)
         {
-            PasteText(!Keyboard.Modifiers.HasFlag(ModifierKeys.Shift));
+            MakePasteText(!Keyboard.Modifiers.HasFlag(ModifierKeys.Shift));
         }
 
         private void btnPasteYoutube_Click(object sender, RoutedEventArgs e)
@@ -1359,6 +1400,8 @@ namespace SubTrans
             lvItems.SelectedItems.CopyTo(items, 0);
             items = items.OrderBy(i => lvItems.Items.IndexOf(i)).ToArray();
 
+            if (items.Count() > 0) MakeBackup();
+
             e.Handled = false;
             if (sender == cmiEventsAdd)
             {
@@ -1421,6 +1464,7 @@ namespace SubTrans
 
                 foreach (var item in items.Reverse())
                 {
+                    var done = false;
                     var evt = item as ASS.EVENT;
                     var idx = Convert.ToInt32(evt.ID) - 1;
 
@@ -1431,6 +1475,7 @@ namespace SubTrans
                         var length = evt.Text.Length;
                         if (length <= SplitCharCount) continue;
                         var total = length % SplitCharCount == 0 ? evt.Text.Length / SplitCharCount : evt.Text.Length / SplitCharCount + 1;
+                        if (total <= 1) continue;
                         var times = evt.EndTime - evt.StartTime;
                         if (times.TotalMilliseconds <= 0) continue;
                         var times_ms = times.TotalMilliseconds / total;
@@ -1446,10 +1491,11 @@ namespace SubTrans
                             evt_new.End = (start + TimeSpan.FromMilliseconds((i + 1) * times_ms - 10)).ToString(time_fmt);
                             evts.Add(evt_new);
                         }
+                        done = true;
                     }
                     else if(split_mode == SplitMode.BySymbol)
                     {
-                        var lines = evt.Text.Split(symbols);
+                        var lines = evt.Text.Split(symbols, StringSplitOptions.RemoveEmptyEntries);
                         var total = lines.Count();
                         if (total > 1)
                         {
@@ -1468,14 +1514,18 @@ namespace SubTrans
                                 evt_new.End = (start + TimeSpan.FromMilliseconds((i + 1) * times_ms - 10)).ToString(time_fmt);
                                 evts.Add(evt_new);
                             }
+                            done = true;
                         }
                     }
 
-                    ass.Events.InsertRange(idx, evts);
-                    ass.Events.Remove(evt);
-                    evts.Reverse();
-                    foreach (var ev in evts) events.Insert(idx, ev);
-                    events.Remove(evt);
+                    if (done)
+                    {
+                        ass.Events.InsertRange(idx, evts);
+                        ass.Events.Remove(evt);
+                        evts.Reverse();
+                        foreach (var ev in evts) events.Insert(idx, ev);
+                        events.Remove(evt);
+                    }
                 }
                 e.Handled = true;
             }

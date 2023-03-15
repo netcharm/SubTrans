@@ -1690,6 +1690,32 @@ namespace SubTrans
             Load(lines);
         }
 
+        public ASS Clone()
+        {
+            var result = new ASS()
+            {
+                OriginalFile = OriginalFile,
+                SaveWithUTF8BOM = SaveWithUTF8BOM,
+                YoutubeLanguage = YoutubeLanguage,
+
+                ScriptInfo = ScriptInfo,
+                StylesRaw = StylesRaw.ToList(),
+                FontsRaw = FontsRaw.ToList(),
+                GraphicsRaw = GraphicsRaw.ToList(),
+                EventsRaw = EventsRaw.ToList(),
+
+                style_format = style_format,
+                style_fields = style_fields,
+
+                event_format = event_format,
+                event_fields = event_fields,
+
+                events = events.ToList(),
+                styles = styles.ToList(),
+            };
+            return (result);
+        }
+
         public async Task Load(string ass)
         {
             ScriptInfo.Clear();

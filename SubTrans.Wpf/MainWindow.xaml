@@ -40,7 +40,7 @@
         </Grid.Resources>
         <Grid.ContextMenu>
             <ContextMenu HasDropShadow="True" FontFamily="{DynamicResource MonoSpaceFamily}" FontSize="{DynamicResource MonoSpaceSize}">
-                <MenuItem x:Name="cmiLoadASS" Header="Load ASS" Click="btnLoad_Click" />
+                <MenuItem x:Name="cmiLoadASS" Header="Load ASS" Click="btnLoad_Click" InputGestureText="Ctrl+L"/>
                 <Separator/>
                 <MenuItem x:Name="cmiPasteYoutube" Header="Paste Youtube Subtitles" Click="btnPasteYoutube_Click" />
                 <Separator/>
@@ -62,12 +62,12 @@
                     <Separator x:Name="cmiSetStyleSep"/>
                 </MenuItem>
                 <MenuItem x:Name="cmiEvents" Header="Events Actions">
-                    <MenuItem x:Name="cmiEventsAdd" Header="Add" Click="cmiEvents_Click" Visibility="Collapsed" />
-                    <MenuItem x:Name="cmiEventsDel" Header="Remove" Click="cmiEvents_Click" />
-                    <MenuItem x:Name="cmiEventsMerge" Header="Merge" Click="cmiEvents_Click" />
-                    <MenuItem x:Name="cmiEventsSplit" Header="Split" Click="cmiEvents_Click" />
+                    <MenuItem x:Name="cmiEventsAdd" Header="Add" Click="cmiEvents_Click" Visibility="Collapsed" InputGestureText="Insert" />
+                    <MenuItem x:Name="cmiEventsDel" Header="Remove" Click="cmiEvents_Click" InputGestureText="Delete" />
+                    <MenuItem x:Name="cmiEventsSplit" Header="Split" Click="cmiEvents_Click" InputGestureText="[" />
+                    <MenuItem x:Name="cmiEventsMerge" Header="Merge" Click="cmiEvents_Click" InputGestureText="]" />
                     <Separator/>
-                    <MenuItem x:Name="cmiEventsClear" Header="Clear Translate" Click="cmiEvents_Click" />
+                    <MenuItem x:Name="cmiEventsClear" Header="Clear Translate" Click="cmiEvents_Click" InputGestureText="Ctrl+Backspace" />
                 </MenuItem>
                 <Separator/>
                 <MenuItem x:Name="cmiLangEng" Header="Youtube English Subtitle" IsChecked="True" Click="cmiLang_Click" />
