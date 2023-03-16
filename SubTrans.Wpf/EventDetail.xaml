@@ -23,7 +23,7 @@
             </Grid.RowDefinitions>
             <TextBlock x:Name="OriginalTitle" x:Uid="OriginalTitle" Grid.Row="0" Text="Original:" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,0,0,4" />
             <TextBox x:Name="OriginalContent" x:Uid="OriginalContent" Grid.Row="1" 
-                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AcceptsReturn="True"
                      TextWrapping="WrapWithOverflow" IsReadOnly="True" GotFocus="EventContent_GotFocus" />
         </Grid>
         <Grid x:Name="pTranslated" Grid.Row="1" Margin="4">
@@ -31,9 +31,9 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock x:Name="TransTitle" x:Uid="TransTitle" Grid.Row="0" Text="Translated:" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,0,0,4" />
+            <TextBlock x:Name="TransTitle" x:Uid="TransTitle" Grid.Row="0" Text="Translated:" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,0,0,4"  />
             <TextBox x:Name="TransContent" x:Uid="TransContent" Grid.Row="1" 
-                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AcceptsReturn="True"
                      TextWrapping="WrapWithOverflow" GotFocus="EventContent_GotFocus" />
         </Grid>
         <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,4,4,4">
@@ -70,8 +70,8 @@
             <CheckBox x:Name="chkOriginalEditable" x:Uid="chkOriginalEditable" Content="Original Editable" ToolTip="Original Editable" Margin="4,0,0,4" VerticalAlignment="Center" Click="btnSpeech_Click"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right" Margin="4">
-            <Button x:Name="btnCancel" x:Uid="btnOK" Content="Cancel" Width="64" Margin="4,0,0,4" Click="btnCancel_Click"/>
-            <Button x:Name="btnOK" x:Uid="btnOK" Content="OK" Width="64" Margin="4,0,0,4" Click="btnOK_Click"/>
+            <Button x:Name="btnCancel" x:Uid="btnOK" Content="Cancel" Width="64" Margin="4,0,0,4" Click="btnCancel_Click" IsDefault="False" IsCancel="True" />
+            <Button x:Name="btnOK" x:Uid="btnOK" Content="OK" Width="64" Margin="4,0,0,4" Click="btnOK_Click" />
         </StackPanel>
     </Grid>
 </Window>

@@ -109,6 +109,9 @@ namespace SubTrans
         private const string SplitCharCount_Key = "SplitCharCount";
         private int SplitCharCount = Properties.Settings.Default.SplitCharCount;
 
+        private const string MergeString_Key = "MergeString";
+        private string MergeString = Properties.Settings.Default.MergeString;
+
         private const string SplitCharSymbols_Key = "SplitCharSymbols";
         private string SplitCharSymbols = string.Join("", new char[] {
             ',', '.', '!', '?', '~',
@@ -567,6 +570,7 @@ namespace SubTrans
                 };
                 if (dlg.ShowDialog() ?? false)
                 {
+                    item.Text = dlg.Event.Text;
                     item.Translated = dlg.Event.Translated;
                 }
             }
@@ -978,6 +982,7 @@ namespace SubTrans
             Enum.TryParse(GetConfigValue(SplitCharMode_Key, SplitCharMode.ToString()), out SplitCharMode);
             int.TryParse(GetConfigValue(SplitCharCount_Key, SplitCharCount), out SplitCharCount);
             SplitCharSymbols = GetConfigValue(SplitCharSymbols_Key, SplitCharSymbols);
+            MergeString = GetConfigValue(MergeString_Key, MergeString);
 
             YoutubeLanguage = GetConfigValue(YoutubeLanguage_Key, YoutubeLanguage);
 
@@ -1129,24 +1134,27 @@ namespace SubTrans
 
         private void MainForm_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e is KeyEventArgs)
+            if (e is KeyEventArgs && e.KeyStates == KeyStates.Toggled)
             {
                 e.Handled = true;
                 if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
                 {
                     if (e.Key == Key.O) InvokeControl(btnLoad);
                     else if (e.Key == Key.S) InvokeControl(cmiSaveAs);
+                    else if (e.Key == Key.M) InvokeControl(btnMerge);
+                    else if (e.Key == Key.R) InvokeControl(btnReplace);
+
                     else if (e.Key == Key.C) InvokeControl(btnCopy);
                     else if (e.Key == Key.V) InvokeControl(btnPaste);
-                    else if (e.Key == Key.F) OpenFindReplaceEditor();
-                    else if (e.Key == Key.R) OpenFindReplaceEditor();
 
-                    //else if (e.Key == Key.N) cmiEvents_Click(cmiEventsAdd, e);
-                    //else if (e.Key == Key.M) cmiEvents_Click(cmiEventsMerge, e);
-                    //else if (e.Key == Key.D) cmiEvents_Click(cmiEventsDel, e);
+                    else if (e.Key == Key.F) OpenFindReplaceEditor();
+                    else if (e.Key == Key.F3) OpenFindReplaceEditor();
+
                     else if (e.Key == Key.Back) cmiEvents_Click(cmiEventsClear, e);
 
                     else if (e.Key == Key.Z) MakeUndo();
+
+                    else if (e.Key == Key.X) InvokeControl(cmiExit);
                 }
 
                 else if (e.Key == Key.OemOpenBrackets) cmiEvents_Click(cmiEventsSplit, e);
@@ -1157,28 +1165,39 @@ namespace SubTrans
                 else if (e.Key == Key.Space) Text2Voice(true);
                 else if (e.Key == Key.OemComma) Text2Voice(false);
                 else if (e.Key == Key.OemPeriod) Text2Voice(true);
-                else if (e.Key == Key.Enter) lvItems_MouseDoubleClick(sender, null);
+                else if (e.Key == Key.Enter) OpenTranslatedEditor();
             }
         }
 
         private void lvItems_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (e is MouseButtonEventArgs) e.Handled = true;
-            OpenTranslatedEditor();
+            if (e is MouseButtonEventArgs)
+            {
+                e.Handled = true;
+                OpenTranslatedEditor();
+            }
         }
 
         private void btnLoad_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog dlgOpen = new OpenFileDialog();
-            dlgOpen.DefaultExt = ".ass";
-            //dlgOpen.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|Text File|*.txt|All File|*.*";
-            dlgOpen.Filter = "All Supported File|*.ass;*.ssa;*.srt;*.vtt;*.lrc|ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|VTT Fils|*.vtt|LRC File|*.lrc";
-            dlgOpen.FilterIndex = 0;
-            dlgOpen.Multiselect = true;
-            if (dlgOpen.ShowDialog() == true)
+            var exist = !string.IsNullOrEmpty(LastFilename) && File.Exists(LastFilename);
+            if (sender == cmiLoadASS || (sender == cmiReloadASS && !exist))
             {
-                //LoadSubtitle(dlgOpen.FileName);
-                LoadSubtitle(dlgOpen.FileNames);
+                OpenFileDialog dlgOpen = new OpenFileDialog();
+                dlgOpen.DefaultExt = ".ass";
+                //dlgOpen.Filter = "ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|Text File|*.txt|All File|*.*";
+                dlgOpen.Filter = "All Supported File|*.ass;*.ssa;*.srt;*.vtt;*.lrc|ASS File|*.ass|SSA File|*.ssa|SRT File|*.srt|VTT Fils|*.vtt|LRC File|*.lrc";
+                dlgOpen.FilterIndex = 0;
+                dlgOpen.Multiselect = true;
+                if (dlgOpen.ShowDialog() == true)
+                {
+                    //LoadSubtitle(dlgOpen.FileName);
+                    LoadSubtitle(dlgOpen.FileNames);
+                }
+            }
+            else if (sender == cmiReloadASS && exist)
+            {
+                LoadSubtitle(LastFilename);
             }
         }
 
@@ -1314,6 +1333,11 @@ namespace SubTrans
                 Close();
         }
 
+        private void cmiFind_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFindReplaceEditor();
+        }
+
         private void cmiFixBracket_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -1402,6 +1426,9 @@ namespace SubTrans
 
             if (items.Count() > 0) MakeBackup();
 
+            //var symbols = SplitCharSymbols.ToList().Distinct().ToArray();
+            var pattern = string.Join("|", SplitCharSymbols.ToList().Distinct().Select(c => $"\\{c}")) + "|\\\\n";
+
             e.Handled = false;
             if (sender == cmiEventsAdd)
             {
@@ -1435,7 +1462,7 @@ namespace SubTrans
                         var first = group.First().Value;
                         var last = group.Last().Value;
                         first.End = last.End;
-                        first.Text = string.Join("\\n", group.Select(evt => evt.Value.Text).Distinct());
+                        first.Text = Regex.Replace(string.Join(MergeString, group.Select(evt => evt.Value.Text).Distinct()), $@"({pattern})+", "$1", RegexOptions.IgnoreCase);
                         foreach (var item in group.Skip(1))
                         {
                             ass.Events.Remove(item.Value);
@@ -1447,7 +1474,6 @@ namespace SubTrans
             }
             else if (sender == cmiEventsSplit)
             {
-                var symbols = SplitCharSymbols.ToList().Distinct().ToArray();
                 var shift = Keyboard.Modifiers == ModifierKeys.Shift;
                 var split_mode = SplitCharMode;
                 var time_fmt = "HH:mm:ss.ff";
@@ -1493,9 +1519,10 @@ namespace SubTrans
                         }
                         done = true;
                     }
-                    else if(split_mode == SplitMode.BySymbol)
+                    else if (split_mode == SplitMode.BySymbol)
                     {
-                        var lines = evt.Text.Split(symbols, StringSplitOptions.RemoveEmptyEntries);
+                        var line  = Regex.Replace(evt.Text, $@"({pattern})", "$1\n", RegexOptions.IgnoreCase);
+                        var lines = line.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).Where(l => !l.Trim().Equals("\\n", StringComparison.CurrentCultureIgnoreCase)).ToList();
                         var total = lines.Count();
                         if (total > 1)
                         {
@@ -1508,7 +1535,7 @@ namespace SubTrans
                                 var start = evt.StartTime;
                                 var evt_new  = evt.Clone();
 
-                                evt_new.Text = lines[i];
+                                evt_new.Text = Regex.Replace(lines[i], @"\\n$", "", RegexOptions.IgnoreCase);
                                 evt_new.Translated = evt.Translated;
                                 evt_new.Start = (start + TimeSpan.FromMilliseconds(i * times_ms)).ToString(time_fmt);
                                 evt_new.End = (start + TimeSpan.FromMilliseconds((i + 1) * times_ms - 10)).ToString(time_fmt);
@@ -1549,5 +1576,6 @@ namespace SubTrans
                 if (_last_find_replace_option_.ReplaceResult is List<bool>) _last_find_replace_option_.ReplaceResult.Clear();
             }
         }
+
     }
 }

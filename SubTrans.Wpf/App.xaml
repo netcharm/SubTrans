@@ -7,10 +7,10 @@
     <Application.Resources>
         <ResourceDictionary>
             <FontFamily x:Key="MonoSpaceFamily">
-                "Sarasa Mono J, 等距更纱黑体 SC, FontAwesome, Iosevka, Consolas, Segoe UI Emoji, Segoe MDL2 Assets, 更纱黑体 SC, Segoe UI, Monospace"
+                "LXGW WenKai Mono, 霞鹭文楷等宽, Sarasa Mono J, 等距更纱黑体 SC, Noto Sans CJK Mono SC, FontAwesome, Iosevka, Consolas, Segoe UI Emoji, Segoe MDL2 Assets, 更纱黑体 SC, Segoe UI, Monospace"
             </FontFamily>
             <FontFamily x:Key="NormalFamily">
-                "Sarasa Gothic J, 更纱黑体 SC, FontAwesome, Segoe UI Emoji, Segoe MDL2 Assets, Segoe UI"
+                "LXGW WenKai Screen, 霞鹭文楷 屏幕阅读版, LXGW WenKai, 霞鹭文楷, Sarasa Gothic J, 更纱黑体 SC, Noto Sans CJK SC, FontAwesome, Segoe UI Emoji, Segoe MDL2 Assets, Segoe UI"
             </FontFamily>
             <FontFamily x:Key="SegoeIconFamily">
                 "Segoe MDL2 Assets, Segoe UI Emoji, Segoe UI"

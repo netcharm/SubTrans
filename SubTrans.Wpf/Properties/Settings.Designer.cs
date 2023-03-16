@@ -25,28 +25,19 @@ namespace SubTrans.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool PasteRemoveNullLine {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string FormatOfStyle {
             get {
-                return ((bool)(this["PasteRemoveNullLine"]));
+                return ((string)(this["FormatOfStyle"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool SaveWithBOM {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string FormatOfEvent {
             get {
-                return ((bool)(this["SaveWithBOM"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("CHS")]
-        public string YoutubeLanguage {
-            get {
-                return ((string)(this["YoutubeLanguage"]));
+                return ((string)(this["FormatOfEvent"]));
             }
         }
         
@@ -92,24 +83,6 @@ namespace SubTrans.Properties {
         public string ENG_Font {
             get {
                 return ((string)(this["ENG_Font"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string FormatOfStyle {
-            get {
-                return ((string)(this["FormatOfStyle"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string FormatOfEvent {
-            get {
-                return ((string)(this["FormatOfEvent"]));
             }
         }
         
@@ -295,10 +268,28 @@ namespace SubTrans.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("16")]
-        public int SplitCharCount {
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool PasteRemoveNullLine {
             get {
-                return ((int)(this["SplitCharCount"]));
+                return ((bool)(this["PasteRemoveNullLine"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SaveWithBOM {
+            get {
+                return ((bool)(this["SaveWithBOM"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("CHS")]
+        public string YoutubeLanguage {
+            get {
+                return ((string)(this["YoutubeLanguage"]));
             }
         }
         
@@ -313,10 +304,28 @@ namespace SubTrans.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\n")]
+        public string MergeString {
+            get {
+                return ((string)(this["MergeString"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string SplitCharMode {
             get {
                 return ((string)(this["SplitCharMode"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("16")]
+        public int SplitCharCount {
+            get {
+                return ((int)(this["SplitCharCount"]));
             }
         }
         

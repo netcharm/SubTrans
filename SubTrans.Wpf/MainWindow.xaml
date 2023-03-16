@@ -40,17 +40,19 @@
         </Grid.Resources>
         <Grid.ContextMenu>
             <ContextMenu HasDropShadow="True" FontFamily="{DynamicResource MonoSpaceFamily}" FontSize="{DynamicResource MonoSpaceSize}">
-                <MenuItem x:Name="cmiLoadASS" Header="Load ASS" Click="btnLoad_Click" InputGestureText="Ctrl+L"/>
+                <MenuItem x:Name="cmiLoadASS" Header="Load ASS" Click="btnLoad_Click" InputGestureText="Ctrl+O"/>
+                <MenuItem x:Name="cmiReloadASS" Header="Reload ASS" Click="btnLoad_Click" InputGestureText="Ctrl+Shift+O"/>
                 <Separator/>
                 <MenuItem x:Name="cmiPasteYoutube" Header="Paste Youtube Subtitles" Click="btnPasteYoutube_Click" />
                 <Separator/>
-                <MenuItem x:Name="cmiCopy" Header="Copy Selected Text To Clipboard" Click="btnCopy_Click" />
-                <MenuItem x:Name="cmiPaste" Header="Paste Translated From Clipboard" Click="btnPaste_Click" />
+                <MenuItem x:Name="cmiCopy" Header="Copy Selected Text To Clipboard" Click="btnCopy_Click" InputGestureText="Ctrl+C"/>
+                <MenuItem x:Name="cmiPaste" Header="Paste Translated From Clipboard" Click="btnPaste_Click" InputGestureText="Ctrl+V"/>
+                <MenuItem x:Name="cmiFind" Header="Find/Replace Text" Click="cmiFind_Click" InputGestureText="Ctrl+F/F3" />
                 <MenuItem x:Name="cmiFixed" Header="Fix Translated Text Bracketing" Click="cmiFixBracket_Click" />
                 <Separator/>
-                <MenuItem x:Name="cmiSaveAs" Header="Save As..." Click="cmiSaveAs_Click" />
-                <MenuItem x:Name="cmiMerge"  Header="Merge Translated As..." Click="btnMerge_Click" />
-                <MenuItem x:Name="cmiReplace" Header="Replace Translated As..." Click="btnReplace_Click" />
+                <MenuItem x:Name="cmiSaveAs" Header="Save As..." Click="cmiSaveAs_Click" InputGestureText="Ctrl+S"/>
+                <MenuItem x:Name="cmiMerge"  Header="Merge Translated As..." Click="btnMerge_Click" InputGestureText="Ctrl+M"/>
+                <MenuItem x:Name="cmiReplace" Header="Replace Translated As..." Click="btnReplace_Click" InputGestureText="Ctrl+R"/>
                 <Separator/>
                 <MenuItem x:Name="cmiSetStyle" Header="Set Style To" >
                     <MenuItem x:Name="cmiSetStyleDefault" Header="Default" IsChecked="False" Click="cmiSetStyle_Click" />
@@ -83,7 +85,7 @@
                 <MenuItem x:Name="cmiReloadPhraseTable" Header="Reload Phrase Table" Click="cmiPhraseOprate_Click"  />
                 <Separator/>
                 <MenuItem x:Name="cmiReload" Header="Reload Config" Click="cmiExit_Click" />
-                <MenuItem x:Name="cmiExit" Header="Exit" Click="cmiExit_Click" />
+                <MenuItem x:Name="cmiExit" Header="Exit" Click="cmiExit_Click" InputGestureText="Ctrl+X" />
             </ContextMenu>
         </Grid.ContextMenu>
         <Grid.RowDefinitions>
