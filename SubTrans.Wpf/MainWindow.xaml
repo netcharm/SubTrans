@@ -68,6 +68,7 @@
                     <MenuItem x:Name="cmiEventsDel" Header="Remove" Click="cmiEvents_Click" InputGestureText="Delete" />
                     <MenuItem x:Name="cmiEventsSplit" Header="Split" Click="cmiEvents_Click" InputGestureText="[" />
                     <MenuItem x:Name="cmiEventsMerge" Header="Merge" Click="cmiEvents_Click" InputGestureText="]" />
+                    <MenuItem x:Name="cmiEventsTrim" Header="Trim" Click="cmiEvents_Click" InputGestureText="\" />
                     <Separator/>
                     <MenuItem x:Name="cmiEventsClear" Header="Clear Translate" Click="cmiEvents_Click" InputGestureText="Ctrl+Backspace" />
                 </MenuItem>
@@ -84,6 +85,7 @@
                 <MenuItem x:Name="cmiEditPhraseTable" Header="Edit Phrase Table" Click="cmiPhraseOprate_Click" />
                 <MenuItem x:Name="cmiReloadPhraseTable" Header="Reload Phrase Table" Click="cmiPhraseOprate_Click"  />
                 <Separator/>
+                <MenuItem x:Name="cmiClearRecent" Header="Clear Recent List" Click="cmiExit_Click" />
                 <MenuItem x:Name="cmiReload" Header="Reload Config" Click="cmiExit_Click" />
                 <MenuItem x:Name="cmiExit" Header="Exit" Click="cmiExit_Click" InputGestureText="Ctrl+X" />
             </ContextMenu>

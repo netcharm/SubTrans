@@ -120,6 +120,19 @@ namespace SubTrans
             '❤', '♩', '♪', '♫', '♬', '✨'
         });
 
+        //var symbols = SplitCharSymbols.ToList().Distinct().ToArray();
+        private string _splitpattern_ = string.Empty;
+        private string SplitPattern
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_splitpattern_))
+                    _splitpattern_ = string.Join("|", SplitCharSymbols.ToList().Distinct().Select(c => c <= 256 ? $"\\{c}" : $"{c}")) + "|\\\\n";
+                return (_splitpattern_);
+            }
+        }
+
+
         private const string OriginalEdiable_Key = "OriginalEdiable";
         private bool OriginalEdiable = Properties.Settings.Default.OriginalEditable;
 
@@ -548,6 +561,35 @@ namespace SubTrans
                 Keyboard.ClearFocus();
             }
         }
+        
+        private void ClearJumpList()
+        {
+            try
+            {                         
+                var jumplist = System.Windows.Shell.JumpList.GetJumpList(Application.Current);
+                if (jumplist == null)
+                {
+                    var jumptask = new System.Windows.Shell.JumpTask()
+                    {
+                        ApplicationPath = "NotePad3.exe",
+                        Title = "Open With NotePad3",
+                        Description = "Using NotePad3 Open Current Subtitle",
+                        WorkingDirectory = AppPath
+                    };
+                    var jumplist_app = new System.Windows.Shell.JumpList();
+                    jumplist_app.JumpItems.Add(jumptask);
+                    System.Windows.Shell.JumpList.SetJumpList(Application.Current, jumplist_app);
+                    jumplist = System.Windows.Shell.JumpList.GetJumpList(Application.Current);
+                }
+                jumplist = System.Windows.Shell.JumpList.GetJumpList(Application.Current);
+                if (jumplist != null)
+                {
+                    if (jumplist.JumpItems != null) jumplist.JumpItems.Clear();
+                    jumplist.Apply();
+                }
+            }
+            catch(Exception ex) { MessageBox.Show($"{ex.Message}"); }
+        }
         #endregion
 
         #region Edit/Find/Replace/Speech Helper
@@ -862,7 +904,7 @@ namespace SubTrans
         }
 
         private ASS _ass_ = new ASS();
-        private List<ASS.EVENT> _events_ = new List<ASS.EVENT>();
+        //private List<ASS.EVENT> _events_ = new List<ASS.EVENT>();
         private void MakeBackup(ASS sub = null)
         {
             try
@@ -886,9 +928,26 @@ namespace SubTrans
                     {
                         events.Add(ass.Events[i]);
                     }
+                    ReNumberID();
                 }
             }
             catch(Exception ex) { MessageBox.Show(ex.Message); }
+        }
+
+        private void ReNumberID()
+        {
+            try
+            {
+                if (ass is ASS && events is ObservableCollection<ASS.EVENT>)
+                {
+                    for (var i = 0; i < ass.Events.Count; i++)
+                    {
+                        events[i].ID = $"{i + 1}";
+                        ass.Events[i].ID = $"{i + 1}";
+                    };
+                }
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
         #endregion
 
@@ -1043,6 +1102,8 @@ namespace SubTrans
             lvItems.ItemsSource = events;
             OriginalTitle = Title;
 
+            cmiClearRecent.Visibility = Visibility.Collapsed;
+
             InitDefaultStyle();
 
             LoadConfig();
@@ -1134,7 +1195,7 @@ namespace SubTrans
 
         private void MainForm_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e is KeyEventArgs && e.KeyStates == KeyStates.Toggled)
+            if (e is KeyEventArgs && e.KeyStates != KeyStates.Down)
             {
                 e.Handled = true;
                 if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
@@ -1161,11 +1222,14 @@ namespace SubTrans
                 else if (e.Key == Key.OemCloseBrackets) cmiEvents_Click(cmiEventsMerge, e);
                 else if (e.Key == Key.Insert) cmiEvents_Click(cmiEventsAdd, e);
                 else if (e.Key == Key.Delete) cmiEvents_Click(cmiEventsDel, e);
+                else if (e.Key == Key.OemPipe) cmiEvents_Click(cmiEventsTrim, e);
 
                 else if (e.Key == Key.Space) Text2Voice(true);
                 else if (e.Key == Key.OemComma) Text2Voice(false);
                 else if (e.Key == Key.OemPeriod) Text2Voice(true);
                 else if (e.Key == Key.Enter) OpenTranslatedEditor();
+
+                lvItems.Focus();
             }
         }
 
@@ -1327,7 +1391,9 @@ namespace SubTrans
 
         private void cmiExit_Click(object sender, RoutedEventArgs e)
         {
-            if (sender == cmiReload)
+            if (sender == cmiClearRecent)
+                ClearJumpList();
+            else if (sender == cmiReload)
                 LoadConfig(reload: true);
             else if (sender == cmiExit)
                 Close();
@@ -1420,112 +1486,99 @@ namespace SubTrans
             if (lvItems.Items.Count <= 0) return;
             if (lvItems.SelectedItems.Count <= 0) return;
 
-            var items = new object[lvItems.SelectedItems.Count];
-            lvItems.SelectedItems.CopyTo(items, 0);
-            items = items.OrderBy(i => lvItems.Items.IndexOf(i)).ToArray();
-
-            if (items.Count() > 0) MakeBackup();
-
-            //var symbols = SplitCharSymbols.ToList().Distinct().ToArray();
-            var pattern = string.Join("|", SplitCharSymbols.ToList().Distinct().Select(c => $"\\{c}")) + "|\\\\n";
-
-            e.Handled = false;
-            if (sender == cmiEventsAdd)
+            try
             {
-                //e.Handled = true;
-            }
-            else if (sender == cmiEventsDel)
-            {
-                foreach (var item in items) { ass.Events.Remove(item as ASS.EVENT); events.Remove(item as ASS.EVENT); }
-                e.Handled = true;
-            }
-            else if (sender == cmiEventsMerge)
-            {
-                var kvs = items.Select(i => new KeyValuePair<int, ASS.EVENT>(lvItems.Items.IndexOf(i), i as ASS.EVENT));
-                var last_idx = -1;
-                var groups = new List<List<KeyValuePair<int, ASS.EVENT>>>();
-                //if (groups.Count == 0) groups.Add(new List<KeyValuePair<int, ASS.EVENT>>());
+                var items = new object[lvItems.SelectedItems.Count];
+                lvItems.SelectedItems.CopyTo(items, 0);
+                items = items.OrderBy(i => lvItems.Items.IndexOf(i)).ToArray();
 
-                foreach (var kv in kvs)
+                if (items.Count() > 0) MakeBackup();
+
+                e.Handled = false;
+                if (sender == cmiEventsAdd)
                 {
-                    var k = kv.Key;
-                    var v = kv.Value;
-
-                    if (last_idx < 0 || k - last_idx > 1) groups.Add(new List<KeyValuePair<int, ASS.EVENT>>());
-                    groups.Last().Add(kv);
-                    last_idx = k;
+                    //e.Handled = true;
                 }
-                foreach (var group in groups)
+                else if (sender == cmiEventsDel)
                 {
-                    if (group.Count > 1)
+                    foreach (var item in items) { ass.Events.Remove(item as ASS.EVENT); events.Remove(item as ASS.EVENT); }
+                    e.Handled = true;
+                }
+                else if (sender == cmiEventsTrim)
+                {
+                    foreach (var item in items) { var ev = (item as ASS.EVENT); ev.Text = ev.Text.Trim(); ev.Translated = ev.Translated.Trim(); }
+                    e.Handled = true;
+                }
+                else if (sender == cmiEventsMerge)
+                {
+                    var kvs = items.Select(i => new KeyValuePair<int, ASS.EVENT>(lvItems.Items.IndexOf(i), i as ASS.EVENT));
+                    var last_idx = -1;
+                    var groups = new List<List<KeyValuePair<int, ASS.EVENT>>>();
+                    //if (groups.Count == 0) groups.Add(new List<KeyValuePair<int, ASS.EVENT>>());
+
+                    foreach (var kv in kvs)
                     {
-                        var first = group.First().Value;
-                        var last = group.Last().Value;
-                        first.End = last.End;
-                        first.Text = Regex.Replace(string.Join(MergeString, group.Select(evt => evt.Value.Text).Distinct()), $@"({pattern})+", "$1", RegexOptions.IgnoreCase);
-                        foreach (var item in group.Skip(1))
+                        var k = kv.Key;
+                        var v = kv.Value;
+
+                        if (last_idx < 0 || k - last_idx > 1) groups.Add(new List<KeyValuePair<int, ASS.EVENT>>());
+                        groups.Last().Add(kv);
+                        last_idx = k;
+                    }
+                    foreach (var group in groups)
+                    {
+                        if (group.Count > 1)
                         {
-                            ass.Events.Remove(item.Value);
-                            events.Remove(item.Value);
+                            var first = group.First().Value;
+                            var last = group.Last().Value;
+                            first.End = last.End;
+#if DEBUG
+                        //first.Text = string.Join(MergeString, group.Select(evt => evt.Value.Text.Trim()).Distinct());
+                        var tt = string.Join(MergeString, group.Select(evt => evt.Value.Text.Trim()).Distinct());
+#endif
+                            first.Text = Regex.Replace(string.Join(MergeString, group.Select(evt => evt.Value.Text.Trim()).Distinct()),
+                                                        $@"({SplitPattern}|{MergeString})+",
+                                                        m => m.Value.FirstOrDefault().ToString(),
+                                                        RegexOptions.IgnoreCase);
+                            foreach (var item in group.Skip(1))
+                            {
+                                ass.Events.Remove(item.Value);
+                                events.Remove(item.Value);
+                            }
                         }
                     }
-                }                
-                e.Handled = true;
-            }
-            else if (sender == cmiEventsSplit)
-            {
-                var shift = Keyboard.Modifiers == ModifierKeys.Shift;
-                var split_mode = SplitCharMode;
-                var time_fmt = "HH:mm:ss.ff";
-
-                switch (SplitCharMode)
-                {
-                    case SplitMode.ByCount:
-                        split_mode = shift ? SplitMode.BySymbol : SplitMode.ByCount;
-                        break;
-                    case SplitMode.BySymbol:
-                        split_mode = shift ? SplitMode.ByCount : SplitMode.BySymbol;
-                        break;
+                    e.Handled = true;
                 }
-
-                foreach (var item in items.Reverse())
+                else if (sender == cmiEventsSplit)
                 {
-                    var done = false;
-                    var evt = item as ASS.EVENT;
-                    var idx = Convert.ToInt32(evt.ID) - 1;
+                    var shift = Keyboard.Modifiers == ModifierKeys.Shift;
+                    var split_mode = SplitCharMode;
+                    var time_fmt = "HH:mm:ss.ff";
 
-                    var evts = new List<ASS.EVENT>();
-
-                    if (split_mode == SplitMode.ByCount)
+                    switch (SplitCharMode)
                     {
-                        var length = evt.Text.Length;
-                        if (length <= SplitCharCount) continue;
-                        var total = length % SplitCharCount == 0 ? evt.Text.Length / SplitCharCount : evt.Text.Length / SplitCharCount + 1;
-                        if (total <= 1) continue;
-                        var times = evt.EndTime - evt.StartTime;
-                        if (times.TotalMilliseconds <= 0) continue;
-                        var times_ms = times.TotalMilliseconds / total;
-
-                        for (var i = 0; i < total; i++)
-                        {
-                            var start = evt.StartTime;
-                            var evt_new  = evt.Clone();
-
-                            evt_new.Text = evt.Text.Substring(i * SplitCharCount, Math.Min(length - i * SplitCharCount, SplitCharCount));
-                            evt_new.Translated = evt.Translated;
-                            evt_new.Start = (start + TimeSpan.FromMilliseconds(i * times_ms)).ToString(time_fmt);
-                            evt_new.End = (start + TimeSpan.FromMilliseconds((i + 1) * times_ms - 10)).ToString(time_fmt);
-                            evts.Add(evt_new);
-                        }
-                        done = true;
+                        case SplitMode.ByCount:
+                            split_mode = shift ? SplitMode.BySymbol : SplitMode.ByCount;
+                            break;
+                        case SplitMode.BySymbol:
+                            split_mode = shift ? SplitMode.ByCount : SplitMode.BySymbol;
+                            break;
                     }
-                    else if (split_mode == SplitMode.BySymbol)
+
+                    foreach (var item in items.Reverse())
                     {
-                        var line  = Regex.Replace(evt.Text, $@"({pattern})", "$1\n", RegexOptions.IgnoreCase);
-                        var lines = line.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).Where(l => !l.Trim().Equals("\\n", StringComparison.CurrentCultureIgnoreCase)).ToList();
-                        var total = lines.Count();
-                        if (total > 1)
+                        var done = false;
+                        var evt = item as ASS.EVENT;
+                        var idx = Convert.ToInt32(evt.ID) - 1;
+
+                        var evts = new List<ASS.EVENT>();
+
+                        if (split_mode == SplitMode.ByCount)
                         {
+                            var length = evt.Text.Length;
+                            if (length <= SplitCharCount) continue;
+                            var total = length % SplitCharCount == 0 ? evt.Text.Length / SplitCharCount : evt.Text.Length / SplitCharCount + 1;
+                            if (total <= 1) continue;
                             var times = evt.EndTime - evt.StartTime;
                             if (times.TotalMilliseconds <= 0) continue;
                             var times_ms = times.TotalMilliseconds / total;
@@ -1535,46 +1588,74 @@ namespace SubTrans
                                 var start = evt.StartTime;
                                 var evt_new  = evt.Clone();
 
-                                evt_new.Text = Regex.Replace(lines[i], @"\\n$", "", RegexOptions.IgnoreCase);
-                                evt_new.Translated = evt.Translated;
+                                evt_new.Text = evt.Text.Substring(i * SplitCharCount, Math.Min(length - i * SplitCharCount, SplitCharCount)).Trim();
+                                evt_new.Translated = evt.Translated.Trim();
                                 evt_new.Start = (start + TimeSpan.FromMilliseconds(i * times_ms)).ToString(time_fmt);
                                 evt_new.End = (start + TimeSpan.FromMilliseconds((i + 1) * times_ms - 10)).ToString(time_fmt);
                                 evts.Add(evt_new);
                             }
                             done = true;
                         }
-                    }
+                        else if (split_mode == SplitMode.BySymbol)
+                        {
+                            var line  = Regex.Replace(evt.Text, $@"({SplitPattern})", "$1\n", RegexOptions.IgnoreCase);
+                            var lines = line.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).Where(l => !l.Trim().Equals("\\n", StringComparison.CurrentCultureIgnoreCase)).ToList();
+                            var total = lines.Count();
+                            if (total > 1)
+                            {
+                                var times = evt.EndTime - evt.StartTime;
+                                if (times.TotalMilliseconds <= 0) continue;
+                                var times_ms = times.TotalMilliseconds / total;
 
-                    if (done)
-                    {
-                        ass.Events.InsertRange(idx, evts);
-                        ass.Events.Remove(evt);
-                        evts.Reverse();
-                        foreach (var ev in evts) events.Insert(idx, ev);
-                        events.Remove(evt);
+                                for (var i = 0; i < total; i++)
+                                {
+                                    var start = evt.StartTime;
+                                    var evt_new  = evt.Clone();
+
+                                    evt_new.Text = Regex.Replace(lines[i], @"\\n$", "", RegexOptions.IgnoreCase).Trim();
+                                    evt_new.Translated = evt.Translated.Trim();
+                                    evt_new.Start = (start + TimeSpan.FromMilliseconds(i * times_ms)).ToString(time_fmt);
+                                    evt_new.End = (start + TimeSpan.FromMilliseconds((i + 1) * times_ms - 10)).ToString(time_fmt);
+                                    evts.Add(evt_new);
+                                }
+                                done = true;
+                            }
+                        }
+
+                        if (done)
+                        {
+                            ass.Events.InsertRange(idx, evts);
+                            ass.Events.Remove(evt);
+                            evts.Reverse();
+                            foreach (var ev in evts) events.Insert(idx, ev);
+                            events.Remove(evt);
+                        }
                     }
+                    e.Handled = true;
                 }
-                e.Handled = true;
-            }
-            else if (sender == cmiEventsClear)
-            {
-                foreach (var item in items)
+                else if (sender == cmiEventsClear)
                 {
-                    var evt = item as ASS.EVENT;
-                    var idx = Convert.ToInt32(evt.ID) - 1;
-                    if (idx < 0 || idx >= ass.Events.Count) break;
+                    foreach (var item in items)
+                    {
+                        var evt = item as ASS.EVENT;
+                        var idx = Convert.ToInt32(evt.ID) - 1;
+                        if (idx < 0 || idx >= ass.Events.Count) break;
 
-                    evt.Translated = string.Empty;
-                    ass.Events[idx].Translated = string.Empty;
+                        evt.Translated = string.Empty;
+                        ass.Events[idx].Translated = string.Empty;
+                    }
+                    e.Handled = true;
                 }
-                e.Handled = true;
+                if (e.Handled) { ReNumberID(); }
+                if (e.Handled && _last_find_replace_option_ is FindReplaceOptions)
+                {
+                    _last_find_replace_option_.FindResult = 0;
+                    if (_last_find_replace_option_.ReplaceResult is List<bool>) _last_find_replace_option_.ReplaceResult.Clear();
+
+                    lvItems.Focus();
+                }
             }
-            if (e.Handled) { for (var i = 0; i < ass.Events.Count; i++) { events[i].ID = $"{i + 1}"; ass.Events[i].ID = $"{i + 1}"; }; }
-            if (e.Handled && _last_find_replace_option_ is FindReplaceOptions)
-            {
-                _last_find_replace_option_.FindResult = 0;
-                if (_last_find_replace_option_.ReplaceResult is List<bool>) _last_find_replace_option_.ReplaceResult.Clear();
-            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
     }

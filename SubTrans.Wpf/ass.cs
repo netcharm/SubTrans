@@ -845,6 +845,19 @@ namespace SubTrans
                 }
             }
 
+            public STYLE Clone()
+            {
+                var result = new STYLE();
+
+                result.FormatRaw = FormatRaw;
+                result.Formats = Formats;
+
+                foreach (var field in Fields)
+                    result.Field(field.Key, Field(field.Key));
+
+                return (result);
+            }
+
             public void ParseFormats(string text)
             {
                 if (text.StartsWith("Format", StringComparison.CurrentCultureIgnoreCase))
@@ -1710,8 +1723,8 @@ namespace SubTrans
                 event_format = event_format,
                 event_fields = event_fields,
 
-                events = events.ToList(),
-                styles = styles.ToList(),
+                events = events.Select(e => e.Clone()).ToList(),
+                styles = styles.Select(s => s.Clone()).ToList(),
             };
             return (result);
         }
